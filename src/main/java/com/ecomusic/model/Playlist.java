@@ -8,7 +8,15 @@ public class Playlist {
     private String name;
     private Date createdAt;
 
-    // Getters & Setters
+    
+    public Playlist(int playlistId, int userId, String name, Date createdAt) {
+		super();
+		this.playlistId = playlistId;
+		this.userId = userId;
+		this.name = name;
+		this.createdAt = createdAt;
+	}
+	// Getters & Setters
     public int getPlaylistId() { return playlistId; }
     public void setPlaylistId(int playlistId) { this.playlistId = playlistId; }
 

@@ -7,15 +7,13 @@ public class DBConnection {
     private static final String USER = "ecomusic";
     private static final String PASSWORD = "ecomusic";
 
-    static {
+    public static Connection getConnection() {
         try {
             Class.forName("oracle.jdbc.driver.OracleDriver");
-        } catch (ClassNotFoundException e) {
+            return DriverManager.getConnection(URL, USER, PASSWORD);
+        } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
+            return null; 
         }
-    }
-
-    public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(URL, USER, PASSWORD);
     }
 }

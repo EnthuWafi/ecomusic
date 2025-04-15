@@ -7,7 +7,14 @@ public class PlaylistMusic {
     private int musicId;
     private Date addedAt;
 
-    // Getters & Setters
+    
+    public PlaylistMusic(int playlistId, int musicId, Date addedAt) {
+		super();
+		this.playlistId = playlistId;
+		this.musicId = musicId;
+		this.addedAt = addedAt;
+	}
+	// Getters & Setters
     public int getPlaylistId() { return playlistId; }
     public void setPlaylistId(int playlistId) { this.playlistId = playlistId; }
 

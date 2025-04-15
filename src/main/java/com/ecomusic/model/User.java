@@ -10,7 +10,20 @@ public class User {
     private String userType;
     private Date createdAt;
 
-    // Getters & Setters
+    
+    public User() {
+	}
+    
+	public User(int userId, String name, String email, String password, String userType, Date createdAt) {
+		super();
+		this.userId = userId;
+		this.name = name;
+		this.email = email;
+		this.password = password;
+		this.userType = userType;
+		this.createdAt = createdAt;
+	}
+	// Getters & Setters
     public int getUserId() { return userId; }
     public void setUserId(int userId) { this.userId = userId; }
 

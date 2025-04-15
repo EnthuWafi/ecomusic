@@ -3,14 +3,28 @@ package com.ecomusic.model;
 import java.util.Date;
 
 public class Music {
-    private int musicId;
+    
+	private int musicId;
     private int artistId;
     private String title;
     private String genre;
     private String description;
     private Date uploadDate;
     private String audioFileUrl;
-
+    
+    public Music(int musicId, int artistId, String title, String genre, String description, Date uploadDate,
+			String audioFileUrl) {
+		super();
+		this.musicId = musicId;
+		this.artistId = artistId;
+		this.title = title;
+		this.genre = genre;
+		this.description = description;
+		this.uploadDate = uploadDate;
+		this.audioFileUrl = audioFileUrl;
+	}
+    
+    
     // Getters & Setters
     public int getMusicId() { return musicId; }
     public void setMusicId(int musicId) { this.musicId = musicId; }

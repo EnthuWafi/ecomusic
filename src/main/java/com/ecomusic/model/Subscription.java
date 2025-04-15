@@ -11,7 +11,19 @@ public class Subscription {
     private String paymentStatus;
     private String paymentGatewayRef;
 
-    // Getters & Setters
+    
+    public Subscription(int subscriptionId, int userId, Date startDate, Date endDate, double amountPaid,
+			String paymentStatus, String paymentGatewayRef) {
+		super();
+		this.subscriptionId = subscriptionId;
+		this.userId = userId;
+		this.startDate = startDate;
+		this.endDate = endDate;
+		this.amountPaid = amountPaid;
+		this.paymentStatus = paymentStatus;
+		this.paymentGatewayRef = paymentGatewayRef;
+	}
+	// Getters & Setters
     public int getSubscriptionId() { return subscriptionId; }
     public void setSubscriptionId(int subscriptionId) { this.subscriptionId = subscriptionId; }
 
