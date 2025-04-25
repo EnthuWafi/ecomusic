@@ -17,7 +17,7 @@ public class UserServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        userDAO = new UserDAO(); // make sure this DAO works first
+        userDAO = new UserDAO();
     }
 
     // GET: fetch list or user by id
