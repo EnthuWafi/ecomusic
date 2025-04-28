@@ -1,4 +1,4 @@
-package com.ecomusic.model;
+package com.enth.ecomusic.model;
 
 import java.util.Date;
 
@@ -12,6 +12,7 @@ public class User {
 
     
     public User() {
+    	super();
 	}
     
 	public User(int userId, String name, String email, String password, String userType, Date createdAt) {
@@ -23,6 +24,16 @@ public class User {
 		this.userType = userType;
 		this.createdAt = createdAt;
 	}
+	
+	
+	public User(String name, String email, String password, String userType) {
+		super();
+		this.name = name;
+		this.email = email;
+		this.password = password;
+		this.userType = userType;
+	}
+
 	// Getters & Setters
     public int getUserId() { return userId; }
     public void setUserId(int userId) { this.userId = userId; }

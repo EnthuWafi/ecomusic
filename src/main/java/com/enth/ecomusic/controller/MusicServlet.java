@@ -1,4 +1,4 @@
-package com.ecomusic.controller;
+package com.enth.ecomusic.controller;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import com.ecomusic.model.Music;
-import com.ecomusic.model.dao.MusicDAO;
+import com.enth.ecomusic.model.Music;
+import com.enth.ecomusic.model.dao.MusicDAO;
 
 @WebServlet("/music")
 public class MusicServlet extends HttpServlet {

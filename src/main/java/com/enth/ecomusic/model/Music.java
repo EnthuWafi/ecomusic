@@ -1,4 +1,4 @@
-package com.ecomusic.model;
+package com.enth.ecomusic.model;
 
 import java.util.Date;
 

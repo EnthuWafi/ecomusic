@@ -1,6 +1,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
 <h2>All Music</h2>
-<a href="${pageContext.request.contextPath}/music?action=add">Add
+<a class="button" href="${pageContext.request.contextPath}/music/add">Add
 	New Music</a>
 
 <table border="1">
@@ -9,6 +11,7 @@
 		<th>Genre</th>
 		<th>Description</th>
 		<th>Audio URL</th>
+		<th>Upload Date</th>
 		<th>Premium Content</th>
 	</tr>
 
@@ -18,6 +21,7 @@
 			<td>${music.genre}</td>
 			<td>${music.description}</td>
 			<td>${music.audioFileUrl}</td>
+			<td><fmt:formatDate value="${music.uploadDate}" pattern="yyyy-MM-dd" /></td>
 			<td>${music.premiumContent ? 'Yes' : 'No'}</td>
 		</tr>
 	</c:forEach>

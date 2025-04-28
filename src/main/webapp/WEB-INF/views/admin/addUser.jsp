@@ -1,4 +1,4 @@
-
+<h2>Fill in the form</h2>
 <form action="user" method="post">
   Name: <input type="text" name="name"><br>
   Email: <input type="email" name="email"><br>

@@ -1,10 +1,10 @@
-package com.ecomusic.model.dao;
+package com.enth.ecomusic.model.dao;
 
 import java.sql.*;
 import java.util.*;
 
-import com.ecomusic.model.User;
-import com.ecomusic.util.DBConnection;
+import com.enth.ecomusic.model.User;
+import com.enth.ecomusic.util.DBConnection;
 
 public class UserDAO {
 

@@ -1,4 +1,4 @@
-package com.ecomusic.util;
+package com.enth.ecomusic.util;
 
 import java.sql.*;
 
