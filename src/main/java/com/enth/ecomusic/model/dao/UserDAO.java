@@ -60,6 +60,23 @@ public class UserDAO {
 		}
 		return users;
 	}
+	
+	// READ (get by user name)
+		public User getUserByUsernameOrEmail(String username) {
+			String sql = "SELECT * FROM Users WHERE email = ?";
+			try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+				stmt.setString(1, username);
+				//stmt.setString(2, username);
+				ResultSet rs = stmt.executeQuery();
+				if (rs.next()) {
+					return new User(rs.getInt("user_id"), rs.getString("name"), rs.getString("email"),
+							rs.getString("password"), rs.getString("user_type"), rs.getDate("created_at"));
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
 
 	// UPDATE
 	public boolean updateUser(User user) {

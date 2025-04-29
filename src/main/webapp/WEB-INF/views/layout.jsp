@@ -13,8 +13,9 @@
         <h1>${applicationScope.websiteName}</h1>
         <nav>
             <a href="${pageContext.request.contextPath}/">Home</a> |
-            <a href="${pageContext.request.contextPath}/music">Music</a> |
-            <a href="${pageContext.request.contextPath}/user">User</a>
+            <a href="${pageContext.request.contextPath}/music">Music Library</a> |
+            <a href="${pageContext.request.contextPath}/login">Login</a> 
+            <a href="${pageContext.request.contextPath}/register">Register</a> 
         </nav>
     </header>
 

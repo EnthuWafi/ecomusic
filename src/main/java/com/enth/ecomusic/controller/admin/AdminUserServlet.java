@@ -1,4 +1,4 @@
-package com.enth.ecomusic.controller;
+package com.enth.ecomusic.controller.admin;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -12,8 +12,8 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import jakarta.servlet.ServletException;
 
-@WebServlet("/user/*")
-public class UserServlet extends HttpServlet {
+@WebServlet("/admin/user/*")
+public class AdminUserServlet extends HttpServlet {
 	private UserDAO userDAO;
 
 	@Override
@@ -76,4 +76,6 @@ public class UserServlet extends HttpServlet {
 			out.println("Failed to add user.");
 		}
 	}
+	
+
 }

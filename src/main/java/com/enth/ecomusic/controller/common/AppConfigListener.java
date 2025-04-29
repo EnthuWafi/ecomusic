@@ -1,4 +1,4 @@
-package com.enth.ecomusic.controller;
+package com.enth.ecomusic.controller.common;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
