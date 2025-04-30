@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.enth.ecomusic.model.User;
 import com.enth.ecomusic.model.dao.UserDAO;
-import com.enth.ecomusic.util.Helper;
+import com.enth.ecomusic.util.CommonUtil;
 
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -14,6 +14,10 @@ import jakarta.servlet.ServletException;
 
 @WebServlet("/admin/user/*")
 public class AdminUserServlet extends HttpServlet {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private UserDAO userDAO;
 
 	@Override
@@ -26,7 +30,7 @@ public class AdminUserServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String pathInfo = request.getPathInfo(); // e.g., "/5" or "/edit/5" or null
-		int id = Helper.extractIdFromPath(pathInfo);
+		int id = CommonUtil.extractIdFromPath(pathInfo);
 		
 		if (pathInfo == null || pathInfo.equals("/")) {
 			// Show all users

@@ -9,7 +9,8 @@ import java.io.IOException;
 
 import com.enth.ecomusic.model.Music;
 import com.enth.ecomusic.model.dao.MusicDAO;
-import com.enth.ecomusic.util.Helper;
+import com.enth.ecomusic.util.CommonUtil;
+import com.enth.ecomusic.util.ToastrType;
 
 /**
  * Servlet implementation class ArtistMusicServlet
@@ -58,11 +59,11 @@ public class ArtistMusicServlet extends HttpServlet {
 
 		// Redirect based on success or failure
 		if (success) {
-			Helper.addMessage(request.getSession(), "success", "Music uploaded!");
+			CommonUtil.addMessage(request.getSession(), ToastrType.SUCCESS, "Music uploaded!");
 			response.sendRedirect(request.getContextPath() + "/artist/music"); // Redirect to music list page
 		}
 		else {
-			Helper.addMessage(request.getSession(), "error", "Music not uploaded!");
+			CommonUtil.addMessage(request.getSession(), ToastrType.ERROR, "Music not uploaded!");
 			response.sendRedirect(request.getContextPath() + "/artist/music");
 		}
 	}

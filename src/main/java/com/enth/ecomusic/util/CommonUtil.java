@@ -8,7 +8,7 @@ import java.util.Map;
 
 import jakarta.servlet.http.HttpSession;
 
-public class Helper {
+public class CommonUtil {
 	//Hashing
     public static String hashPassword(String password) {
         try {
@@ -55,19 +55,19 @@ public class Helper {
     
     // Flash toast
     @SuppressWarnings("unchecked")
-    public static void addMessage(HttpSession session, String type, String message) {
+    public static void addMessage(HttpSession session, ToastrType type, String message) {
         List<Map<String, String>> messages = (List<Map<String, String>>) session.getAttribute("flash_messages");
         if (messages == null) {
             messages = new ArrayList<>();
         }
         Map<String, String> msg = new HashMap<>();
-        msg.put("type", type); // e.g., error, success, info, warning
+        msg.put("type", type.getValue()); // e.g., error, success, info, warning
         msg.put("message", message);
         messages.add(msg);
         session.setAttribute("flash_messages", messages);
     }
     @SuppressWarnings("unchecked")
-    public static List<Map<String, String>> clearMessages(HttpSession session) {
+    public static List<Map<String, String>> extractMessages(HttpSession session) {
         List<Map<String, String>> messages = (List<Map<String, String>>) session.getAttribute("flash_messages");
         session.removeAttribute("flash_messages");
         return messages != null ? messages : new ArrayList<>();

@@ -33,6 +33,14 @@ public class User {
 		this.password = password;
 		this.userType = userType;
 	}
+	
+	public User(String name, String email, String password) {
+		super();
+		this.name = name;
+		this.email = email;
+		this.password = password;
+		this.userType = "user";
+	}
 
 	// Getters & Setters
     public int getUserId() { return userId; }

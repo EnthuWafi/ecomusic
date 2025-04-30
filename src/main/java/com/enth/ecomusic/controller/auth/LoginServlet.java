@@ -4,7 +4,8 @@ import java.io.IOException;
 
 import com.enth.ecomusic.model.User;
 import com.enth.ecomusic.model.dao.UserDAO;
-import com.enth.ecomusic.util.Helper;
+import com.enth.ecomusic.util.CommonUtil;
+import com.enth.ecomusic.util.ToastrType;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -14,6 +15,10 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private UserDAO userDAO;
 	
 	@Override
@@ -37,13 +42,13 @@ public class LoginServlet extends HttpServlet {
 				
 		User user = userDAO.getUserByUsernameOrEmail(username);
 		
-		if (user != null && Helper.checkPassword(password, user.getPassword())) {
+		if (user != null && CommonUtil.checkPassword(password, user.getPassword())) {
 	        request.getSession().setAttribute("user", user);
 	        response.sendRedirect(request.getContextPath() + "/home");
 	        return;
 	    }
 		else {
-			Helper.addMessage(request.getSession(), "error", "Invalid username or password!");
+			CommonUtil.addMessage(request.getSession(), ToastrType.ERROR, "Invalid username or password!");
 			response.sendRedirect(request.getContextPath() + "/login");
 	        return;
 		}

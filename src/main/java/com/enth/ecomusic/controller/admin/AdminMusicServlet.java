@@ -4,7 +4,6 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.WebServlet;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 import com.enth.ecomusic.model.Music;
@@ -13,6 +12,10 @@ import com.enth.ecomusic.model.dao.MusicDAO;
 @WebServlet("/admin/music/*")
 public class AdminMusicServlet extends HttpServlet {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private MusicDAO musicDAO;
 
 	@Override
