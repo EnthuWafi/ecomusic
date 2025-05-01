@@ -66,7 +66,7 @@ public class RegisterServlet extends HttpServlet {
 	    String hashedPassword = CommonUtil.hashPassword(password);
 
 	    // Create user object
-	    User newUser = new User(name, email, hashedPassword);
+	    User newUser = new User(name, email, hashedPassword, "listener");
 
 	    boolean success = userDAO.insertUser(newUser);
 

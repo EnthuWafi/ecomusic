@@ -43,6 +43,7 @@ public class LoginServlet extends HttpServlet {
 		User user = userDAO.getUserByUsernameOrEmail(username);
 		
 		if (user != null && CommonUtil.checkPassword(password, user.getPassword())) {
+			CommonUtil.addMessage(request.getSession(), ToastrType.SUCCESS, "Successfully logged in!");
 	        request.getSession().setAttribute("user", user);
 	        response.sendRedirect(request.getContextPath() + "/home");
 	        return;

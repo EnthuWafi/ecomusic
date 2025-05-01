@@ -19,6 +19,8 @@ import com.enth.ecomusic.util.CommonUtil;
 
 /**
  * Servlet Filter implementation class FlashFilter
+ * Purpose of this filter is simply to destroy the flash message in session
+ * and extract all messages if it exists
  */
 @WebFilter("/*")
 public class FlashFilter extends HttpFilter implements Filter {

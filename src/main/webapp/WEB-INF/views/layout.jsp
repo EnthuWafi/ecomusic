@@ -1,39 +1,69 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+	pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
-<c:if test="${not empty flashMessages}">
-    <c:forEach var="msg" items="${flashMessages}">
-        <script>
-            toastr["${msg.type}"]("${msg.message}");
-        </script>
-    </c:forEach>
-</c:if>
 <!DOCTYPE html>
 <html>
 <head>
-	<link rel="stylesheet" href="https://cdn.simplecss.org/simple.css">
-    <title>${applicationScope.websiteName} - ${pageTitle}</title>
+
+<!-- CSS -->
+<link rel="stylesheet" href="https://cdn.simplecss.org/simple.css">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.css"
+	integrity="sha512-oe8OpYjBaDWPt2VmSFR+qYOdnTjeV9QPLJUeqZyprDEQvQLJ9C5PCFclxwNuvb/GQgQngdCXzKSFltuHD3eCxA=="
+	crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<!-- SCRIPTS -->
+
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+	integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+	crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"
+	integrity="sha512-lbwH47l/tPXJYG9AcFNoJaTMhGvYWhVM9YI43CT+uteTRRaiLCui8snIgyAN8XWgNjNhCqlAUdzZptso6OCoFQ=="
+	crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<title>${applicationScope.websiteName}-${pageTitle}</title>
 </head>
 <body>
 
-    <header>
-        <h1>${applicationScope.websiteName}</h1>
-        <nav>
-            <a href="${pageContext.request.contextPath}/">Home</a> |
-            <a href="${pageContext.request.contextPath}/music">Music Library</a> |
-            <a href="${pageContext.request.contextPath}/login">Login</a> 
-            <a href="${pageContext.request.contextPath}/register">Register</a> 
-        </nav>
-    </header>
+	<header>
+		<h1>${applicationScope.websiteName}</h1>
+		<nav>
+			<a href="${pageContext.request.contextPath}/">Home</a> | <a
+				href="${pageContext.request.contextPath}/music">Music Library</a> |
 
-    <main>
-        <jsp:include page="${contentPage}" />
-    </main>
+			<c:choose>
+				<c:when test="${not empty sessionScope.user}">
+                Welcome, ${sessionScope.user.name}!
+                <a href="${pageContext.request.contextPath}/profile">Profile</a> |
+                <a href="${pageContext.request.contextPath}/logout">Logout</a>
+				</c:when>
+				<c:otherwise>
+				<a href="${pageContext.request.contextPath}/login">Login</a> |
+                <a href="${pageContext.request.contextPath}/register">Register</a>
+				</c:otherwise>
+			</c:choose>
 
-    <footer>
-        <p>&copy; 2025 Wafi Inc.</p>
-    </footer>
+		</nav>
+	</header>
+
+	<main>
+		<jsp:include page="${contentPage}" />
+	</main>
+
+	<footer>
+		<p>&copy; 2025 Wafi Inc.</p>
+	</footer>
+
+	<c:if test="${not empty flashMessages}">
+		<c:forEach var="msg" items="${flashMessages}">
+			<script>
+				toastr["${msg.type}"]("${msg.message}");
+			</script>
+		</c:forEach>
+	</c:if>
 
 </body>
 </html>
