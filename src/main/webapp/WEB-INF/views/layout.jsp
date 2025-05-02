@@ -37,11 +37,21 @@
 			<c:choose>
 				<c:when test="${not empty sessionScope.user}">
                 Welcome, ${sessionScope.user.name}!
-                <a href="${pageContext.request.contextPath}/profile">Profile</a> |
+                
+                <c:choose>
+					<c:when test="${sessionScope.user.userType == 'admin'}">
+						<a href="${pageContext.request.contextPath}/admin">Dashboard</a> |
+           			</c:when>
+					<c:when test="${sessionScope.user.userType == 'artist'}">
+						<a href="${pageContext.request.contextPath}/artist">Panel</a> |
+           			</c:when>
+				</c:choose>
+
+				<a href="${pageContext.request.contextPath}/profile">Profile</a> |
                 <a href="${pageContext.request.contextPath}/logout">Logout</a>
 				</c:when>
 				<c:otherwise>
-				<a href="${pageContext.request.contextPath}/login">Login</a> |
+					<a href="${pageContext.request.contextPath}/login">Login</a> |
                 <a href="${pageContext.request.contextPath}/register">Register</a>
 				</c:otherwise>
 			</c:choose>
