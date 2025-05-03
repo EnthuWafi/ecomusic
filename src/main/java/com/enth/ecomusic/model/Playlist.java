@@ -1,12 +1,15 @@
 package com.enth.ecomusic.model;
 
 import java.util.Date;
+import java.util.List;
 
 public class Playlist {
     private int playlistId;
     private int userId;
     private String name;
     private Date createdAt;
+    //experimental
+    private List<PlaylistMusic> musicList;
 
     
     public Playlist(int playlistId, int userId, String name, Date createdAt) {
@@ -28,4 +31,13 @@ public class Playlist {
 
     public Date getCreatedAt() { return createdAt; }
     public void setCreatedAt(Date createdAt) { this.createdAt = createdAt; }
+    
+	public List<PlaylistMusic> getMusicList() {
+		return musicList;
+	}
+	public void setMusicList(List<PlaylistMusic> musicList) {
+		this.musicList = musicList;
+	}
+    
+    
 }

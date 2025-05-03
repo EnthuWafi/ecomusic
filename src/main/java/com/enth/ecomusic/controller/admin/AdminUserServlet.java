@@ -1,12 +1,12 @@
 package com.enth.ecomusic.controller.admin;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.List;
 
 import com.enth.ecomusic.model.User;
 import com.enth.ecomusic.model.dao.UserDAO;
 import com.enth.ecomusic.util.CommonUtil;
+import com.enth.ecomusic.util.ToastrType;
 
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -31,25 +31,24 @@ public class AdminUserServlet extends HttpServlet {
 			throws ServletException, IOException {
 		String pathInfo = request.getPathInfo(); // e.g., "/5" or "/edit/5" or null
 		int id = CommonUtil.extractIdFromPath(pathInfo);
-		
+
 		if (pathInfo == null || pathInfo.equals("/")) {
 			// Show all users
 			List<User> userList = userDAO.getAllUsers();
 			request.setAttribute("userList", userList);
 			request.setAttribute("pageTitle", "User List");
-			request.setAttribute("contentPage", "/WEB-INF/views/admin/userList.jsp");
-		}else if (pathInfo.equals("/add")) {
-	        // Add user Form
+			request.setAttribute("contentPage", "/WEB-INF/views/admin/view-user-list.jsp");
+		} else if (pathInfo.equals("/add")) {
+			// Add user Form
 			request.setAttribute("pageTitle", "Add User");
-			request.setAttribute("contentPage", "/WEB-INF/views/admin/addUser.jsp");
-	    } 
-		else if (pathInfo.matches("/\\d+")) {
+			request.setAttribute("contentPage", "/WEB-INF/views/admin/create-user.jsp");
+		} else if (pathInfo.matches("/\\d+")) {
 			// Show a specific user
 			User user = userDAO.getUserById(id);
-			
+
 			request.setAttribute("pageTitle", "Show User");
 			request.setAttribute("user", user);
-			request.setAttribute("contentPage", "/WEB-INF/views/admin/showUser.jsp");
+			request.setAttribute("contentPage", "/WEB-INF/views/admin/view-user.jsp");
 		} else if (pathInfo.startsWith("/edit/\\d+")) {
 			// Show edit page TODO
 		} else {
@@ -63,23 +62,37 @@ public class AdminUserServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		String name = request.getParameter("name");
+		String fname = request.getParameter("first_name");
+		String lname = request.getParameter("last_name");
+		String username = request.getParameter("username");
 		String email = request.getParameter("email");
 		String password = request.getParameter("password");
 		String userType = request.getParameter("user_type");
 
-		User user = new User(name, email, password, userType);
+		HttpSession session = request.getSession();
+		// Check if user already exists
+		User existing = userDAO.getUserByUsernameOrEmail(email);
+		if (existing != null) {
+			CommonUtil.addMessage(session, ToastrType.ERROR, "Email is already registered.");
+			response.sendRedirect(request.getContextPath() + "/admin/user/add");
+			return;
+		}
+
+		// Hash password
+		String hashedPassword = CommonUtil.hashPassword(password);
+
+		User user = new User(fname, lname, null, username, email, hashedPassword, userType, userType);
 		boolean success = userDAO.insertUser(user);
 
-		response.setContentType("text/html");
-		PrintWriter out = response.getWriter();
-
 		if (success) {
-			out.println("User added successfully!");
+			CommonUtil.addMessage(session, ToastrType.SUCCESS, "Registration successful. Please log in.");
+			response.sendRedirect(request.getContextPath() + "/admin/user/");
+			return;
 		} else {
-			out.println("Failed to add user.");
+			CommonUtil.addMessage(session, ToastrType.ERROR, "Something went wrong. Try again.");
+			response.sendRedirect(request.getContextPath() + "/admin/user/add");
+			return;
 		}
 	}
-	
 
 }

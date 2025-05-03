@@ -1,92 +1,119 @@
 package com.enth.ecomusic.model.dao;
 
-import java.sql.*;
-import java.util.*;
-
 import com.enth.ecomusic.model.Music;
 import com.enth.ecomusic.util.DBConnection;
 
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
 public class MusicDAO {
-	private Connection conn;
-	
-	public MusicDAO() {
-		this.conn = DBConnection.getConnection();
-	}
-	
-	//create
-	public boolean insertMusic(Music music) {
-		String sql = "INSERT INTO MUSIC (ARTIST_ID, TITLE, GENRE, DESCRIPTION, AUDIO_FILE_URL, PREMIUM_CONTENT) VALUES (?, ?, ?, ?, ?, ?)";
-		try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-			//stmt.setString(1, user.getName());
-			stmt.setInt(1, music.getArtistId());
-			stmt.setString(2, music.getTitle());
-	        stmt.setString(3, music.getGenre());
-	        stmt.setString(4, music.getDescription());
-	        stmt.setString(5, music.getAudioFileUrl());
-	        stmt.setInt(6, music.isPremiumContent() ? 1 : 0);
-			
-			int rows = stmt.executeUpdate();
-			return rows > 0;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
-	
-	//get 
-	public Music getMusicById(int musicId) {
-	    Music music = null;
-	    String sql = "SELECT * FROM MUSIC WHERE MUSIC_ID = ?";
+    private Connection conn;
 
-	    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-	        stmt.setInt(1, musicId);
+    public MusicDAO() {
+        this.conn = DBConnection.getConnection();
+    }
 
-	        try (ResultSet rs = stmt.executeQuery()) {
-	            if (rs.next()) {
-	                music = new Music(
-	                    rs.getInt("MUSIC_ID"),
-	                    rs.getInt("ARTIST_ID"),
-	                    rs.getString("TITLE"),
-	                    rs.getString("GENRE"),
-	                    rs.getString("DESCRIPTION"),
-	                    rs.getDate("UPLOAD_DATE"),
-	                    rs.getString("AUDIO_FILE_URL"),
-	                    rs.getInt("PREMIUM_CONTENT") == 1 // Convert int to boolean
-	                );
-	            }
-	        }
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	    }
+    // CREATE
+    public boolean insertMusic(Music music) {
+        String sql = "INSERT INTO Music (artist_id, title, genre, description, audio_file_url, image_url, premium_content) "
+                   + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, music.getArtistId());
+            stmt.setString(2, music.getTitle());
+            stmt.setString(3, music.getGenre());
+            stmt.setString(4, music.getDescription());
+            stmt.setString(5, music.getAudioFileUrl());
+            stmt.setString(6, music.getImageUrl());
+            stmt.setInt(7, music.isPremiumContent() ? 1 : 0);
 
-	    return music;
-	}
-	
-	//get all
-	public List<Music> getAllMusic() {
-	    List<Music> musicList = new ArrayList<>();
-	    String sql = "SELECT * FROM MUSIC";
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Error inserting music: " + e.getMessage());
+            return false;
+        }
+    }
 
-	    try (PreparedStatement stmt = conn.prepareStatement(sql);
-	         ResultSet rs = stmt.executeQuery()) {
+    // READ by ID
+    public Music getMusicById(int musicId) {
+        String sql = "SELECT * FROM Music WHERE music_id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, musicId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToMusic(rs);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching music by ID: " + e.getMessage());
+        }
+        return null;
+    }
 
-	        while (rs.next()) {
-	            Music music = new Music(
-	                rs.getInt("MUSIC_ID"),
-	                rs.getInt("ARTIST_ID"),
-	                rs.getString("TITLE"),
-	                rs.getString("GENRE"),
-	                rs.getString("DESCRIPTION"),
-	                rs.getDate("UPLOAD_DATE"),
-	                rs.getString("AUDIO_FILE_URL"),
-	                (rs.getInt("PREMIUM_CONTENT") == 1) // Convert int to boolean
-	            );
-	            musicList.add(music);
-	        }
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	    }
+    // READ all
+    public List<Music> getAllMusic() {
+        List<Music> musicList = new ArrayList<>();
+        String sql = "SELECT * FROM Music ORDER BY upload_date DESC";
 
-	    return musicList;
-	}
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                musicList.add(mapResultSetToMusic(rs));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching all music: " + e.getMessage());
+        }
+
+        return musicList;
+    }
+
+    // UPDATE
+    public boolean updateMusic(Music music) {
+        String sql = "UPDATE Music SET artist_id = ?, title = ?, genre = ?, description = ?, "
+                   + "audio_file_url = ?, image_url = ?, premium_content = ? WHERE music_id = ?";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, music.getArtistId());
+            stmt.setString(2, music.getTitle());
+            stmt.setString(3, music.getGenre());
+            stmt.setString(4, music.getDescription());
+            stmt.setString(5, music.getAudioFileUrl());
+            stmt.setString(6, music.getImageUrl());
+            stmt.setInt(7, music.isPremiumContent() ? 1 : 0);
+            stmt.setInt(8, music.getMusicId());
+
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Error updating music: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // DELETE
+    public boolean deleteMusic(int musicId) {
+        String sql = "DELETE FROM Music WHERE music_id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, musicId);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Error deleting music: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // 🔧 Helper method to map ResultSet to Music object
+    private Music mapResultSetToMusic(ResultSet rs) throws SQLException {
+        return new Music(
+            rs.getInt("music_id"),
+            rs.getInt("artist_id"),
+            rs.getString("title"),
+            rs.getString("genre"),
+            rs.getString("description"),
+            rs.getDate("upload_date"),
+            rs.getString("audio_file_url"),
+            rs.getString("image_url"),
+            rs.getInt("premium_content") != 0
+        );
+    }
 }

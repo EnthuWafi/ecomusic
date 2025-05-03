@@ -30,7 +30,7 @@ public class AdminMusicServlet extends HttpServlet {
 		List<Music> musicList = musicDAO.getAllMusic();
 		request.setAttribute("musicList", musicList);
 		request.setAttribute("pageTitle", "Music List");
-		request.setAttribute("contentPage", "/WEB-INF/views/admin/viewMusicList.jsp");
+		request.setAttribute("contentPage", "/WEB-INF/views/admin/view-music-list.jsp");
 
 		request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
 	}

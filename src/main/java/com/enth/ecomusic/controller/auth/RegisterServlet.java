@@ -39,20 +39,15 @@ public class RegisterServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// registration process
-		String name = request.getParameter("name");
+		String fname = request.getParameter("first_name");
+		String lname = request.getParameter("last_name");
+		String username = request.getParameter("username");
 	    String email = request.getParameter("email");
 	    String password = request.getParameter("password");
 
 	    HttpSession session = request.getSession();
 
 	    // Basic validation
-	    if (name == null || name.isBlank() ||
-	        email == null || email.isBlank() ||
-	        password == null || password.isBlank()) {
-	        CommonUtil.addMessage(session, ToastrType.ERROR, "All fields are required.");
-	        response.sendRedirect(request.getContextPath() + "/register");
-	        return;
-	    }
 
 	    // Check if user already exists
 	    User existing = userDAO.getUserByUsernameOrEmail(email);
@@ -66,7 +61,7 @@ public class RegisterServlet extends HttpServlet {
 	    String hashedPassword = CommonUtil.hashPassword(password);
 
 	    // Create user object
-	    User newUser = new User(name, email, hashedPassword, "listener");
+	    User newUser = new User(fname, lname, null, username, email, hashedPassword, "listener");
 
 	    boolean success = userDAO.insertUser(newUser);
 

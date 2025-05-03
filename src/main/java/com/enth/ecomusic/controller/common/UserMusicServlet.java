@@ -1,4 +1,4 @@
-package com.enth.ecomusic.controller.user;
+package com.enth.ecomusic.controller.common;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -41,7 +41,7 @@ public class UserMusicServlet extends HttpServlet {
 		
 		request.setAttribute("musicList", musicList);
 		request.setAttribute("pageTitle", "Music Library");
-		request.setAttribute("contentPage", "/WEB-INF/views/common/musicLibrary.jsp");
+		request.setAttribute("contentPage", "/WEB-INF/views/common/music-library.jsp");
 		request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);;
 	}
 

@@ -11,10 +11,13 @@ public class Music {
 	private String description;
 	private Date uploadDate;
 	private String audioFileUrl;
+	private String imageUrl;
 	private boolean premiumContent;
 
+	
+	
 	public Music(int musicId, int artistId, String title, String genre, String description, Date uploadDate,
-			String audioFileUrl, boolean premiumContent) {
+			String audioFileUrl, String imageUrl, boolean premiumContent) {
 		super();
 		this.musicId = musicId;
 		this.artistId = artistId;
@@ -23,11 +26,26 @@ public class Music {
 		this.description = description;
 		this.uploadDate = uploadDate;
 		this.audioFileUrl = audioFileUrl;
-		this.premiumContent = premiumContent ? true : false;
+		this.imageUrl = imageUrl;
+		this.premiumContent = premiumContent;
+	}
+
+
+	//this constructor for database insertion 
+
+	public Music(int artistId, String title, String genre, String description, String audioFileUrl, String imageUrl,
+			boolean premiumContent) {
+		super();
+		this.artistId = artistId;
+		this.title = title;
+		this.genre = genre;
+		this.description = description;
+		this.audioFileUrl = audioFileUrl;
+		this.imageUrl = imageUrl;
+		this.premiumContent = premiumContent;
 	}
 	
-	
-	//this constructor for database insertion 
+	//default image constructor
 	public Music(int artistId, String title, String genre, String description, String audioFileUrl,
 			boolean premiumContent) {
 		super();
@@ -36,15 +54,17 @@ public class Music {
 		this.genre = genre;
 		this.description = description;
 		this.audioFileUrl = audioFileUrl;
+		this.imageUrl = "/WEB-INF/assets/images/default.jpg"; // default images
 		this.premiumContent = premiumContent;
 	}
-
 
 
 	public Music() {
 		super();
 	}
 
+
+	
 
 	// Getters & Setters
 	public int getMusicId() {
@@ -102,6 +122,17 @@ public class Music {
 	public void setAudioFileUrl(String audioFileUrl) {
 		this.audioFileUrl = audioFileUrl;
 	}
+	
+
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
+
 
 	public boolean isPremiumContent() {
 		return premiumContent;

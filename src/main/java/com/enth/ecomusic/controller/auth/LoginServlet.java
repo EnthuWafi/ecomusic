@@ -37,10 +37,10 @@ public class LoginServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// Login post path
-        String username = request.getParameter("username"); //username or email really
+        String email = request.getParameter("email"); //username or email really
         String password = request.getParameter("password");
 				
-		User user = userDAO.getUserByUsernameOrEmail(username);
+		User user = userDAO.getUserByUsernameOrEmail(email);
 		
 		if (user != null && CommonUtil.checkPassword(password, user.getPassword())) {
 			CommonUtil.addMessage(request.getSession(), ToastrType.SUCCESS, "Successfully logged in!");
