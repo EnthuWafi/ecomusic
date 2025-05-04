@@ -7,14 +7,20 @@
 <head>
 
 <!-- CSS -->
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+	rel="stylesheet"
+	integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+	crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdn.simplecss.org/simple.css">
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.css"
 	integrity="sha512-oe8OpYjBaDWPt2VmSFR+qYOdnTjeV9QPLJUeqZyprDEQvQLJ9C5PCFclxwNuvb/GQgQngdCXzKSFltuHD3eCxA=="
 	crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-<!-- SCRIPTS -->
 
+<!-- SCRIPTS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 <script
 	src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
 	integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
@@ -32,22 +38,23 @@
 		<h1>${applicationScope.websiteName}</h1>
 		<nav>
 			<a href="${pageContext.request.contextPath}/">Home</a> | <a
-				href="${pageContext.request.contextPath}/music">Music Library</a> |
+				href="${pageContext.request.contextPath}/music">Browse Music</a> |
 
 			<c:choose>
 				<c:when test="${not empty sessionScope.user}">
-                Welcome, ${sessionScope.user.name}!
+				
+                <span>Welcome, ${sessionScope.user.username}!</span>
                 
                 <c:choose>
-					<c:when test="${sessionScope.user.userType == 'admin'}">
-						<a href="${pageContext.request.contextPath}/admin">Dashboard</a> |
+						<c:when test="${sessionScope.user.userType == 'admin'}">
+							<a href="${pageContext.request.contextPath}/admin">Dashboard</a> |
            			</c:when>
-					<c:when test="${sessionScope.user.userType == 'artist'}">
-						<a href="${pageContext.request.contextPath}/artist">Panel</a> |
+						<c:when test="${sessionScope.user.userType == 'artist'}">
+							<a href="${pageContext.request.contextPath}/artist">Panel</a> |
            			</c:when>
-				</c:choose>
+					</c:choose>
 
-				<a href="${pageContext.request.contextPath}/profile">Profile</a> |
+					<a href="${pageContext.request.contextPath}/profile">Profile</a> |
                 <a href="${pageContext.request.contextPath}/logout">Logout</a>
 				</c:when>
 				<c:otherwise>

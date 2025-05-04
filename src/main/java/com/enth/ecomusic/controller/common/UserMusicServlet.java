@@ -10,6 +10,7 @@ import java.util.List;
 
 import com.enth.ecomusic.model.Music;
 import com.enth.ecomusic.model.dao.MusicDAO;
+import com.enth.ecomusic.util.CommonUtil;
 
 /**
  * Servlet implementation class UserMusicServlet
@@ -37,11 +38,33 @@ public class UserMusicServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		List<Music> musicList = musicDAO.getAllMusic();
+
+		String pathInfo = request.getPathInfo(); // e.g., "/5" or "/edit/5" or null
+		int id = CommonUtil.extractIdFromPath(pathInfo);
+
+		if (pathInfo == null || pathInfo.equals("/")) {
+			List<Music> musicList = musicDAO.getAllMusic();
+			
+			request.setAttribute("musicList", musicList);
+			request.setAttribute("pageTitle", "Browse Music");
+			request.setAttribute("contentPage", "/WEB-INF/views/common/browse-music.jsp");
+		} else if (pathInfo.matches("/\\d+")) {
+			Music music = musicDAO.getMusicById(id);
+			List<Music> recommendedList = musicDAO.getAllRelatedMusic(id, 5);
+			
+			//TODO: Check if user has subscription if premium music
+			
+			
+			
+			request.setAttribute("pageTitle", "Listen to Music");
+			request.setAttribute("music", music);			
+			request.setAttribute("relatedTracks", recommendedList);
+			request.setAttribute("contentPage", "/WEB-INF/views/common/play-music.jsp");
+		} else {
+			// 404 Not Found
+			response.sendError(HttpServletResponse.SC_NOT_FOUND);
+		}
 		
-		request.setAttribute("musicList", musicList);
-		request.setAttribute("pageTitle", "Music Library");
-		request.setAttribute("contentPage", "/WEB-INF/views/common/music-library.jsp");
 		request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);;
 	}
 
