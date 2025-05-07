@@ -134,4 +134,30 @@ public class MusicDAO {
 				rs.getString("description"), rs.getDate("upload_date"), rs.getString("audio_file_url"),
 				rs.getString("image_url"), rs.getInt("premium_content") == 1);
 	}
+
+	public List<Music> searchMusicByTitleOrArtist(String keyword) {
+		List<Music> results = new ArrayList<>();
+	    String sql = "SELECT m.* FROM Music m "
+	    		+ "INNER JOIN User u ON u.user_id = m.artist_id "
+	    		+ "WHERE LOWER(m.title) LIKE ? "
+	    		+ "OR LOWER(u.username) LIKE ? "
+	    		+ "ORDER BY m.upload_date DESC";
+
+	    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+	        String likeQuery = "%" + keyword.toLowerCase() + "%";
+	        stmt.setString(1, likeQuery);
+	        stmt.setString(2, likeQuery);
+
+	        try (ResultSet rs = stmt.executeQuery()) {
+	            while (rs.next()) {
+	                results.add(mapResultSetToMusic(rs));
+	            }
+	        }
+
+	    } catch (SQLException e) {
+	        System.err.println("Error searching music: " + e.getMessage());
+	    }
+
+	    return results;
+	}
 }

@@ -13,7 +13,7 @@
         
         <!-- Sample Audio Player -->
         <audio controls class="mt-3 w-100">
-            <source src="${music.audioFileUrl}" type="audio/mpeg">
+            <source src="${pageContext.request.contextPath}/stream/${music.musicId}" type="audio/mpeg">
             Your browser does not support the audio element.
         </audio>
 

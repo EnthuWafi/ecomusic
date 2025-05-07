@@ -16,7 +16,7 @@ public class AppConfigListener implements ServletContextListener {
         // Set global settings in the ServletContext
         context.setAttribute("websiteName", "Eco Music");
         context.setAttribute("websiteDescription", "A place for all your music needs.");
-        
+        context.setAttribute("audioFilePath", "C:/Users/wapi/Desktop/ecomusic-file/");
         // Optional: log the initialization
         System.out.println("ServletContext Initialized: Global settings set.");
     }

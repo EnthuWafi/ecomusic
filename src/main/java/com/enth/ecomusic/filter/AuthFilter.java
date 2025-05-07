@@ -72,15 +72,15 @@ public class AuthFilter extends HttpFilter implements Filter {
         String userType = user.getUserType();
         
         //Role based filtering
-        if (uri.startsWith(httpRequest.getContextPath() + "/admin") && !"admin".equals(userType)) {
+        if (uri.startsWith(httpRequest.getContextPath() + "/admin") && !"admin".equals(userType) ) {
             CommonUtil.addMessage(session, ToastrType.ERROR, "Access denied: Admins only");
-            httpResponse.sendRedirect(httpRequest.getContextPath() + "/");
+            httpResponse.sendRedirect(httpRequest.getContextPath());
             return;
         }
 
-        if (uri.startsWith(httpRequest.getContextPath() + "/artist") && !"artist".equals(userType)) {
+        if (uri.startsWith(httpRequest.getContextPath() + "/artist") && !"artist".equals(userType) ) {
             CommonUtil.addMessage(session, ToastrType.ERROR, "Access denied: Artists only");
-            httpResponse.sendRedirect(httpRequest.getContextPath() + "/");
+            httpResponse.sendRedirect(httpRequest.getContextPath());
             return;
         }
         
