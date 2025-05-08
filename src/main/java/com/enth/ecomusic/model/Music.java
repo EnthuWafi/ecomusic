@@ -54,7 +54,6 @@ public class Music {
 		this.genre = genre;
 		this.description = description;
 		this.audioFileUrl = audioFileUrl;
-		this.imageUrl = "/WEB-INF/assets/images/default.jpg"; // default images
 		this.premiumContent = premiumContent;
 	}
 

@@ -67,20 +67,41 @@ public class MusicDAO {
 		return musicList;
 	}
 
+	// READ all
+	public List<Music> getPaginatedMusic(int page, int pageSize) {
+		List<Music> musicList = new ArrayList<>();
+		String sql = "SELECT * FROM (" + "SELECT MUSIC.*, ROW_NUMBER() OVER (ORDER BY MUSIC.music_id) AS rnum "
+				+ "FROM MUSIC)" + "WHERE rnum > ? AND rnum <= ?";
+
+		try (PreparedStatement stmt = conn.prepareStatement(sql);) {
+			int lower = (page - 1) * pageSize;
+			int upper = lower + pageSize;
+			stmt.setInt(1, lower);
+			stmt.setInt(2, upper);
+
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					musicList.add(mapResultSetToMusic(rs));
+				}
+			}
+		} catch (SQLException e) {
+			System.err.println("Error fetching paginated music: " + e.getMessage());
+		}
+
+		return musicList;
+	}
+
 	// READ all related music
-	public List<Music> getAllRelatedMusic(int musicId, int limit) {
+	public List<Music> getAllRelatedMusic(int musicId) {
 		List<Music> musicList = new ArrayList<>();
 
-		String sql = "SELECT * FROM ("
-				+ " SELECT m1.* FROM Music m1 "
-				+ " JOIN Music m2 ON m1.genre = m2.genre "
-				+ " WHERE m1.music_id = ? AND m1.music_id != m2.music_id "
-				+ " ORDER BY m1.upload_date DESC"
-				+ ") WHERE ROWNUM <= ?";
+		String sql = "SELECT * FROM (" + " SELECT m1.* FROM Music m1 " + " JOIN Music m2 ON m1.genre = m2.genre "
+				+ " WHERE m1.music_id = ? AND m1.music_id != m2.music_id " + " ORDER BY m1.upload_date DESC"
+				+ ") WHERE ROWNUM <= 5";
 
 		try (PreparedStatement stmt = conn.prepareStatement(sql)) {
 			stmt.setInt(1, musicId);
-			stmt.setInt(2, limit);
+//			stmt.setInt(2, limit);
 
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
@@ -115,6 +136,23 @@ public class MusicDAO {
 			return false;
 		}
 	}
+	
+	//count
+	public int countProducts() {
+	    String sql = "SELECT COUNT(*) FROM Music";
+	    
+	    try (PreparedStatement stmt = conn.prepareStatement(sql);
+	         ResultSet rs = stmt.executeQuery()) {
+	        
+	        if (rs.next()) {
+	            return rs.getInt(1);
+	        }
+	    } catch (SQLException e) {
+	        System.err.println("Error counting music: " + e.getMessage());
+	    }
+
+	    return 0;
+	}
 
 	// DELETE
 	public boolean deleteMusic(int musicId) {
@@ -137,27 +175,24 @@ public class MusicDAO {
 
 	public List<Music> searchMusicByTitleOrArtist(String keyword) {
 		List<Music> results = new ArrayList<>();
-	    String sql = "SELECT m.* FROM Music m "
-	    		+ "INNER JOIN User u ON u.user_id = m.artist_id "
-	    		+ "WHERE LOWER(m.title) LIKE ? "
-	    		+ "OR LOWER(u.username) LIKE ? "
-	    		+ "ORDER BY m.upload_date DESC";
+		String sql = "SELECT m.* FROM Music m " + "INNER JOIN User u ON u.user_id = m.artist_id "
+				+ "WHERE LOWER(m.title) LIKE ? " + "OR LOWER(u.username) LIKE ? " + "ORDER BY m.upload_date DESC";
 
-	    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-	        String likeQuery = "%" + keyword.toLowerCase() + "%";
-	        stmt.setString(1, likeQuery);
-	        stmt.setString(2, likeQuery);
+		try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+			String likeQuery = "%" + keyword.toLowerCase() + "%";
+			stmt.setString(1, likeQuery);
+			stmt.setString(2, likeQuery);
 
-	        try (ResultSet rs = stmt.executeQuery()) {
-	            while (rs.next()) {
-	                results.add(mapResultSetToMusic(rs));
-	            }
-	        }
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					results.add(mapResultSetToMusic(rs));
+				}
+			}
 
-	    } catch (SQLException e) {
-	        System.err.println("Error searching music: " + e.getMessage());
-	    }
+		} catch (SQLException e) {
+			System.err.println("Error searching music: " + e.getMessage());
+		}
 
-	    return results;
+		return results;
 	}
 }

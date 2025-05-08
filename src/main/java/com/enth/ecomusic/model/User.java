@@ -58,7 +58,6 @@ public class User {
 		this.email = email;
 		this.password = password;
 		this.userType = userType;
-		this.imageUrl = "/WEB-INF/assets/images/default.jpg"; // default profile
 	}
 
 	// Getters & Setters

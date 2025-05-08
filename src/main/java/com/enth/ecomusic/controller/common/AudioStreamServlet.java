@@ -16,7 +16,7 @@ import com.enth.ecomusic.util.CommonUtil;
 /**
  * Servlet implementation class AudioStreamServlet
  */
-@WebServlet("/stream/*")
+@WebServlet("/stream/audio/*")
 public class AudioStreamServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
