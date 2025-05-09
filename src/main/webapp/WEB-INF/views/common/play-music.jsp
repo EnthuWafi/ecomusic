@@ -6,7 +6,7 @@
     <!-- Music Details -->
     <div class="card p-4 mb-4">
         <h2>${music.title}</h2>
-        <img alt="No image" src="${music.imageUrl}">
+        <img alt="No image" src="${pageContext.request.contextPath}/stream/image/music/${music.musicId}">
         <p><strong>Artist:</strong> ${music.artistId}</p>
         <p><strong>Genre:</strong> ${music.genre}</p>
         <p><strong>Released:</strong> ${music.uploadDate}</p>

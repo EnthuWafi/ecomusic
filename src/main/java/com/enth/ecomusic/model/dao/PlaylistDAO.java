@@ -9,18 +9,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlaylistDAO {
-	private Connection conn;
 	private PlaylistMusicDAO playlistMusicDAO;
 
 	public PlaylistDAO() {
-		this.conn = DBConnection.getConnection();
 		this.playlistMusicDAO = new PlaylistMusicDAO();
 	}
 
 	// CREATE
 	public boolean insertPlaylist(Playlist playlist) {
 		String sql = "INSERT INTO Playlists (user_id, name) VALUES (?, ?)";
-		try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (Connection conn = DBConnection.getConnection();PreparedStatement stmt = conn.prepareStatement(sql)) {
 			stmt.setInt(1, playlist.getUserId());
 			stmt.setString(2, playlist.getName());
 			return stmt.executeUpdate() > 0;
@@ -33,7 +31,7 @@ public class PlaylistDAO {
 	// READ by ID
 	public Playlist getPlaylistById(int playlistId) {
 		String sql = "SELECT * FROM Playlists WHERE playlist_id = ?";
-		try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (Connection conn = DBConnection.getConnection();PreparedStatement stmt = conn.prepareStatement(sql)) {
 			stmt.setInt(1, playlistId);
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (rs.next()) {
@@ -56,7 +54,7 @@ public class PlaylistDAO {
 	public List<Playlist> getPlaylistsByUserId(int userId) {
 		List<Playlist> playlists = new ArrayList<>();
 		String sql = "SELECT * FROM Playlists WHERE user_id = ? ORDER BY created_at DESC";
-		try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (Connection conn = DBConnection.getConnection();PreparedStatement stmt = conn.prepareStatement(sql)) {
 			stmt.setInt(1, userId);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {
@@ -72,7 +70,7 @@ public class PlaylistDAO {
 	// UPDATE
 	public boolean updatePlaylistName(int playlistId, String newName) {
 		String sql = "UPDATE Playlists SET name = ? WHERE playlist_id = ?";
-		try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (Connection conn = DBConnection.getConnection();PreparedStatement stmt = conn.prepareStatement(sql)) {
 			stmt.setString(1, newName);
 			stmt.setInt(2, playlistId);
 			return stmt.executeUpdate() > 0;
@@ -85,7 +83,7 @@ public class PlaylistDAO {
 	// DELETE
 	public boolean deletePlaylist(int playlistId) {
 		String sql = "DELETE FROM Playlists WHERE playlist_id = ?";
-		try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (Connection conn = DBConnection.getConnection();PreparedStatement stmt = conn.prepareStatement(sql)) {
 			stmt.setInt(1, playlistId);
 			return stmt.executeUpdate() > 0;
 		} catch (SQLException e) {

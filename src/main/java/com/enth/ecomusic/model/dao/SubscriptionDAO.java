@@ -9,17 +9,11 @@ import java.util.List;
 
 public class SubscriptionDAO {
 
-    private Connection conn;
-
-    public SubscriptionDAO() {
-        this.conn = DBConnection.getConnection();
-    }
-
     // CREATE
     public boolean insertSubscription(Subscription sub) {
         String sql = "INSERT INTO Subscriptions (subscription_id, user_id, start_date, end_date, amount_paid, payment_status, payment_gateway_ref) "
                    + "VALUES (?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection();PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, sub.getSubscriptionId());
             stmt.setInt(2, sub.getUserId());
             stmt.setDate(3, (java.sql.Date) sub.getStartDate());
@@ -38,7 +32,7 @@ public class SubscriptionDAO {
     // READ (by ID)
     public Subscription getSubscriptionById(int id) {
         String sql = "SELECT * FROM Subscriptions WHERE subscription_id = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection();PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -54,7 +48,7 @@ public class SubscriptionDAO {
     public List<Subscription> getSubscriptionsByUserId(int userId) {
         List<Subscription> list = new ArrayList<>();
         String sql = "SELECT * FROM Subscriptions WHERE user_id = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection();PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, userId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -70,7 +64,7 @@ public class SubscriptionDAO {
     public boolean updateSubscription(Subscription sub) {
         String sql = "UPDATE Subscriptions SET user_id = ?, start_date = ?, end_date = ?, amount_paid = ?, "
                    + "payment_status = ?, payment_gateway_ref = ? WHERE subscription_id = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection();PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, sub.getUserId());
             stmt.setDate(2, (java.sql.Date) sub.getStartDate());
             stmt.setDate(3, (java.sql.Date) sub.getEndDate());
@@ -89,7 +83,7 @@ public class SubscriptionDAO {
     // DELETE
     public boolean deleteSubscription(int id) {
         String sql = "DELETE FROM Subscriptions WHERE subscription_id = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection();PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {

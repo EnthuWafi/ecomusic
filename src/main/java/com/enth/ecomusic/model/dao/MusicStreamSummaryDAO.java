@@ -8,12 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MusicStreamSummaryDAO {
-	private final Connection conn;
-
-	public MusicStreamSummaryDAO() {
-		this.conn = DBConnection.getConnection();
-	}
-
 	// INSERT or UPDATE (Upsert)
 	public boolean upsertStreamCount(int musicId, Date streamDate) {
 		String updateSql = "MERGE INTO MusicStreamSummary mss "
@@ -21,7 +15,7 @@ public class MusicStreamSummaryDAO {
 				+ "  UPDATE SET mss.stream_count = mss.stream_count + 1 " + "WHEN NOT MATCHED THEN "
 				+ "  INSERT (music_id, stream_date, stream_count) " + "  VALUES (?, ?, 1)"; 
 
-		try (PreparedStatement stmt = conn.prepareStatement(updateSql)) {
+		try (Connection conn = DBConnection.getConnection();PreparedStatement stmt = conn.prepareStatement(updateSql)) {
 			stmt.setInt(1, musicId);
 			stmt.setDate(2, streamDate);
 			stmt.setInt(3, musicId); 
@@ -39,7 +33,7 @@ public class MusicStreamSummaryDAO {
 		List<MusicStreamSummary> summaries = new ArrayList<>();
 		String sql = "SELECT * FROM MusicStreamSummary WHERE music_id = ? ORDER BY stream_date DESC";
 
-		try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (Connection conn = DBConnection.getConnection();PreparedStatement stmt = conn.prepareStatement(sql)) {
 			stmt.setInt(1, musicId);
 			try (ResultSet rs = stmt.executeQuery()) {
 				while (rs.next()) {

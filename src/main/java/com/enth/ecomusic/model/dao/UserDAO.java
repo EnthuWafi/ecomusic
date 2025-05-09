@@ -8,17 +8,11 @@ import com.enth.ecomusic.util.DBConnection;
 
 public class UserDAO {
 
-	private final Connection conn;
-
-	public UserDAO() {
-		this.conn = DBConnection.getConnection();
-	}
-
 	// CREATE
 	public boolean insertUser(User user) {
 		String sql = "INSERT INTO Users (first_name, last_name, bio, username, email, image_url, password, user_type) "
 				   + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-		try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (Connection conn = DBConnection.getConnection();PreparedStatement stmt = conn.prepareStatement(sql)) {
 			stmt.setString(1, user.getFirstName());
 			stmt.setString(2, user.getLastName());
 			stmt.setString(3, user.getBio());
@@ -37,7 +31,7 @@ public class UserDAO {
 	// READ
 	public User getUserById(int id) {
 		String sql = "SELECT * FROM Users WHERE user_id = ?";
-		try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (Connection conn = DBConnection.getConnection();PreparedStatement stmt = conn.prepareStatement(sql)) {
 			stmt.setInt(1, id);
 			ResultSet rs = stmt.executeQuery();
 			if (rs.next()) {
@@ -51,7 +45,7 @@ public class UserDAO {
 
 	public User getUserByUsernameOrEmail(String identifier) {
 		String sql = "SELECT * FROM Users WHERE email = ? OR username = ?";
-		try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (Connection conn = DBConnection.getConnection();PreparedStatement stmt = conn.prepareStatement(sql)) {
 			stmt.setString(1, identifier);
 			stmt.setString(2, identifier);
 			ResultSet rs = stmt.executeQuery();
@@ -67,7 +61,9 @@ public class UserDAO {
 	public List<User> getAllUsers() {
 		List<User> users = new ArrayList<>();
 		String sql = "SELECT * FROM Users";
-		try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+		try (Connection conn = DBConnection.getConnection();
+				PreparedStatement stmt = conn.prepareStatement(sql)) {
+			ResultSet rs = stmt.executeQuery();
 			while (rs.next()) {
 				users.add(mapUserFromResultSet(rs));
 			}
@@ -81,7 +77,7 @@ public class UserDAO {
 	public boolean updateUser(User user) {
 		String sql = "UPDATE Users SET first_name = ?, last_name = ?, bio = ?, username = ?, "
 				   + "email = ?, image_url = ?, password = ?, user_type = ? WHERE user_id = ?";
-		try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (Connection conn = DBConnection.getConnection();PreparedStatement stmt = conn.prepareStatement(sql)) {
 			stmt.setString(1, user.getFirstName());
 			stmt.setString(2, user.getLastName());
 			stmt.setString(3, user.getBio());
@@ -101,7 +97,7 @@ public class UserDAO {
 	// DELETE
 	public boolean deleteUser(int id) {
 		String sql = "DELETE FROM Users WHERE user_id = ?";
-		try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (Connection conn = DBConnection.getConnection();PreparedStatement stmt = conn.prepareStatement(sql)) {
 			stmt.setInt(1, id);
 			return stmt.executeUpdate() > 0;
 		} catch (SQLException e) {

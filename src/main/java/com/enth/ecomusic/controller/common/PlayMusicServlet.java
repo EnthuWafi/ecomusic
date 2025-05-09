@@ -22,7 +22,9 @@ public class PlayMusicServlet extends HttpServlet {
 	private MusicDAO musicDAO;
 
 	@Override
-	public void init() {
+	public void init() throws ServletException {
+		// TODO Auto-generated method stub
+		super.init();
 		musicDAO = new MusicDAO(); 
 	}
     /**
