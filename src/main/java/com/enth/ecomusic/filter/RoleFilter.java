@@ -15,25 +15,21 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
+import com.enth.ecomusic.model.User;
 import com.enth.ecomusic.util.CommonUtil;
 import com.enth.ecomusic.util.ToastrType;
 
 /**
- * Servlet Filter implementation class AuthFilter
+ * Servlet Filter implementation class RoleFilter
  */
-@WebFilter(urlPatterns = {"/user/*", "/admin/*", "/artist/*"})
-@Priority(1)
-public class AuthFilter extends HttpFilter implements Filter {
+@WebFilter({"/admin/*", "/artist/*"})
+@Priority(2)
+public class RoleFilter extends HttpFilter implements Filter {
        
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
-	/**
      * @see HttpFilter#HttpFilter()
      */
-    public AuthFilter() {
+    public RoleFilter() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -53,21 +49,31 @@ public class AuthFilter extends HttpFilter implements Filter {
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
         HttpSession session = httpRequest.getSession(false);
-        boolean loggedIn = session != null && session.getAttribute("user") != null;
+        User user = (User) session.getAttribute("user");
+        String uri = httpRequest.getRequestURI();
 
-        if (!loggedIn) {
-        	String requestedUri = httpRequest.getRequestURI();
-        	
-            session = httpRequest.getSession();
-            session.setAttribute("redirectAfterLogin", requestedUri);
-            
-            CommonUtil.addMessage(session, ToastrType.WARNING, "You must log in first!");
+        if (user == null) {
+            // User not logged in — skip role check
+            // AuthFilter should have handled this
             httpResponse.sendRedirect(httpRequest.getContextPath() + "/login");
+            return;
+        }
+        
+        if (uri.startsWith("/admin") && !CommonUtil.isAdmin(user)) {
+            CommonUtil.addMessage(session, ToastrType.ERROR, "Access denied: Admins only");
+            httpResponse.sendRedirect(httpRequest.getContextPath());
+            return;
+        }
+
+        if (uri.startsWith("/artist") && !CommonUtil.isArtist(user)) {
+            CommonUtil.addMessage(session, ToastrType.ERROR, "Access denied: Artists only");
+            httpResponse.sendRedirect(httpRequest.getContextPath());
             return;
         }
 
         chain.doFilter(request, response);
     }
+
 	/**
 	 * @see Filter#init(FilterConfig)
 	 */

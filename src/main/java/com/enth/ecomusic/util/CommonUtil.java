@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.enth.ecomusic.model.User;
+
 import jakarta.servlet.http.HttpSession;
 
 public class CommonUtil {
@@ -71,5 +73,21 @@ public class CommonUtil {
         List<Map<String, String>> messages = (List<Map<String, String>>) session.getAttribute("flash_messages");
         session.removeAttribute("flash_messages");
         return messages != null ? messages : new ArrayList<>();
+    }
+    
+    public static boolean isAdmin(User user) {
+    	String userType = user.getUserType();
+    	if ("admin".equals(userType)) {
+    		return true;
+    	}
+    	return false;
+    }
+    
+    public static boolean isArtist(User user) {
+    	String userType = user.getUserType();
+    	if ("artist".equals(userType)) {
+    		return true;
+    	}
+    	return false;
     }
 }

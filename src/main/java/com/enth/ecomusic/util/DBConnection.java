@@ -8,11 +8,17 @@ public class DBConnection {
     private static final HikariDataSource dataSource;
 
     static {
-        dataSource = new HikariDataSource();
-        dataSource.setJdbcUrl("jdbc:oracle:thin:@localhost:1521:xe");
-        dataSource.setUsername("ecomusic");
-        dataSource.setPassword("ecomusic");
-        dataSource.setMaximumPoolSize(10); // Adjust as needed
+    	try {
+            Class.forName("oracle.jdbc.OracleDriver");
+
+            dataSource = new HikariDataSource();
+            dataSource.setJdbcUrl("jdbc:oracle:thin:@localhost:1521:xe");
+            dataSource.setUsername("ecomusic");
+            dataSource.setPassword("ecomusic");
+            dataSource.setMaximumPoolSize(10);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Failed to load Oracle JDBC Driver", e);
+        }
     }
 
     public static Connection getConnection() {

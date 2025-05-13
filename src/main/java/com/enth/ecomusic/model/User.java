@@ -10,7 +10,7 @@ public class User {
 	private String bio;
 	private String email;
 	private String password;
-	private String userType;
+	private String userType; // user, admin, superadmin
 	private String imageUrl;
 	private Date createdAt;
 

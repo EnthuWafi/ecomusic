@@ -23,3 +23,5 @@ hs_err_pid*
 replay_pid*
 /build/
 /target/
+
+src/main/webapp/WEB-INF/classes/config.properties

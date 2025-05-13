@@ -101,7 +101,9 @@ public class SubscriptionDAO {
                 rs.getDate("end_date"),
                 rs.getDouble("amount_paid"),
                 rs.getString("payment_status"),
-                rs.getString("payment_gateway_ref")
+                rs.getString("payment_gateway_ref"),
+                rs.getDate("created_date"),
+                rs.getInt("subscription_plan_id")
         );
     }
 }

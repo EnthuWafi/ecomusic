@@ -3,30 +3,36 @@
 
 <h2>All Music</h2>
 
-<table border="1">
-	<tr>
-		<th>Title</th>
-		<th>Genre</th>
-		<th>Description</th>
-		<th>Upload Date</th>
-		<th>Premium Content</th>
-		<th>Link</th>
-	</tr>
+<div class="container mt-4">
+	<div class="row row-cols-1 row-cols-md-3 g-4">
+		<c:forEach var="music" items="${musicList}">
+			<div class="col">
+				<div class="card h-100 shadow-sm">
+					<img src="${pageContext.request.contextPath}/stream/image/music/${music.musicId}" class="card-img-top" 
+					alt="${music.title}" style="height: 200px; object-fit: cover;">
+					<div class="card-body">
+						<h5 class="card-title">${music.title}</h5>
+						<h6 class="card-subtitle mb-2 text-muted">${music.genre}</h6>
+						<p class="card-text">
+							<small class="text-muted">Uploaded on: 
+								<fmt:formatDate value="${music.uploadDate}" pattern="yyyy-MM-dd" />
+							</small>
+						</p>
+						<p class="card-text">
+							<span class="badge ${music.premiumContent ? 'bg-warning text-dark' : 'bg-secondary'}">
+								${music.premiumContent ? 'Premium' : 'Free'}
+							</span>
+						</p>
+					</div>
+					<div class="card-footer text-center">
+						<a href="${pageContext.request.contextPath}/music/play/${music.musicId}" class="btn btn-primary">Play</a>
+					</div>
+				</div>
+			</div>
+		</c:forEach>
+	</div>
+</div>
 
-	<c:forEach var="music" items="${musicList}">
-		<tr>
-			<td>${music.title}</td>
-			<td>${music.genre}</td>
-			<td>${music.description}</td>
-			<td><fmt:formatDate value="${music.uploadDate}"
-					pattern="yyyy-MM-dd" /></td>
-			<td>${music.premiumContent ? 'Yes' : 'No'}</td>
-			<td><a
-				href="${pageContext.request.contextPath}/music/play/${music.musicId}">Play</a></td>
-		</tr>
-	</c:forEach>
-
-</table>
 
 <!-- Pagination controls -->
 <div>

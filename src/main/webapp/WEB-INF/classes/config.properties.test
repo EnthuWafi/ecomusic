@@ -1,0 +1,7 @@
+websiteName=Eco Music
+websiteDescription=A place for all your music needs.
+audioFilePath=C:/Users/wapi/Desktop/ecomusic-file/audio/
+imageFilePath=C:/Users/wapi/Desktop/ecomusic-file/image/
+stripePublicKey=
+stripeSecretKey=
+stripeWebhookKey=

@@ -12,6 +12,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
@@ -20,7 +21,7 @@ public class LoginServlet extends HttpServlet {
 	 */
 	private static final long serialVersionUID = 1L;
 	private UserDAO userDAO;
-	
+
 	@Override
 	public void init() throws ServletException {
 		super.init();
@@ -28,30 +29,42 @@ public class LoginServlet extends HttpServlet {
 	}
 
 	@Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		request.setAttribute("pageTitle", "Login Page");
 		request.setAttribute("contentPage", "/WEB-INF/views/auth/login.jsp");
 		request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
 	}
-	
+
 	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		// Login post path
-        String email = request.getParameter("email"); //username or email really
-        String password = request.getParameter("password");
-				
+		String email = request.getParameter("email"); // username or email really
+		String password = request.getParameter("password");
+
 		User user = userDAO.getUserByUsernameOrEmail(email);
-		
+
+		HttpSession session = request.getSession();
+
 		if (user != null && CommonUtil.checkPassword(password, user.getPassword())) {
-			CommonUtil.addMessage(request.getSession(), ToastrType.SUCCESS, "Successfully logged in!");
-	        request.getSession().setAttribute("user", user);
-	        response.sendRedirect(request.getContextPath() + "/home");
-	        return;
-	    }
-		else {
-			CommonUtil.addMessage(request.getSession(), ToastrType.ERROR, "Invalid username or password!");
+			CommonUtil.addMessage(session, ToastrType.SUCCESS, "Successfully logged in!");
+			session.setAttribute("user", user);
+			
+			// Handle redirection after login
+			String redirectUri = (String) session.getAttribute("redirectAfterLogin");
+			if (redirectUri != null) {
+				session.removeAttribute("redirectAfterLogin");
+				response.sendRedirect(
+						request.getContextPath() + redirectUri.replaceFirst("^" + request.getContextPath(), ""));
+			} else {
+				response.sendRedirect(request.getContextPath() + "/home");
+			}
+			return;
+		} else {
+			CommonUtil.addMessage(session, ToastrType.ERROR, "Invalid username or password!");
 			response.sendRedirect(request.getContextPath() + "/login");
-	        return;
+			return;
 		}
 	}
 }

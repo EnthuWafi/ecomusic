@@ -10,19 +10,42 @@ public class Subscription {
     private double amountPaid;
     private String paymentStatus;
     private String paymentGatewayRef;
+    private Date createdAt;
+    private int subscriptionPlanId;
 
+ // Optional but convenient
+    private SubscriptionPlan subscriptionPlan;
+
+    public Subscription(int subscriptionId, int userId, Date startDate, Date endDate,
+                        double amountPaid, String paymentStatus, String paymentGatewayRef,
+                        Date createdAt, int subscriptionPlanId) {
+        this.subscriptionId = subscriptionId;
+        this.userId = userId;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.amountPaid = amountPaid;
+        this.paymentStatus = paymentStatus;
+        this.paymentGatewayRef = paymentGatewayRef;
+        this.createdAt = createdAt;
+        this.subscriptionPlanId = subscriptionPlanId;
+    }
     
-    public Subscription(int subscriptionId, int userId, Date startDate, Date endDate, double amountPaid,
-			String paymentStatus, String paymentGatewayRef) {
+    
+    
+	public Subscription(int userId, Date startDate, Date endDate, double amountPaid, String paymentStatus,
+			String paymentGatewayRef, int subscriptionPlanId) {
 		super();
-		this.subscriptionId = subscriptionId;
 		this.userId = userId;
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.amountPaid = amountPaid;
 		this.paymentStatus = paymentStatus;
 		this.paymentGatewayRef = paymentGatewayRef;
+		this.subscriptionPlanId = subscriptionPlanId;
 	}
+
+
+
 	// Getters & Setters
     public int getSubscriptionId() { return subscriptionId; }
     public void setSubscriptionId(int subscriptionId) { this.subscriptionId = subscriptionId; }
@@ -45,4 +68,31 @@ public class Subscription {
     public String getPaymentGatewayRef() { return paymentGatewayRef; }
     public void setPaymentGatewayRef(String paymentGatewayRef) { this.paymentGatewayRef = paymentGatewayRef; }
 
+	public Date getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(Date createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public int getSubscriptionPlanId() {
+		return subscriptionPlanId;
+	}
+
+	public void setSubscriptionPlanId(int subscriptionPlanId) {
+		this.subscriptionPlanId = subscriptionPlanId;
+	}
+
+	public SubscriptionPlan getSubscriptionPlan() {
+		return subscriptionPlan;
+	}
+
+	public void setSubscriptionPlan(SubscriptionPlan subscriptionPlan) {
+		this.subscriptionPlan = subscriptionPlan;
+	}
+	
+	
+
+    
 }
