@@ -10,16 +10,18 @@ public class User {
 	private String bio;
 	private String email;
 	private String password;
-	private String userType; // user, admin, superadmin
+	private int roleId; 
 	private String imageUrl;
 	private Date createdAt;
 
+	private Role role;
+	
 	public User() {
 		super();
 	}
 
 	public User(int userId, String firstName, String lastName, String username, String bio, String email,
-			String password, String userType, String imageUrl, Date createdAt) {
+			String password, int roleId, String imageUrl, Date createdAt) {
 		super();
 		this.userId = userId;
 		this.firstName = firstName;
@@ -28,13 +30,13 @@ public class User {
 		this.bio = bio;
 		this.email = email;
 		this.password = password;
-		this.userType = userType;
+		this.roleId = roleId;
 		this.imageUrl = imageUrl;
 		this.createdAt = createdAt;
 	}
 
 	public User(String firstName, String lastName, String username, String bio, String email, String password,
-			String userType, String imageUrl) {
+			int roleId, String imageUrl) {
 		super();
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -42,14 +44,12 @@ public class User {
 		this.bio = bio;
 		this.email = email;
 		this.password = password;
-		this.userType = userType;
+		this.roleId = roleId;
 		this.imageUrl = imageUrl;
 	}
 	
-	
-
 	public User(String firstName, String lastName, String username, String bio, String email, String password,
-			String userType) {
+			int roleId) {
 		super();
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -57,10 +57,19 @@ public class User {
 		this.bio = bio;
 		this.email = email;
 		this.password = password;
-		this.userType = userType;
+		this.roleId = roleId;
 	}
 
-	// Getters & Setters
+	//minimal constructor
+	public User(String firstName, String lastName, String username, String bio, String email, String password) {
+		super();
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.username = username;
+		this.bio = bio;
+		this.email = email;
+		this.password = password;
+	}
 
 	public int getUserId() {
 		return userId;
@@ -86,20 +95,20 @@ public class User {
 		this.lastName = lastName;
 	}
 
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
 	public String getBio() {
 		return bio;
 	}
 
 	public void setBio(String bio) {
 		this.bio = bio;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String name) {
-		this.username = name;
 	}
 
 	public String getEmail() {
@@ -118,12 +127,12 @@ public class User {
 		this.password = password;
 	}
 
-	public String getUserType() {
-		return userType;
+	public int getRoleId() {
+		return roleId;
 	}
 
-	public void setUserType(String userType) {
-		this.userType = userType;
+	public void setRoleId(int roleId) {
+		this.roleId = roleId;
 	}
 
 	public String getImageUrl() {
@@ -141,4 +150,35 @@ public class User {
 	public void setCreatedAt(Date createdAt) {
 		this.createdAt = createdAt;
 	}
+
+	public Role getRole() {
+		return role;
+	}
+
+	public void setRole(Role role) {
+		this.role = role;
+	}
+
+	//role checking
+	public boolean hasRole(RoleType roleType) {
+	    return this.role != null &&
+	           roleType.getValue().equalsIgnoreCase(this.role.getRoleName());
+	}
+
+	public boolean isAdmin() {
+	    return hasRole(RoleType.ADMIN);
+	}
+
+	public boolean isSuperAdmin() {
+	    return hasRole(RoleType.SUPERADMIN);
+	}
+
+	public boolean isArtist() {
+	    return hasRole(RoleType.ARTIST);
+	}
+	
+	public boolean isUser() {
+	    return hasRole(RoleType.USER);
+	}
+	
 }

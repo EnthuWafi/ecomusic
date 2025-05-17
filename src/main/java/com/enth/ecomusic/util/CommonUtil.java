@@ -75,19 +75,4 @@ public class CommonUtil {
         return messages != null ? messages : new ArrayList<>();
     }
     
-    public static boolean isAdmin(User user) {
-    	String userType = user.getUserType();
-    	if ("admin".equals(userType)) {
-    		return true;
-    	}
-    	return false;
-    }
-    
-    public static boolean isArtist(User user) {
-    	String userType = user.getUserType();
-    	if ("artist".equals(userType)) {
-    		return true;
-    	}
-    	return false;
-    }
 }

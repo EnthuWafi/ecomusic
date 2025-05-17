@@ -1,23 +1,25 @@
 package com.enth.ecomusic.model.dao;
 
-import com.enth.ecomusic.model.Subscription;
+import com.enth.ecomusic.model.UserSubscription;
 import com.enth.ecomusic.util.DBConnection;
 
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SubscriptionDAO {
 
     // CREATE
-    public boolean insertSubscription(Subscription sub) {
+    public boolean insertSubscription(UserSubscription sub) {
         String sql = "INSERT INTO Subscriptions (subscription_id, user_id, start_date, end_date, amount_paid, payment_status, payment_gateway_ref) "
                    + "VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, sub.getSubscriptionId());
             stmt.setInt(2, sub.getUserId());
-            stmt.setDate(3, (java.sql.Date) sub.getStartDate());
-            stmt.setDate(4, (java.sql.Date) sub.getEndDate());
+            stmt.setDate(3, sub.getStartDate() != null ? Date.valueOf(sub.getStartDate()) : null);
+            stmt.setDate(4, sub.getEndDate() != null ? Date.valueOf(sub.getEndDate()) : null);
             stmt.setDouble(5, sub.getAmountPaid());
             stmt.setString(6, sub.getPaymentStatus());
             stmt.setString(7, sub.getPaymentGatewayRef());
@@ -30,7 +32,7 @@ public class SubscriptionDAO {
     }
 
     // READ (by ID)
-    public Subscription getSubscriptionById(int id) {
+    public UserSubscription getSubscriptionById(int id) {
         String sql = "SELECT * FROM Subscriptions WHERE subscription_id = ?";
         try (Connection conn = DBConnection.getConnection();PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
@@ -45,8 +47,8 @@ public class SubscriptionDAO {
     }
 
     // READ (all for a user)
-    public List<Subscription> getSubscriptionsByUserId(int userId) {
-        List<Subscription> list = new ArrayList<>();
+    public List<UserSubscription> getSubscriptionsByUserId(int userId) {
+        List<UserSubscription> list = new ArrayList<>();
         String sql = "SELECT * FROM Subscriptions WHERE user_id = ?";
         try (Connection conn = DBConnection.getConnection();PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, userId);
@@ -61,13 +63,13 @@ public class SubscriptionDAO {
     }
 
     // UPDATE
-    public boolean updateSubscription(Subscription sub) {
+    public boolean updateSubscription(UserSubscription sub) {
         String sql = "UPDATE Subscriptions SET user_id = ?, start_date = ?, end_date = ?, amount_paid = ?, "
                    + "payment_status = ?, payment_gateway_ref = ? WHERE subscription_id = ?";
         try (Connection conn = DBConnection.getConnection();PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, sub.getUserId());
-            stmt.setDate(2, (java.sql.Date) sub.getStartDate());
-            stmt.setDate(3, (java.sql.Date) sub.getEndDate());
+            stmt.setDate(2, sub.getStartDate() != null ? Date.valueOf(sub.getStartDate()) : null);
+            stmt.setDate(3, sub.getEndDate() != null ? Date.valueOf(sub.getEndDate()) : null);
             stmt.setDouble(4, sub.getAmountPaid());
             stmt.setString(5, sub.getPaymentStatus());
             stmt.setString(6, sub.getPaymentGatewayRef());
@@ -93,16 +95,20 @@ public class SubscriptionDAO {
     }
 
     // Helper method
-    private Subscription mapResultSetToSubscription(ResultSet rs) throws SQLException {
-        return new Subscription(
+    private UserSubscription mapResultSetToSubscription(ResultSet rs) throws SQLException {
+    	LocalDate startDate = rs.getDate("start_date") != null ? rs.getDate("start_date").toLocalDate() : null;
+    	LocalDate endDate = rs.getDate("end_date") != null ? rs.getDate("end_date").toLocalDate() : null;
+    	LocalDateTime createdAt = rs.getTimestamp("created_at").toLocalDateTime();
+
+        return new UserSubscription(
                 rs.getInt("subscription_id"),
                 rs.getInt("user_id"),
-                rs.getDate("start_date"),
-                rs.getDate("end_date"),
+                startDate,
+                endDate,
                 rs.getDouble("amount_paid"),
                 rs.getString("payment_status"),
                 rs.getString("payment_gateway_ref"),
-                rs.getDate("created_date"),
+                createdAt,
                 rs.getInt("subscription_plan_id")
         );
     }

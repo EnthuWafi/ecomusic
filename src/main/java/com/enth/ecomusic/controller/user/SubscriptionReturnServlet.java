@@ -18,14 +18,14 @@ import com.stripe.model.checkout.Session;
 /**
  * Servlet implementation class ArtistSubscriptionReturnServlet
  */
-@WebServlet("/user/subscription/artist/return")
-public class ArtistSubscriptionReturnServlet extends HttpServlet {
+@WebServlet("/user/subscription/return")
+public class SubscriptionReturnServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public ArtistSubscriptionReturnServlet() {
+    public SubscriptionReturnServlet() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -56,6 +56,8 @@ public class ArtistSubscriptionReturnServlet extends HttpServlet {
             Session session = Session.retrieve(sessionId);
             String status = session.getStatus(); // "complete", "open", etc.
 
+            // TODO: SOmething heres
+            
             if ("complete".equals(status)) {
                 CommonUtil.addMessage(httpSession, ToastrType.SUCCESS, "You're now an artist!");
                 response.sendRedirect(request.getContextPath() + "/artist/dashboard");
@@ -70,13 +72,5 @@ public class ArtistSubscriptionReturnServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/become-artist");
         }
     }
-
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
-	}
 
 }

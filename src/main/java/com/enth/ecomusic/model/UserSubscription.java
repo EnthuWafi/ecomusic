@@ -1,38 +1,41 @@
 package com.enth.ecomusic.model;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
-public class Subscription {
+
+public class UserSubscription {
 	private int subscriptionId;
     private int userId;
-    private Date startDate;
-    private Date endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private double amountPaid;
     private String paymentStatus;
     private String paymentGatewayRef;
-    private Date createdAt;
+    private LocalDateTime createdAt;
     private int subscriptionPlanId;
 
- // Optional but convenient
+    // Optional but convenient
     private SubscriptionPlan subscriptionPlan;
 
-    public Subscription(int subscriptionId, int userId, Date startDate, Date endDate,
-                        double amountPaid, String paymentStatus, String paymentGatewayRef,
-                        Date createdAt, int subscriptionPlanId) {
-        this.subscriptionId = subscriptionId;
-        this.userId = userId;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.amountPaid = amountPaid;
-        this.paymentStatus = paymentStatus;
-        this.paymentGatewayRef = paymentGatewayRef;
-        this.createdAt = createdAt;
-        this.subscriptionPlanId = subscriptionPlanId;
-    }
-    
-    
-    
-	public Subscription(int userId, Date startDate, Date endDate, double amountPaid, String paymentStatus,
+
+	public UserSubscription(int subscriptionId, int userId, LocalDate startDate, LocalDate endDate, double amountPaid,
+			String paymentStatus, String paymentGatewayRef, LocalDateTime createdAt, int subscriptionPlanId) {
+		super();
+		this.subscriptionId = subscriptionId;
+		this.userId = userId;
+		this.startDate = startDate;
+		this.endDate = endDate;
+		this.amountPaid = amountPaid;
+		this.paymentStatus = paymentStatus;
+		this.paymentGatewayRef = paymentGatewayRef;
+		this.createdAt = createdAt;
+		this.subscriptionPlanId = subscriptionPlanId;
+	}
+	
+	
+	public UserSubscription(int userId, LocalDate startDate, LocalDate endDate, double amountPaid, String paymentStatus,
 			String paymentGatewayRef, int subscriptionPlanId) {
 		super();
 		this.userId = userId;
@@ -45,7 +48,6 @@ public class Subscription {
 	}
 
 
-
 	// Getters & Setters
     public int getSubscriptionId() { return subscriptionId; }
     public void setSubscriptionId(int subscriptionId) { this.subscriptionId = subscriptionId; }
@@ -53,13 +55,33 @@ public class Subscription {
     public int getUserId() { return userId; }
     public void setUserId(int userId) { this.userId = userId; }
 
-    public Date getStartDate() { return startDate; }
-    public void setStartDate(Date startDate) { this.startDate = startDate; }
+    
 
-    public Date getEndDate() { return endDate; }
-    public void setEndDate(Date endDate) { this.endDate = endDate; }
+    public LocalDate getStartDate() {
+		return startDate;
+	}
 
-    public double getAmountPaid() { return amountPaid; }
+
+
+	public void setStartDate(LocalDate startDate) {
+		this.startDate = startDate;
+	}
+
+
+
+	public LocalDate getEndDate() {
+		return endDate;
+	}
+
+
+
+	public void setEndDate(LocalDate endDate) {
+		this.endDate = endDate;
+	}
+
+
+
+	public double getAmountPaid() { return amountPaid; }
     public void setAmountPaid(double amountPaid) { this.amountPaid = amountPaid; }
 
     public String getPaymentStatus() { return paymentStatus; }
@@ -68,13 +90,18 @@ public class Subscription {
     public String getPaymentGatewayRef() { return paymentGatewayRef; }
     public void setPaymentGatewayRef(String paymentGatewayRef) { this.paymentGatewayRef = paymentGatewayRef; }
 
-	public Date getCreatedAt() {
+	
+	public LocalDateTime getCreatedAt() {
 		return createdAt;
 	}
 
-	public void setCreatedAt(Date createdAt) {
+
+
+	public void setCreatedAt(LocalDateTime createdAt) {
 		this.createdAt = createdAt;
 	}
+
+
 
 	public int getSubscriptionPlanId() {
 		return subscriptionPlanId;

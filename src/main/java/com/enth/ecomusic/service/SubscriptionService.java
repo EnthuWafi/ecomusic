@@ -1,5 +1,5 @@
-package com.enth.ecomusic.model.service;
-import com.enth.ecomusic.model.Subscription;
+package com.enth.ecomusic.service;
+import com.enth.ecomusic.model.UserSubscription;
 import com.enth.ecomusic.model.SubscriptionPlan;
 import com.enth.ecomusic.model.dao.SubscriptionDAO;
 import com.enth.ecomusic.model.dao.SubscriptionPlanDAO;
@@ -18,28 +18,28 @@ public class SubscriptionService {
     }
 
     // CREATE
-    public boolean createSubscription(Subscription sub) {
+    public boolean createSubscription(UserSubscription sub) {
         return subscriptionDAO.insertSubscription(sub);
     }
 
     // GET by subscription ID (with plan loaded)
-    public Subscription getSubscriptionById(int id) {
-        Subscription sub = subscriptionDAO.getSubscriptionById(id);
+    public UserSubscription getSubscriptionById(int id) {
+        UserSubscription sub = subscriptionDAO.getSubscriptionById(id);
         attachPlanIfAvailable(sub);
         return sub;
     }
 
     // GET all user subscriptions (with plans)
-    public List<Subscription> getSubscriptionsByUserId(int userId) {
-        List<Subscription> subs = subscriptionDAO.getSubscriptionsByUserId(userId);
-        for (Subscription sub : subs) {
+    public List<UserSubscription> getSubscriptionsByUserId(int userId) {
+        List<UserSubscription> subs = subscriptionDAO.getSubscriptionsByUserId(userId);
+        for (UserSubscription sub : subs) {
             attachPlanIfAvailable(sub);
         }
         return subs;
     }
 
     // UPDATE
-    public boolean updateSubscription(Subscription sub) {
+    public boolean updateSubscription(UserSubscription sub) {
         return subscriptionDAO.updateSubscription(sub);
     }
 
@@ -49,7 +49,7 @@ public class SubscriptionService {
     }
 
     // PRIVATE — reusability booster
-    private void attachPlanIfAvailable(Subscription sub) {
+    private void attachPlanIfAvailable(UserSubscription sub) {
         if (sub != null && sub.getSubscriptionPlanId() > 0) {
             SubscriptionPlan plan = subscriptionPlanDAO.getSubscriptionPlanById(sub.getSubscriptionPlanId());
             sub.setSubscriptionPlan(plan);
@@ -60,13 +60,19 @@ public class SubscriptionService {
     public List<SubscriptionPlan> getAllSubscriptionPlans() {
         return subscriptionPlanDAO.getAllSubscriptionPlans();
     }
+    
+    public List<SubscriptionPlan> getAllSubscriptionPlansForListener() {
+        return subscriptionPlanDAO.getAllSubscriptionPlansByPlanType("listener");
+    }
+    
+    public List<SubscriptionPlan> getAllSubscriptionPlansForCreator() {
+        return subscriptionPlanDAO.getAllSubscriptionPlansByPlanType("creator");
+    }
 
-    // Optional — get a single plan
     public SubscriptionPlan getSubscriptionPlanById(int planId) {
         return subscriptionPlanDAO.getSubscriptionPlanById(planId);
     }
 
-    // Optional — by Stripe ID
     public SubscriptionPlan getSubscriptionPlanByStripeId(String stripePriceId) {
         return subscriptionPlanDAO.getSubscriptionPlanByStripePriceId(stripePriceId);
     }

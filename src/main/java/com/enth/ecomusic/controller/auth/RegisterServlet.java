@@ -2,8 +2,9 @@ package com.enth.ecomusic.controller.auth;
 
 import java.io.IOException;
 
+import com.enth.ecomusic.model.RoleType;
 import com.enth.ecomusic.model.User;
-import com.enth.ecomusic.model.dao.UserDAO;
+import com.enth.ecomusic.service.UserService;
 import com.enth.ecomusic.util.CommonUtil;
 import com.enth.ecomusic.util.ToastrType;
 
@@ -20,12 +21,12 @@ public class RegisterServlet extends HttpServlet {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private UserDAO userDAO;
+	private UserService userService;
 
 	@Override
 	public void init() throws ServletException {
 		super.init();
-		userDAO = new UserDAO();
+		userService = new UserService();
 	}
 
 	@Override
@@ -47,10 +48,8 @@ public class RegisterServlet extends HttpServlet {
 
 	    HttpSession session = request.getSession();
 
-	    // Basic validation
-
 	    // Check if user already exists
-	    User existing = userDAO.getUserByUsernameOrEmail(email);
+	    User existing = userService.getUserByUsernameOrEmail(email);
 	    if (existing != null) {
 	        CommonUtil.addMessage(session, ToastrType.ERROR, "Email is already registered.");
 	        response.sendRedirect(request.getContextPath() + "/register");
@@ -61,9 +60,9 @@ public class RegisterServlet extends HttpServlet {
 	    String hashedPassword = CommonUtil.hashPassword(password);
 
 	    // Create user object
-	    User newUser = new User(fname, lname, username, null, email, hashedPassword, "user");
+	    User newUser = new User(fname, lname, username, null, email, hashedPassword);
 
-	    boolean success = userDAO.insertUser(newUser);
+	    boolean success = userService.registerUserWithRoleName(newUser, RoleType.USER);
 
 	    if (success) {
 	        CommonUtil.addMessage(session, ToastrType.SUCCESS, "Registration successful. Please log in.");

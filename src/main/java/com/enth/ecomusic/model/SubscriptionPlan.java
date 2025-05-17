@@ -1,6 +1,10 @@
 package com.enth.ecomusic.model;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import com.enth.ecomusic.util.JsonUtil;
+import com.google.gson.reflect.TypeToken;
 
 public class SubscriptionPlan {
     private int subscriptionPlanId;
@@ -9,13 +13,13 @@ public class SubscriptionPlan {
     private String billingCycle;
     private double price;
     private String description;
-    private String features; 
-    private Date createdAt;
+    private LocalDateTime createdAt;
     private String planType;
 
+    private List<String> features; 
     
     public SubscriptionPlan(int subscriptionPlanId, String name, String stripePriceId, String billingCycle,
-                            double price, String description, String features, Date createdAt, String planType) {
+                            double price, String description, List<String> features, LocalDateTime createdAt, String planType) {
         this.subscriptionPlanId = subscriptionPlanId;
         this.name = name;
         this.stripePriceId = stripePriceId;
@@ -26,6 +30,21 @@ public class SubscriptionPlan {
         this.createdAt = createdAt;
         this.planType = planType;
     }
+
+    
+
+	public SubscriptionPlan(String name, String stripePriceId, String billingCycle, double price, String description,
+			List<String> features, String planType) {
+		super();
+		this.name = name;
+		this.stripePriceId = stripePriceId;
+		this.billingCycle = billingCycle;
+		this.price = price;
+		this.description = description;
+		this.features = features;
+		this.planType = planType;
+	}
+
 
 
 	public int getSubscriptionPlanId() {
@@ -88,22 +107,31 @@ public class SubscriptionPlan {
 	}
 
 
-	public String getFeatures() {
-		return features;
-	}
+    public String getFeaturesJson() {
+        return JsonUtil.toJson(this.features);
+    }
+
+    public void setFeaturesFromJson(String json) {
+        TypeToken<List<String>> typeToken = new TypeToken<>(){};
+        this.features = JsonUtil.fromJson(json, typeToken);
+    }
 
 
-	public void setFeatures(String features) {
-		this.features = features;
-	}
+    public List<String> getFeatures() {
+        return features;
+    }
+
+    public void setFeatures(List<String> features) {
+        this.features = features;
+    }
 
 
-	public Date getCreatedAt() {
+	public LocalDateTime getCreatedAt() {
 		return createdAt;
 	}
 
 
-	public void setCreatedAt(Date createdAt) {
+	public void setCreatedAt(LocalDateTime createdAt) {
 		this.createdAt = createdAt;
 	}
 
@@ -116,6 +144,7 @@ public class SubscriptionPlan {
 	public void setPlanType(String planType) {
 		this.planType = planType;
 	}
-    
+
+	
     
 }

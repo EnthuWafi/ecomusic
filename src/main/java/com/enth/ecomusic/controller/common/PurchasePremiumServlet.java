@@ -1,0 +1,52 @@
+package com.enth.ecomusic.controller.common;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.List;
+
+import com.enth.ecomusic.model.SubscriptionPlan;
+import com.enth.ecomusic.service.SubscriptionService;
+
+/**
+ * Servlet implementation class PurchasePremiumServlet
+ */
+@WebServlet("/purchase-premium")
+public class PurchasePremiumServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+	private SubscriptionService subscriptionService;
+
+	@Override
+	public void init() throws ServletException {
+		// TODO Auto-generated method stub
+		super.init();
+		subscriptionService = new SubscriptionService();
+	}
+
+	/**
+	 * @see HttpServlet#HttpServlet()
+	 */
+	public PurchasePremiumServlet() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		List<SubscriptionPlan> plans = subscriptionService.getAllSubscriptionPlansForListener();
+
+		request.setAttribute("subscriptionPlanList", plans);
+		request.setAttribute("pageTitle", "Become a Premium User");
+		request.setAttribute("contentPage", "/WEB-INF/views/common/choose-plan.jsp");
+		request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
+	}
+
+}

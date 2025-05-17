@@ -7,6 +7,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.List;
+
+import com.enth.ecomusic.model.SubscriptionPlan;
+import com.enth.ecomusic.service.SubscriptionService;
 
 /**
  * Servlet implementation class BecomeCreatorServlet
@@ -14,8 +18,14 @@ import java.io.IOException;
 @WebServlet("/become-artist")
 public class BecomeArtistServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-    
+    private SubscriptionService subscriptionService;
 
+    @Override
+    public void init() throws ServletException {
+    	// TODO Auto-generated method stub
+    	super.init();
+    	subscriptionService = new SubscriptionService();
+    }
     /**
      * @see HttpServlet#HttpServlet()
      */
@@ -28,8 +38,12 @@ public class BecomeArtistServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    	
+    	List<SubscriptionPlan> plans = subscriptionService.getAllSubscriptionPlansForCreator();
+    	
+    	request.setAttribute("subscriptionPlanList", plans);
         request.setAttribute("pageTitle", "Become an Artist");
-        request.setAttribute("contentPage", "/WEB-INF/views/common/become-artist.jsp");
+        request.setAttribute("contentPage", "/WEB-INF/views/common/choose-plan.jsp");
         request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
     }
 

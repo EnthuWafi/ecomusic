@@ -1,22 +1,26 @@
-package com.enth.ecomusic.util;
+package com.enth.ecomusic.service;
 
+import com.enth.ecomusic.model.SubscriptionPlan;
+import com.enth.ecomusic.util.AppConfig;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
 
-public class PaymentUtil {
+public class StripeService {
 	static {
 		AppConfig config = new AppConfig();
 		Stripe.apiKey = config.get("stripeSecretKey");
 	}
 
-	public static String createCheckoutSessionForPlan(String stripePriceId, String returnUrl, String userId)
+	public static String createCheckoutSessionForPlan(SubscriptionPlan plan, String returnUrl, String userId)
 			throws StripeException {
 		SessionCreateParams params = SessionCreateParams.builder().setUiMode(SessionCreateParams.UiMode.EMBEDDED)
 				.setMode(SessionCreateParams.Mode.SUBSCRIPTION)
 				.setReturnUrl(returnUrl + "?session_id={CHECKOUT_SESSION_ID}").setClientReferenceId(userId)
-				.addLineItem(SessionCreateParams.LineItem.builder().setQuantity(1L).setPrice(stripePriceId).build())
+				.putMetadata("subscription_plan_id", String.valueOf(plan.getSubscriptionPlanId()))
+				.addLineItem(SessionCreateParams.LineItem.builder().setQuantity(1L).setPrice(plan.getStripePriceId())
+						.build())
 				.build();
 
 		Session session = Session.create(params);

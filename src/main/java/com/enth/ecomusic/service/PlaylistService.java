@@ -1,4 +1,4 @@
-package com.enth.ecomusic.model.service;
+package com.enth.ecomusic.service;
 
 import com.enth.ecomusic.model.Music;
 import com.enth.ecomusic.model.Playlist;
