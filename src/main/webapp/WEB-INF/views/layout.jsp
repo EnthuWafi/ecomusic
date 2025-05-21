@@ -17,10 +17,13 @@
 	href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.css"
 	integrity="sha512-oe8OpYjBaDWPt2VmSFR+qYOdnTjeV9QPLJUeqZyprDEQvQLJ9C5PCFclxwNuvb/GQgQngdCXzKSFltuHD3eCxA=="
 	crossorigin="anonymous" referrerpolicy="no-referrer" />
-
+<meta charset="UTF-8">
 
 <!-- SCRIPTS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+<script
+	src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+	integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+	crossorigin="anonymous"></script>
 <script
 	src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
 	integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
@@ -42,10 +45,10 @@
 
 			<c:choose>
 				<c:when test="${not empty sessionScope.user}">
-				
-                <span>Welcome, ${sessionScope.user.username}!</span>
-                
-                <c:choose>
+
+					<span>Welcome, ${sessionScope.user.username}!</span>
+
+					<c:choose>
 						<c:when test="${sessionScope.user.userType == 'admin'}">
 							<a href="${pageContext.request.contextPath}/admin">Dashboard</a> |
            			</c:when>
@@ -67,7 +70,7 @@
 	</header>
 
 	<main>
-		<jsp:include page="${contentPage}" />
+		<c:import url="${contentPage}" />
 	</main>
 
 	<footer>

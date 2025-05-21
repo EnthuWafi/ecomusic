@@ -1,3 +1,5 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 
@@ -9,12 +11,11 @@
 				<div class="card h-100 shadow-sm">
 					<div class="card-header bg-primary text-white">
 						<h5 class="card-title mb-0">${plan.name}</h5>
-						<small class="d-block"> Created: <fmt:formatDate
-								value="${plan.createdAt}" pattern="MMM d, yyyy" />
+						<small class="d-block"> Created: <fmt:formatDate value="${plan.createdAtDate}" pattern="MMM d, yyyy" />
 						</small>
 					</div>
 					<div class="card-body">
-						<h6 class="card-subtitle mb-2 text-muted">${plan.planType} •
+						<h6 class="card-subtitle mb-2 text-muted">${plan.planType} |
 							${plan.billingCycle}</h6>
 						<p class="card-text">${plan.description}</p>
 						<ul class="list-unstyled">

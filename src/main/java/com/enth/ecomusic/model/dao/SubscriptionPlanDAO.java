@@ -116,8 +116,14 @@ public class SubscriptionPlanDAO {
         String type = rs.getString("plan_type");
         LocalDateTime createdAt = rs.getTimestamp("created_at").toLocalDateTime();
 
-        TypeToken<List<String>> typeToken = new TypeToken<List<String>>() {};
-        List<String> features = JsonUtil.fromJson(rawJson, typeToken);
+        List<String> features;
+        if (rawJson != null && rawJson.trim().startsWith("[")) {
+            TypeToken<List<String>> typeToken = new TypeToken<List<String>>() {};
+            features = JsonUtil.fromJson(rawJson, typeToken);
+        } else {
+            features = new ArrayList<>();
+        }
+
 
         return new SubscriptionPlan(
                 id,

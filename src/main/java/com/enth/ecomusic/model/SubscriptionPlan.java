@@ -1,6 +1,8 @@
 package com.enth.ecomusic.model;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 import com.enth.ecomusic.util.JsonUtil;
@@ -133,6 +135,10 @@ public class SubscriptionPlan {
 
 	public void setCreatedAt(LocalDateTime createdAt) {
 		this.createdAt = createdAt;
+	}
+	
+	public Date getCreatedAtDate() {
+	    return Timestamp.valueOf(createdAt);
 	}
 
 
