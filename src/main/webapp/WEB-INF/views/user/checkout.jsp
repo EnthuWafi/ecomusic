@@ -1,5 +1,5 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<script src="https://js.stripe.com/basil/stripe.js"></script>
+<script src="https://js.stripe.com/v3/"></script>
 
 <div class="container mt-5">
   <div class="card shadow p-4">
@@ -50,7 +50,7 @@
   const stripe = Stripe("${stripePublicKey}");
 
   document.getElementById("subscribeButton").addEventListener("click", async () => {
-    const response = await fetch("${pageContext.request.contextPath}/user/subscription/checkout", {
+    const response = await fetch("${pageContext.request.contextPath}/api/subscription/create", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -70,7 +70,10 @@
     const data = await response.json();
     const clientSecret = data.clientSecret;
 
-    const checkout = stripe.initEmbeddedCheckout({ clientSecret });
+    const checkout = await stripe.initEmbeddedCheckout({
+      clientSecret,
+    });
+
     checkout.mount("#stripe-checkout-element");
   });
 </script>

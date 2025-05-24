@@ -27,7 +27,7 @@
 					<div
 						class="card-footer d-flex justify-content-between align-items-center">
 						<span class="h5 mb-0"> RM ${plan.price} </span>
-						<form action="${pageContext.request.contextPath}/user/subscription/checkout" method="get">
+						<form action="${pageContext.request.contextPath}/user/subscription/checkout" method="post">
 							<input type="hidden" name="planId"
 								value="${plan.subscriptionPlanId}" />
 							<button type="submit" class="btn btn-success">Subscribe

@@ -49,10 +49,10 @@
 					<span>Welcome, ${sessionScope.user.username}!</span>
 
 					<c:choose>
-						<c:when test="${sessionScope.user.userType == 'admin'}">
+						<c:when test="${sessionScope.user.role.roleName == 'admin'}">
 							<a href="${pageContext.request.contextPath}/admin">Dashboard</a> |
            			</c:when>
-						<c:when test="${sessionScope.user.userType == 'artist'}">
+						<c:when test="${sessionScope.user.role.roleName == 'artist'}">
 							<a href="${pageContext.request.contextPath}/artist">Panel</a> |
            			</c:when>
 					</c:choose>

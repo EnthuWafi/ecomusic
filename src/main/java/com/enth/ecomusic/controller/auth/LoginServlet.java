@@ -3,7 +3,7 @@ package com.enth.ecomusic.controller.auth;
 import java.io.IOException;
 
 import com.enth.ecomusic.model.User;
-import com.enth.ecomusic.model.dao.UserDAO;
+import com.enth.ecomusic.service.UserService;
 import com.enth.ecomusic.util.CommonUtil;
 import com.enth.ecomusic.util.ToastrType;
 
@@ -20,12 +20,12 @@ public class LoginServlet extends HttpServlet {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private UserDAO userDAO;
+	private UserService userService;
 
 	@Override
 	public void init() throws ServletException {
 		super.init();
-		userDAO = new UserDAO();
+		userService = new UserService();
 	}
 
 	@Override
@@ -43,7 +43,7 @@ public class LoginServlet extends HttpServlet {
 		String email = request.getParameter("email"); // username or email really
 		String password = request.getParameter("password");
 
-		User user = userDAO.getUserByUsernameOrEmail(email);
+		User user = userService.getUserByUsernameOrEmail(email);
 
 		HttpSession session = request.getSession();
 

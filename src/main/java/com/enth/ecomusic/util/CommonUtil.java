@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.enth.ecomusic.model.User;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
 public class CommonUtil {
@@ -47,12 +48,30 @@ public class CommonUtil {
                 try {
                     return Integer.parseInt(parts[i]);
                 } catch (NumberFormatException e) {
-                    return -1;
                 }
             }
         }
         
         return -1;
+    }
+    
+    public static String getBaseUrl(HttpServletRequest request) {
+        String scheme = request.getScheme(); // http or https
+        String serverName = request.getServerName(); // localhost or domain
+        int serverPort = request.getServerPort();
+        String contextPath = request.getContextPath();
+
+        StringBuilder url = new StringBuilder();
+        url.append(scheme).append("://").append(serverName);
+
+        // Append port if it's not the default 80 (http) or 443 (https)
+        if ((scheme.equals("http") && serverPort != 80) || (scheme.equals("https") && serverPort != 443)) {
+            url.append(":").append(serverPort);
+        }
+
+        url.append(contextPath);
+
+        return url.toString();
     }
     
     // Flash toast
