@@ -47,7 +47,7 @@ public class SubscriptionReturnServlet extends HttpServlet {
 
         String sessionId = request.getParameter("session_id");
         if (sessionId == null) {
-            CommonUtil.addMessage(httpSession, ToastrType.ERROR, "Missing session ID.");
+            CommonUtil.addMessage(httpSession, ToastrType.ERROR, "Payment failed or was canceled!");
             response.sendRedirect(request.getContextPath() + "/become-artist");
             return;
         }

@@ -1,6 +1,7 @@
 package com.enth.ecomusic.controller.webhook;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,20 +18,20 @@ import com.stripe.model.checkout.Session;
 import com.stripe.model.Subscription;
 import com.stripe.net.Webhook;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.logging.Logger;
 
 /**
  * Servlet implementation class StripeWebhookServlet
  */
-@WebServlet("/webhook/stripe/")
+@WebServlet("/webhook/stripe")
 public class StripeWebhookServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	//stripe listen --forward-to localhost:8081/webhook/stripe
+	//stripe listen --forward-to localhost:8081/ecomusic/webhook/stripe
 	private static final String STRIPE_WEBHOOK_SECRET = "whsec_555ab27a8876b601deb279f6b20c238110e68060d74af0651118ce2679deaa68";
 	private static final Logger logger = Logger.getLogger(StripeWebhookServlet.class.getName());
 	private SubscriptionService subscriptionService;
@@ -51,15 +52,10 @@ public class StripeWebhookServlet extends HttpServlet {
 
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		StringBuilder payloadBuilder = new StringBuilder();
-		try (BufferedReader reader = request.getReader()) {
-			String line;
-			while ((line = reader.readLine()) != null) {
-				payloadBuilder.append(line);
-			}
-		}
-
-		String payload = payloadBuilder.toString();
+		ServletInputStream inputStream = request.getInputStream();
+		byte[] payloadBytes = inputStream.readAllBytes();
+		String payload = new String(payloadBytes, StandardCharsets.UTF_8);
+		
 		String sigHeader = request.getHeader("Stripe-Signature");
 
 		Event event = null;

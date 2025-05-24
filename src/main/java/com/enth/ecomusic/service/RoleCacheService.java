@@ -9,12 +9,27 @@ import com.enth.ecomusic.model.RoleType;
 import com.enth.ecomusic.model.dao.RoleDAO;
 
 public class RoleCacheService {
-	private final RoleDAO roleDAO;
     private final Map<Integer, Role> roleById;
     private final Map<RoleType, Role> roleByType;
 
     public RoleCacheService() {
-    	this.roleDAO = new RoleDAO();
+    	RoleDAO roleDAO = new RoleDAO();
+    	
+        List<Role> roles = roleDAO.getAllRoles();
+        this.roleById = roles.stream().collect(Collectors.toMap(
+            Role::getRoleId,
+            role -> role
+        ));
+        
+        this.roleByType = roles.stream()
+    			.filter(role -> RoleType.fromString(role.getRoleName()) != null)
+    			.collect(Collectors.toMap(
+    				role -> RoleType.fromString(role.getRoleName()),
+    				role -> role
+    			));
+    }
+    
+    public RoleCacheService(RoleDAO roleDAO) {
     	
         List<Role> roles = roleDAO.getAllRoles();
         this.roleById = roles.stream().collect(Collectors.toMap(

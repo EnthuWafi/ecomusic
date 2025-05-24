@@ -60,17 +60,18 @@ public class CreateSubscriptionSessionAPIServlet extends HttpServlet {
 	    }
 
 	    // Parse JSON into Map
-	    Map<String, String> requestBody = JsonUtil.fromJson(jsonBody.toString(), new TypeToken<Map<String, String>>() {});
+	    Map<String, Object> requestBody = JsonUtil.fromJson(jsonBody.toString(), new TypeToken<Map<String, Object>>() {});
 
 	    int subscriptionPlanId = Integer.parseInt(requestBody.get("planId").toString());
 	    String userId = String.valueOf(user.getUserId());
+	    String email = user.getEmail();
 	    String returnUrl = CommonUtil.getBaseUrl(request) + "/user/subscription/return";
 
 	    SubscriptionPlan plan = subscriptionService.getSubscriptionPlanById(subscriptionPlanId);
 
 		try {
 
-			String clientSecret = StripeService.createCheckoutSessionForPlan(plan, returnUrl, userId);
+			String clientSecret = StripeService.createCheckoutSessionForPlan(plan, returnUrl, userId, email);
 
 			response.setContentType("application/json");
 			

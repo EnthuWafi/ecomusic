@@ -53,7 +53,7 @@ public class RoleFilter extends HttpFilter implements Filter {
 		User user = (User) session.getAttribute("user");
 		String uri = httpRequest.getRequestURI();
 
-		// Define role flags
+		// role flags
 		boolean isSuperadmin = user.isSuperAdmin();
 		boolean isAdmin = user.isAdmin();
 		boolean isArtist = user.isArtist();

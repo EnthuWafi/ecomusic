@@ -56,8 +56,8 @@ public class CommonUtil {
     }
     
     public static String getBaseUrl(HttpServletRequest request) {
-        String scheme = request.getScheme(); // http or https
-        String serverName = request.getServerName(); // localhost or domain
+        String scheme = request.getScheme(); 
+        String serverName = request.getServerName(); 
         int serverPort = request.getServerPort();
         String contextPath = request.getContextPath();
 

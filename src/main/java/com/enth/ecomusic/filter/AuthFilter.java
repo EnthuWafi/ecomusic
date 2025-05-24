@@ -21,7 +21,7 @@ import com.enth.ecomusic.util.ToastrType;
 /**
  * Servlet Filter implementation class AuthFilter
  */
-@WebFilter(urlPatterns = {"/user/*", "/admin/*", "/artist/*"})
+@WebFilter({"/user/*", "/admin/*", "/artist/*"})
 @Priority(1)
 public class AuthFilter extends HttpFilter implements Filter {
        
