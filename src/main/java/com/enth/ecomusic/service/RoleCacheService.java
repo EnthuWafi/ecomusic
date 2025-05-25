@@ -28,22 +28,6 @@ public class RoleCacheService {
     				role -> role
     			));
     }
-    
-    public RoleCacheService(RoleDAO roleDAO) {
-    	
-        List<Role> roles = roleDAO.getAllRoles();
-        this.roleById = roles.stream().collect(Collectors.toMap(
-            Role::getRoleId,
-            role -> role
-        ));
-        
-        this.roleByType = roles.stream()
-    			.filter(role -> RoleType.fromString(role.getRoleName()) != null)
-    			.collect(Collectors.toMap(
-    				role -> RoleType.fromString(role.getRoleName()),
-    				role -> role
-    			));
-    }
 
     public Role getById(int id) {
         return roleById.get(id);

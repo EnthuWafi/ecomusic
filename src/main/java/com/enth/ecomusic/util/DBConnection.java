@@ -29,4 +29,11 @@ public class DBConnection {
         	return null;
         }
     }
+    
+    public static void closeDataSource() {
+        if (dataSource != null && !dataSource.isClosed()) {
+            dataSource.close();
+            System.out.println("HikariDataSource closed.");
+        }
+    }
 }

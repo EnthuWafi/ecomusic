@@ -4,6 +4,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import com.enth.ecomusic.service.RoleCacheService;
+import com.enth.ecomusic.util.AppConfig;
+import com.enth.ecomusic.util.DBConnection;
+
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
@@ -26,30 +30,13 @@ public class AppConfigListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
         // Get the ServletContext to store global settings
         ServletContext context = sce.getServletContext();
-        
-        // Set global settings in the ServletContext
-        Properties config = new Properties();
-        try (InputStream input = Thread.currentThread()
-                                       .getContextClassLoader()
-                                       .getResourceAsStream("config.properties")) {
 
-            if (input == null) {
-                throw new RuntimeException("config.properties not found in classpath");
-            }
-
-            config.load(input);
-
-            // Set properties to ServletContext for access in Servlets/JSP
-            for (String key : config.stringPropertyNames()) {
-                context.setAttribute(key, config.getProperty(key));
-            }
-
-            System.out.println("Config loaded and set to ServletContext.");
-
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to load config.properties", e);
+        for (String key : AppConfig.getProperties().stringPropertyNames()) {
+            context.setAttribute(key, AppConfig.get(key));
         }
-        
+
+        //RoleCache
+        context.setAttribute("roleCacheService", new RoleCacheService());       
         // Optional: log the initialization
         System.out.println("ServletContext Initialized: Global settings set.");
 
@@ -58,6 +45,7 @@ public class AppConfigListener implements ServletContextListener {
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         // Cleanup code if needed when the application stops
+    	DBConnection.closeDataSource();
         System.out.println("ServletContext Destroyed: Cleanup.");
     }
 	

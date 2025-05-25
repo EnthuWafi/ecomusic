@@ -5,13 +5,14 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class AppConfig {
-    private final Properties properties;
 
-    public AppConfig() {
-    	this.properties = new Properties();
+    private static final Properties properties = new Properties();
+
+    // static initializer block - runs once when class is loaded
+    static {
         try (InputStream input = Thread.currentThread()
-                                       .getContextClassLoader()
-                                       .getResourceAsStream("config.properties")) {
+                .getContextClassLoader()
+                .getResourceAsStream("config.properties")) {
 
             if (input == null) {
                 throw new RuntimeException("config.properties not found in classpath");
@@ -23,8 +24,15 @@ public class AppConfig {
             throw new RuntimeException("Failed to load config.properties", e);
         }
     }
-    
-    public String get(String key) {
+
+    // prevent instantiation
+    private AppConfig() {}
+
+    public static String get(String key) {
         return properties.getProperty(key);
+    }
+
+    public static Properties getProperties() {
+        return properties;
     }
 }

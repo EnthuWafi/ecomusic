@@ -13,14 +13,9 @@ public class UserService {
 	private final UserDAO userDAO;
 	private final RoleCacheService roleCacheService;
 	
-	public UserService() {
-		this.userDAO = new UserDAO();
-		this.roleCacheService = new RoleCacheService();
-	}
-	
 	public UserService(RoleCacheService roleCacheService) {
 		this.userDAO = new UserDAO();
-		this.roleCacheService = roleCacheService;
+		this.roleCacheService = roleCacheService != null ? roleCacheService : new RoleCacheService();
 	}
 
 	// Register new user

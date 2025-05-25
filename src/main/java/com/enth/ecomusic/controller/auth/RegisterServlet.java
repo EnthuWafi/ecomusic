@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import com.enth.ecomusic.model.RoleType;
 import com.enth.ecomusic.model.User;
+import com.enth.ecomusic.service.RoleCacheService;
 import com.enth.ecomusic.service.UserService;
 import com.enth.ecomusic.util.CommonUtil;
 import com.enth.ecomusic.util.ToastrType;
@@ -26,7 +27,9 @@ public class RegisterServlet extends HttpServlet {
 	@Override
 	public void init() throws ServletException {
 		super.init();
-		userService = new UserService();
+		
+		RoleCacheService roleCache = (RoleCacheService) getServletContext().getAttribute("roleCache");
+		userService = new UserService(roleCache);
 	}
 
 	@Override

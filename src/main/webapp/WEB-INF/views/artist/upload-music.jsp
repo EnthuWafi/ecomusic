@@ -1,20 +1,29 @@
-<h2>Add New Music</h2>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<form action="${pageContext.request.contextPath}/music" method="post">
-    <label for="title">Title:</label>
-    <input type="text" id="title" name="title" required><br><br>
+<div class="upload-form">
+    <h2>Upload New Track</h2>
+    
+    <form action="${pageContext.request.contextPath}/artist/upload" method="post" enctype="multipart/form-data">
+        <div>
+            <label for="title">Track Title:</label>
+            <input type="text" id="title" name="title" required />
+        </div>
 
-    <label for="genre">Genre:</label>
-    <input type="text" id="genre" name="genre" required><br><br>
+        <div>
+            <label for="genre">Genre:</label>
+            <input type="text" id="genre" name="genre" required />
+        </div>
 
-    <label for="description">Description:</label>
-    <textarea id="description" name="description" required></textarea><br><br>
+        <div>
+            <label for="file">Audio File (MP3 only):</label>
+            <input type="file" id="file" name="file" accept=".mp3" required />
+        </div>
 
-    <label for="audioFileUrl">Audio File URL:</label>
-    <input type="text" id="audioFileUrl" name="audioFileUrl" required><br><br>
+        <div>
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" rows="4"></textarea>
+        </div>
 
-    <label for="premiumContent">Premium Content:</label>
-    <input type="checkbox" id="premiumContent" name="premiumContent"><br><br>
-
-    <input type="submit" value="Add Music">
-</form>
+        <button type="submit">Upload</button>
+    </form>
+</div>

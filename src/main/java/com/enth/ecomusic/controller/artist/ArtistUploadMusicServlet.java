@@ -26,8 +26,10 @@ public class ArtistUploadMusicServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+		// Forward to the upload form JSP
+        request.setAttribute("pageTitle", "Upload Music");
+        request.setAttribute("contentPage", "/WEB-INF/views/artist/upload-music.jsp");
+        request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
 	}
 
 	/**

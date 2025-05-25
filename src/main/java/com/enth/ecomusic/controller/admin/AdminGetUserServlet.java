@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import com.enth.ecomusic.model.User;
+import com.enth.ecomusic.service.RoleCacheService;
 import com.enth.ecomusic.service.UserService;
 import com.enth.ecomusic.util.CommonUtil;
 
@@ -23,7 +24,9 @@ public class AdminGetUserServlet extends HttpServlet {
 	public void init() throws ServletException {
 		// TODO Auto-generated method stub
 		super.init();
-		userService = new UserService();
+		
+		RoleCacheService roleCache = (RoleCacheService) getServletContext().getAttribute("roleCache");
+		userService = new UserService(roleCache);
 	}
 	/**
 	 * @see HttpServlet#HttpServlet()

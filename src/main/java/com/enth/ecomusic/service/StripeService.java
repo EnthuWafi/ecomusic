@@ -9,8 +9,7 @@ import com.stripe.param.checkout.SessionCreateParams;
 
 public class StripeService {
 	static {
-		AppConfig config = new AppConfig();
-		Stripe.apiKey = config.get("stripeSecretKey");
+		Stripe.apiKey = AppConfig.get("stripeSecretKey");
 	}
 
 	public static String createCheckoutSessionForPlan(SubscriptionPlan plan, String returnUrl, String userId, String email)

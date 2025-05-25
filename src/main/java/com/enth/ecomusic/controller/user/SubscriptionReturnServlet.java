@@ -54,16 +54,16 @@ public class SubscriptionReturnServlet extends HttpServlet {
 
         try {
             Session session = Session.retrieve(sessionId);
-            String status = session.getStatus(); // "complete", "open", etc.
+            String status = session.getStatus(); // "complete", "open", "invalid".
 
             // TODO: SOmething heres
             
             if ("complete".equals(status)) {
                 CommonUtil.addMessage(httpSession, ToastrType.SUCCESS, "You're now an artist!");
-                response.sendRedirect(request.getContextPath() + "/artist/dashboard");
+                response.sendRedirect(request.getContextPath() + "/home");
             } else {
                 CommonUtil.addMessage(httpSession, ToastrType.WARNING, "Subscription not completed.");
-                response.sendRedirect(request.getContextPath() + "/become-artist");
+                response.sendRedirect(request.getContextPath() + "/home");
             }
 
         } catch (StripeException e) {
