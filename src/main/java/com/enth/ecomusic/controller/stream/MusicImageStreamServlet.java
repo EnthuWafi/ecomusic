@@ -1,4 +1,4 @@
-package com.enth.ecomusic.controller.common;
+package com.enth.ecomusic.controller.stream;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -57,8 +57,8 @@ public class MusicImageStreamServlet extends HttpServlet {
 		Music music = musicDAO.getMusicById(musicId);
 
 		// Get image base path from context
-		String basePath = getServletContext().getAttribute("imageFilePath").toString();
-		String imagePath = basePath + "music/" + music.getImageUrl();
+		String basePath = getServletContext().getAttribute("musicImageFilePath").toString();
+		String imagePath = basePath + music.getImageUrl();
 		
 		File imageFile = new File(imagePath);
 		

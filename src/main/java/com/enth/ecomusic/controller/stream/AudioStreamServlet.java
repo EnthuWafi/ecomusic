@@ -1,4 +1,4 @@
-package com.enth.ecomusic.controller.common;
+package com.enth.ecomusic.controller.stream;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;

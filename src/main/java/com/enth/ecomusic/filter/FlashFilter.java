@@ -54,7 +54,11 @@ public class FlashFilter extends HttpFilter implements Filter {
 		if (request instanceof HttpServletRequest) {
             HttpServletRequest httpReq = (HttpServletRequest) request;
             HttpSession session = httpReq.getSession(false);
-            if (session != null) {
+            
+            String acceptHeader = httpReq.getHeader("Accept");
+            boolean isHtmlRequest = acceptHeader != null && acceptHeader.contains("text/html");
+
+            if (isHtmlRequest && session != null) {
                 List<Map<String, String>> flashMessages = CommonUtil.extractMessages(session);
                 request.setAttribute("flashMessages", flashMessages);
             }

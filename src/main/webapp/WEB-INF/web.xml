@@ -9,7 +9,6 @@
 		<welcome-file>index.jsp</welcome-file>
 	</welcome-file-list>
 
-	<!--  
 	<error-page>
 		<error-code>404</error-code>
 		<location>/WEB-INF/error-pages/not-found.jsp</location>
@@ -21,5 +20,5 @@
 	<error-page>
 		<location>/WEB-INF/error-pages/unknown-error.jsp</location>
 	</error-page>
-	-->
+
 </web-app>

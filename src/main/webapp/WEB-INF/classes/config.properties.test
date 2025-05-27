@@ -1,7 +1,8 @@
 websiteName=Eco Music
 websiteDescription=A place for all your music needs.
 audioFilePath=C:/Users/wapi/Desktop/ecomusic-file/audio/
-imageFilePath=C:/Users/wapi/Desktop/ecomusic-file/image/
+musicImageFilePath=C:/Users/wapi/Desktop/ecomusic-file/image/music/
+userImageFilePath=C:/Users/wapi/Desktop/ecomusic-file/image/user/
 stripePublicKey=
 stripeSecretKey=
 stripeWebhookKey=

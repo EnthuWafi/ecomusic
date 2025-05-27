@@ -21,7 +21,7 @@ public class MusicService {
     }
 
     public boolean uploadMusic(int artistId, String title, String genre, String description, 
-                               Part audioPart, boolean isPremium, String uploadDir) {
+                               Part audioPart, boolean isPremium) {
         try {
             // Validate file
             if (audioPart == null || audioPart.getSize() == 0 || !audioPart.getContentType().equals("audio/mpeg")) {
@@ -29,6 +29,8 @@ public class MusicService {
             }
       
             // Generate unique filename
+            String uploadDir = AppConfig.get("audioFilePath");
+            
             String audioFileName = UUID.randomUUID().toString() + ".mp3";
             String audioPath = uploadDir + File.separator + audioFileName;
 
@@ -40,8 +42,8 @@ public class MusicService {
             music.setTitle(title);
             music.setGenre(genre);
             music.setDescription(description);
-            music.setAudioFileUrl(AppConfig.get("audioFilePath") + audioFileName); // Web-accessible path
-            music.setImageUrl(null); // optional: handle later
+            music.setAudioFileUrl(audioFileName);
+            music.setImageUrl(null);
             music.setPremiumContent(isPremium);
 
             return musicDAO.insertMusic(music);

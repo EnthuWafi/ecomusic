@@ -5,7 +5,14 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
+
 import java.io.IOException;
+
+import com.enth.ecomusic.service.MusicService;
+import com.enth.ecomusic.util.CommonUtil;
+import com.enth.ecomusic.util.ToastrType;
 
 /**
  * Servlet implementation class ArtistUploadMusicServlet
@@ -35,9 +42,28 @@ public class ArtistUploadMusicServlet extends HttpServlet {
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+	        throws ServletException, IOException {
+		HttpSession session = request.getSession();
+		
+	    int artistId = (int) request.getSession().getAttribute("userId"); // Or however you track login
+	    String title = request.getParameter("title");
+	    String genre = request.getParameter("genre");
+	    String description = request.getParameter("description");
+	    boolean isPremium = request.getParameter("premium") != null;
+
+	    Part audioPart = request.getPart("file");
+
+	    MusicService musicService = new MusicService();
+	    boolean success = musicService.uploadMusic(artistId, title, genre, description, audioPart, isPremium);
+
+	    if (success) {
+	    	CommonUtil.addMessage(session, ToastrType.SUCCESS, "Music successfully uploaded");
+	        response.sendRedirect(request.getContextPath() + "/artist/music");
+	    } else {
+	    	CommonUtil.addMessage(session, ToastrType.ERROR, "Music failed to upload!");
+	    	response.sendRedirect(request.getContextPath() + "/artist/music/upload");
+	    }
 	}
 
 }
