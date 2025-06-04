@@ -7,12 +7,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
-import com.enth.ecomusic.model.User;
-import com.enth.ecomusic.model.dao.UserDAO;
+import com.enth.ecomusic.model.dto.StreamRangeDTO;
+import com.enth.ecomusic.model.dto.UserDTO;
+import com.enth.ecomusic.service.FileStreamingService;
+import com.enth.ecomusic.service.RoleCacheService;
+import com.enth.ecomusic.service.UserService;
 import com.enth.ecomusic.util.CommonUtil;
 
 /**
@@ -22,13 +23,17 @@ import com.enth.ecomusic.util.CommonUtil;
 public class UserImageStreamServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	private UserDAO userDAO;
-	
+	private UserService userService;
+	private FileStreamingService fileStreamingService;
+
 	@Override
 	public void init() throws ServletException {
 		// TODO Auto-generated method stub
-		userDAO = new UserDAO();
+		RoleCacheService roleCache = (RoleCacheService) getServletContext().getAttribute("roleCacheService");
+		userService = new UserService(roleCache);
+		fileStreamingService = new FileStreamingService();
 	}
+
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
@@ -44,44 +49,40 @@ public class UserImageStreamServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		String pathInfo = request.getPathInfo(); // e.g., "/123"
+		String pathInfo = request.getPathInfo(); 
 		int userId = CommonUtil.extractIdFromPath(pathInfo);
 
 		if (userId == -1) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid user ID.");
 			return;
 		}
-		
-		User user = userDAO.getUserById(userId);
 
-		// Get image base path from context
+		UserDTO user = userService.getUserDTOById(userId);
+
+		String imageUrl = user.getImageUrl();
+		if (imageUrl != null && imageUrl.startsWith("http")) {
+		    response.sendRedirect(imageUrl);
+		    return;
+		}
+
+		
 		String basePath = getServletContext().getAttribute("userImageFilePath").toString();
-		String imagePath = basePath + user.getImageUrl(); // or .png/.webp/etc
+		File imageFile = new File(basePath + imageUrl);
 
-		File imageFile = new File(imagePath);
-		
-		// no image found?
 		if (!imageFile.exists()) {
 			response.sendRedirect(request.getContextPath() + "/assets/images/default.jpg");
 			return;
 		}
 
-		// Infer MIME type (better than hardcoding)
 		String mimeType = getServletContext().getMimeType(imageFile.getName());
 		if (mimeType == null) {
-			mimeType = "application/octet-stream"; // fallback
+			mimeType = "application/octet-stream";
 		}
 
-		response.setContentType(mimeType);
-		response.setContentLengthLong(imageFile.length());
+		String rangeHeader = request.getHeader("Range");
 
-		try (FileInputStream fis = new FileInputStream(imageFile); OutputStream out = response.getOutputStream()) {
-			byte[] buffer = new byte[4096];
-			int bytesRead;
-			while ((bytesRead = fis.read(buffer)) != -1) {
-				out.write(buffer, 0, bytesRead);
-			}
-		}
+		StreamRangeDTO range = fileStreamingService.parseRangeHeader(rangeHeader, imageFile.length());
+		fileStreamingService.streamFile(imageFile, range, response, mimeType);
 	}
 
 }

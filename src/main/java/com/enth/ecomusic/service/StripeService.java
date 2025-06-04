@@ -1,6 +1,6 @@
 package com.enth.ecomusic.service;
 
-import com.enth.ecomusic.model.SubscriptionPlan;
+import com.enth.ecomusic.model.entity.SubscriptionPlan;
 import com.enth.ecomusic.util.AppConfig;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;

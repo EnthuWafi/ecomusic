@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-import com.enth.ecomusic.model.SubscriptionPlan;
+import com.enth.ecomusic.model.entity.SubscriptionPlan;
 import com.enth.ecomusic.service.SubscriptionService;
 
 /**

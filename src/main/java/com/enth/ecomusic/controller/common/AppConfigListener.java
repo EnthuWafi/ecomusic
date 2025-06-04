@@ -1,9 +1,7 @@
 package com.enth.ecomusic.controller.common;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
-
+import com.enth.ecomusic.service.GenreCacheService;
+import com.enth.ecomusic.service.MoodCacheService;
 import com.enth.ecomusic.service.RoleCacheService;
 import com.enth.ecomusic.util.AppConfig;
 import com.enth.ecomusic.util.DBConnection;
@@ -36,7 +34,9 @@ public class AppConfigListener implements ServletContextListener {
         }
 
         //RoleCache
-        context.setAttribute("roleCacheService", new RoleCacheService());       
+        context.setAttribute("roleCacheService", new RoleCacheService());   
+        context.setAttribute("genreCacheService", new GenreCacheService());      
+        context.setAttribute("moodCacheService", new MoodCacheService());      
         // Optional: log the initialization
         System.out.println("ServletContext Initialized: Global settings set.");
 

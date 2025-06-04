@@ -1,6 +1,6 @@
 package com.enth.ecomusic.model.dao;
 
-import com.enth.ecomusic.model.SubscriptionPlan;
+import com.enth.ecomusic.model.entity.SubscriptionPlan;
 import com.enth.ecomusic.util.DBConnection;
 import com.enth.ecomusic.util.JsonUtil;
 import com.google.gson.reflect.TypeToken;

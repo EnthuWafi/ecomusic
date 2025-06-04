@@ -11,13 +11,13 @@ import java.io.IOException;
  * Servlet implementation class PlaylistServlet
  */
 @WebServlet("/user/playlist")
-public class PlaylistServlet extends HttpServlet {
+public class PlaylistsServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public PlaylistServlet() {
+    public PlaylistsServlet() {
         super();
         // TODO Auto-generated constructor stub
     }

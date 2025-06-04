@@ -1,6 +1,6 @@
 package com.enth.ecomusic.model.dao;
 
-import com.enth.ecomusic.model.UserSubscription;
+import com.enth.ecomusic.model.entity.UserSubscription;
 import com.enth.ecomusic.util.DBConnection;
 
 import java.sql.*;

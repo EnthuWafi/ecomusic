@@ -1,15 +1,17 @@
-package com.enth.ecomusic.model;
+package com.enth.ecomusic.model.entity;
 
-import java.util.Date;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
-public class PlaylistMusic {
+public class PlaylistMusic  implements Serializable{
+	private static final long serialVersionUID = 1L;
 	private int playlistId;
 	private int musicId;
-	private Date addedAt;
+	private LocalDateTime addedAt;
 	// experimental
 	private Music music;
 
-	public PlaylistMusic(int playlistId, int musicId, Date addedAt) {
+	public PlaylistMusic(int playlistId, int musicId, LocalDateTime addedAt) {
 		super();
 		this.playlistId = playlistId;
 		this.musicId = musicId;
@@ -41,11 +43,11 @@ public class PlaylistMusic {
 		this.musicId = musicId;
 	}
 
-	public Date getAddedAt() {
+	public LocalDateTime getAddedAt() {
 		return addedAt;
 	}
 
-	public void setAddedAt(Date addedAt) {
+	public void setAddedAt(LocalDateTime addedAt) {
 		this.addedAt = addedAt;
 	}
 

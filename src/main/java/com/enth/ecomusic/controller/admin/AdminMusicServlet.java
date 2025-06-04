@@ -6,8 +6,8 @@ import jakarta.servlet.annotation.WebServlet;
 import java.io.IOException;
 import java.util.List;
 
-import com.enth.ecomusic.model.Music;
 import com.enth.ecomusic.model.dao.MusicDAO;
+import com.enth.ecomusic.model.entity.Music;
 
 @WebServlet("/admin/music/*")
 public class AdminMusicServlet extends HttpServlet {

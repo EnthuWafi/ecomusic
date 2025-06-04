@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import com.enth.ecomusic.model.User;
+import com.enth.ecomusic.model.dto.UserDTO;
 import com.enth.ecomusic.service.RoleCacheService;
 import com.enth.ecomusic.service.UserService;
 import com.enth.ecomusic.util.CommonUtil;
@@ -25,7 +25,7 @@ public class AdminGetUserServlet extends HttpServlet {
 		// TODO Auto-generated method stub
 		super.init();
 		
-		RoleCacheService roleCache = (RoleCacheService) getServletContext().getAttribute("roleCache");
+		RoleCacheService roleCache = (RoleCacheService) getServletContext().getAttribute("roleCacheService");
 		userService = new UserService(roleCache);
 	}
 	/**
@@ -47,7 +47,7 @@ public class AdminGetUserServlet extends HttpServlet {
 		String pathInfo = request.getPathInfo();
 		int id = CommonUtil.extractIdFromPath(pathInfo);
 		
-		User user = userService.getUserById(id);
+		UserDTO user = userService.getUserDTOById(id);
 
 		request.setAttribute("pageTitle", "Show User");
 		request.setAttribute("user", user);

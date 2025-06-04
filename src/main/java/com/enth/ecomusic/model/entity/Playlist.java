@@ -1,18 +1,22 @@
-package com.enth.ecomusic.model;
+package com.enth.ecomusic.model.entity;
 
-import java.util.Date;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 
-public class Playlist {
+public class Playlist implements Serializable{
+	private static final long serialVersionUID = 1L;
     private int playlistId;
     private int userId;
     private String name;
-    private Date createdAt;
+    private LocalDateTime createdAt;
     //experimental
     private List<PlaylistMusic> musicList;
 
-    
-    public Playlist(int playlistId, int userId, String name, Date createdAt) {
+    public Playlist() {
+		super();
+	}
+	public Playlist(int playlistId, int userId, String name, LocalDateTime createdAt) {
 		super();
 		this.playlistId = playlistId;
 		this.userId = userId;
@@ -29,8 +33,8 @@ public class Playlist {
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
-    public Date getCreatedAt() { return createdAt; }
-    public void setCreatedAt(Date createdAt) { this.createdAt = createdAt; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     
 	public List<PlaylistMusic> getMusicList() {
 		return musicList;

@@ -6,11 +6,12 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
 
 import java.io.IOException;
 
-import com.enth.ecomusic.model.RoleType;
-import com.enth.ecomusic.model.User;
+import com.enth.ecomusic.model.dto.UserDTO;
+import com.enth.ecomusic.model.entity.RoleType;
 import com.enth.ecomusic.service.RoleCacheService;
 import com.enth.ecomusic.service.UserService;
 import com.enth.ecomusic.util.CommonUtil;
@@ -29,7 +30,7 @@ public class AdminAddUserServlet extends HttpServlet {
 		// TODO Auto-generated method stub
 		super.init();
 		
-		RoleCacheService roleCache = (RoleCacheService) getServletContext().getAttribute("roleCache");
+		RoleCacheService roleCache = (RoleCacheService) getServletContext().getAttribute("roleCacheService");
 		userService = new UserService(roleCache);
 	}
     /**
@@ -61,24 +62,21 @@ public class AdminAddUserServlet extends HttpServlet {
 		String email = request.getParameter("email");
 		String password = request.getParameter("password");
 		String userType = request.getParameter("user_type");
+		
+		Part imagePart = request.getPart("image");
 
 		HttpSession session = request.getSession();
-		// Check if user already exists
-		User existing = userService.getUserByUsernameOrEmail(email);
+		UserDTO existing = userService.getUserDTOByUsernameOrEmail(email);
+		
 		if (existing != null) {
 			CommonUtil.addMessage(session, ToastrType.ERROR, "Email is already registered.");
 			response.sendRedirect(request.getContextPath() + "/admin/user/add");
 			return;
 		}
-
-		// Hash password
-		String hashedPassword = CommonUtil.hashPassword(password);
-
-		User user = new User(fname, lname, username, null, email, hashedPassword);
-		
+	
 		RoleType role = RoleType.fromString(userType);
 		
-		boolean success = userService.registerUserWithRoleName(user, role);
+		boolean success = userService.registerUserAccount(fname, lname, username, null, email, password, imagePart, role);
 
 		if (success) {
 			CommonUtil.addMessage(session, ToastrType.SUCCESS, "Registration successful. Please log in.");

@@ -17,6 +17,8 @@
 	href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.css"
 	integrity="sha512-oe8OpYjBaDWPt2VmSFR+qYOdnTjeV9QPLJUeqZyprDEQvQLJ9C5PCFclxwNuvb/GQgQngdCXzKSFltuHD3eCxA=="
 	crossorigin="anonymous" referrerpolicy="no-referrer" />
+	
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 <meta charset="UTF-8">
 
 <!-- SCRIPTS -->
@@ -49,12 +51,12 @@
 					<span>Welcome, ${sessionScope.user.username}!</span>
 
 					<c:choose>
-						<c:when test="${sessionScope.user.role.roleName == 'admin'}">
+						<c:when test="${sessionScope.user.roleName == 'admin'}">
 							<a href="${pageContext.request.contextPath}/admin">Dashboard</a> |
-           			</c:when>
-						<c:when test="${sessionScope.user.role.roleName == 'artist'}">
+           				</c:when>
+						<c:when test="${sessionScope.user.roleName == 'artist'}">
 							<a href="${pageContext.request.contextPath}/artist">Panel</a> |
-           			</c:when>
+           				</c:when>
 					</c:choose>
 
 					<a href="${pageContext.request.contextPath}/profile">Profile</a> |

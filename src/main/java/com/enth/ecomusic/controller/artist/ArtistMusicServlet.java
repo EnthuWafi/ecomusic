@@ -6,24 +6,30 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
-import com.enth.ecomusic.model.Music;
-import com.enth.ecomusic.model.dao.MusicDAO;
-import com.enth.ecomusic.util.CommonUtil;
-import com.enth.ecomusic.util.ToastrType;
+import com.enth.ecomusic.model.dto.MusicDetailDTO;
+import com.enth.ecomusic.model.dto.UserDTO;
+import com.enth.ecomusic.service.GenreCacheService;
+import com.enth.ecomusic.service.MoodCacheService;
+import com.enth.ecomusic.service.MusicService;
 
 /**
  * Servlet implementation class ArtistMusicServlet
  */
-@WebServlet("/artist/music/*")
+@WebServlet("/artist/music")
 public class ArtistMusicServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
-	private MusicDAO musicDAO;
+	private MusicService musicService;
 
 	@Override
-	public void init() {
-		musicDAO = new MusicDAO(); 
+	public void init() throws ServletException {
+		super.init();
+		
+		GenreCacheService genreCacheService = (GenreCacheService) this.getServletContext().getAttribute("genreCacheService");
+		MoodCacheService moodCacheService = (MoodCacheService) this.getServletContext().getAttribute("moodCacheService");
+		this.musicService = new MusicService(genreCacheService, moodCacheService);
 	}
        
     /**
@@ -38,34 +44,28 @@ public class ArtistMusicServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+		// TODO Auto-generated method
+		
+		int page = 1;
+        int pageSize = 10;
+
+        if (request.getParameter("page") != null) {
+            page = Integer.parseInt(request.getParameter("page"));
+        }
+		
+		UserDTO user = (UserDTO) request.getSession().getAttribute("user");
+		List<MusicDetailDTO> musicList = musicService.getPaginatedMusicDetailDTOByArtistId(user.getUserId(), page, pageSize);
+		int totalRecords = musicService.getMusicCountByArtist(user.getUserId()); 
+        int totalPages = (int) Math.ceil(totalRecords / (double) pageSize);
+		
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
+        
+		request.setAttribute("musicList", musicList);
+		request.setAttribute("pageTitle", "Music Page");
+		request.setAttribute("contentPage", "/WEB-INF/views/artist/view-music-list.jsp");
+		request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String title = request.getParameter("title");
-		String genre = request.getParameter("genre");
-		String description = request.getParameter("description");
-		String audioFileUrl = request.getParameter("audioFileUrl");
-		boolean premiumContent = Boolean.parseBoolean(request.getParameter("premiumContent"));
-		// TODO: Artist later
-		Music newMusic = new Music(1, title, genre, description, audioFileUrl, premiumContent);
-
-		// Insert music into database
-		boolean success = musicDAO.insertMusic(newMusic);
-
-		// Redirect based on success or failure
-		if (success) {
-			CommonUtil.addMessage(request.getSession(), ToastrType.SUCCESS, "Music uploaded!");
-			response.sendRedirect(request.getContextPath() + "/artist/music"); // Redirect to music list page
-		}
-		else {
-			CommonUtil.addMessage(request.getSession(), ToastrType.ERROR, "Music not uploaded!");
-			response.sendRedirect(request.getContextPath() + "/artist/music");
-		}
-	}
 
 }

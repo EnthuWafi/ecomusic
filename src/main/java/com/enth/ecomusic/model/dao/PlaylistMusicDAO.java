@@ -1,7 +1,6 @@
 package com.enth.ecomusic.model.dao;
 
-import com.enth.ecomusic.model.Music;
-import com.enth.ecomusic.model.PlaylistMusic;
+import com.enth.ecomusic.model.entity.PlaylistMusic;
 import com.enth.ecomusic.util.DBConnection;
 
 import java.sql.*;
@@ -32,7 +31,8 @@ public class PlaylistMusicDAO {
             stmt.setInt(1, playlistId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    PlaylistMusic pm = new PlaylistMusic(rs.getInt("playlist_id"), rs.getInt("music_id"), rs.getDate("added_at"));
+                    PlaylistMusic pm = new PlaylistMusic(rs.getInt("playlist_id"), 
+                    		rs.getInt("music_id"), rs.getTimestamp("added_at").toLocalDateTime());
                     list.add(pm);
                 }
             }

@@ -15,7 +15,7 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
-import com.enth.ecomusic.model.User;
+import com.enth.ecomusic.model.dto.UserDTO;
 import com.enth.ecomusic.util.CommonUtil;
 import com.enth.ecomusic.util.ToastrType;
 
@@ -25,6 +25,11 @@ import com.enth.ecomusic.util.ToastrType;
 @WebFilter({ "/admin/*", "/artist/*" })
 @Priority(2)
 public class RoleFilter extends HttpFilter implements Filter {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @see HttpFilter#HttpFilter()
@@ -50,7 +55,7 @@ public class RoleFilter extends HttpFilter implements Filter {
 		HttpServletResponse httpResponse = (HttpServletResponse) response;
 
 		HttpSession session = httpRequest.getSession(false);
-		User user = (User) session.getAttribute("user");
+		UserDTO user = (UserDTO) session.getAttribute("user");
 		String uri = httpRequest.getRequestURI();
 
 		// role flags

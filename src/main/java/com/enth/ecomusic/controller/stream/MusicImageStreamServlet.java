@@ -7,12 +7,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
-import com.enth.ecomusic.model.Music;
-import com.enth.ecomusic.model.dao.MusicDAO;
+import com.enth.ecomusic.service.MusicService;
+import com.enth.ecomusic.model.dto.MusicDTO;
+import com.enth.ecomusic.model.dto.StreamRangeDTO;
+import com.enth.ecomusic.service.FileStreamingService;
+import com.enth.ecomusic.service.GenreCacheService;
+import com.enth.ecomusic.service.MoodCacheService;
 import com.enth.ecomusic.util.CommonUtil;
 
 /**
@@ -22,13 +24,18 @@ import com.enth.ecomusic.util.CommonUtil;
 public class MusicImageStreamServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	private MusicDAO musicDAO;
+	private MusicService musicService;
+	private FileStreamingService fileStreamingService;
 
 	@Override
 	public void init() throws ServletException {
 		// TODO Auto-generated method stub
 		super.init();
-		musicDAO = new MusicDAO();
+		
+		GenreCacheService genreCacheService = (GenreCacheService) this.getServletContext().getAttribute("genreCacheService");
+		MoodCacheService moodCacheService = (MoodCacheService) this.getServletContext().getAttribute("moodCacheService");
+		this.musicService = new MusicService(genreCacheService, moodCacheService);
+		fileStreamingService = new FileStreamingService();
 	}
 
 	/**
@@ -54,35 +61,26 @@ public class MusicImageStreamServlet extends HttpServlet {
 			return;
 		}
 		
-		Music music = musicDAO.getMusicById(musicId);
+		MusicDTO music = musicService.getMusicDTOById(musicId);
 
 		// Get image base path from context
 		String basePath = getServletContext().getAttribute("musicImageFilePath").toString();
-		String imagePath = basePath + music.getImageUrl();
-		
-		File imageFile = new File(imagePath);
-		
-		//no image found?
-		if (!imageFile.exists()) {
-			response.sendRedirect(request.getContextPath() + "/assets/images/default.jpg");
-		    return;
-		}
+		File imageFile = new File(basePath + music.getImageUrl());
 
-		String mimeType = getServletContext().getMimeType(imageFile.getName());
-		if (mimeType == null) {
-			mimeType = "application/octet-stream";
-		}
+	    if (!imageFile.exists()) {
+	        response.sendRedirect(request.getContextPath() + "/assets/images/default.jpg");
+	        return;
+	    }
 
-		response.setContentType(mimeType);
-		response.setContentLengthLong(imageFile.length());
+	    String mimeType = getServletContext().getMimeType(imageFile.getName());
+	    if (mimeType == null) {
+	        mimeType = "application/octet-stream";
+	    }
 
-		try (FileInputStream fis = new FileInputStream(imageFile); OutputStream out = response.getOutputStream()) {
-			byte[] buffer = new byte[4096];
-			int bytesRead;
-			while ((bytesRead = fis.read(buffer)) != -1) {
-				out.write(buffer, 0, bytesRead);
-			}
-		}
+	    String rangeHeader = request.getHeader("Range");
+
+	    StreamRangeDTO range = fileStreamingService.parseRangeHeader(rangeHeader, imageFile.length());
+	    fileStreamingService.streamFile(imageFile, range, response, mimeType);
 	}
 
 }

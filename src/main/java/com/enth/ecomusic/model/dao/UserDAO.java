@@ -3,7 +3,7 @@ package com.enth.ecomusic.model.dao;
 import java.sql.*;
 import java.util.*;
 
-import com.enth.ecomusic.model.User;
+import com.enth.ecomusic.model.entity.User;
 import com.enth.ecomusic.util.DBConnection;
 
 public class UserDAO {
@@ -123,7 +123,7 @@ public class UserDAO {
 			rs.getString("password"),
 			rs.getInt("role_id"),
 			rs.getString("image_url"),
-			rs.getDate("created_at")
+			rs.getTimestamp("created_at").toLocalDateTime()
 		);
 		// Lazy load: user.setRole(null) by default
 		return user;

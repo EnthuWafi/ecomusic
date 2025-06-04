@@ -1,8 +1,9 @@
-package com.enth.ecomusic.model;
+package com.enth.ecomusic.model.entity;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
-public class User {
+public class User{
+
 	private int userId;
 	private String firstName;
 	private String lastName;
@@ -12,16 +13,15 @@ public class User {
 	private String password;
 	private int roleId; 
 	private String imageUrl;
-	private Date createdAt;
+	private LocalDateTime createdAt;
 
-	private Role role;
 	
 	public User() {
 		super();
 	}
 
 	public User(int userId, String firstName, String lastName, String username, String bio, String email,
-			String password, int roleId, String imageUrl, Date createdAt) {
+			String password, int roleId, String imageUrl, LocalDateTime createdAt) {
 		super();
 		this.userId = userId;
 		this.firstName = firstName;
@@ -143,42 +143,13 @@ public class User {
 		this.imageUrl = imageUrl;
 	}
 
-	public Date getCreatedAt() {
+	public LocalDateTime getCreatedAt() {
 		return createdAt;
 	}
 
-	public void setCreatedAt(Date createdAt) {
+	public void setCreatedAt(LocalDateTime createdAt) {
 		this.createdAt = createdAt;
 	}
 
-	public Role getRole() {
-		return role;
-	}
-
-	public void setRole(Role role) {
-		this.role = role;
-	}
-
-	//role checking
-	public boolean hasRole(RoleType roleType) {
-	    return this.role != null &&
-	           roleType.getValue().equalsIgnoreCase(this.role.getRoleName());
-	}
-
-	public boolean isAdmin() {
-	    return hasRole(RoleType.ADMIN);
-	}
-
-	public boolean isSuperAdmin() {
-	    return hasRole(RoleType.SUPERADMIN);
-	}
-
-	public boolean isArtist() {
-	    return hasRole(RoleType.ARTIST);
-	}
-	
-	public boolean isUser() {
-	    return hasRole(RoleType.USER);
-	}
 	
 }

@@ -12,8 +12,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.enth.ecomusic.model.SubscriptionPlan;
-import com.enth.ecomusic.model.User;
+import com.enth.ecomusic.model.entity.SubscriptionPlan;
+import com.enth.ecomusic.model.entity.User;
 import com.enth.ecomusic.service.StripeService;
 import com.enth.ecomusic.service.SubscriptionService;
 import com.enth.ecomusic.util.CommonUtil;

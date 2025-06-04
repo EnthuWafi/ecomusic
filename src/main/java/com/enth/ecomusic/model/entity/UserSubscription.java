@@ -1,11 +1,12 @@
-package com.enth.ecomusic.model;
+package com.enth.ecomusic.model.entity;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 
-public class UserSubscription {
+public class UserSubscription implements Serializable{
+	private static final long serialVersionUID = 1L;
 	private int subscriptionId;
     private int userId;
     private LocalDate startDate;
@@ -16,7 +17,7 @@ public class UserSubscription {
     private LocalDateTime createdAt;
     private int subscriptionPlanId;
 
-    // Optional but convenient
+    // Optional
     private SubscriptionPlan subscriptionPlan;
 
 

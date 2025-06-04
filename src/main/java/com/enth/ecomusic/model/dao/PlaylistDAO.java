@@ -1,7 +1,6 @@
 package com.enth.ecomusic.model.dao;
 
-import com.enth.ecomusic.model.Playlist;
-import com.enth.ecomusic.model.PlaylistMusic;
+import com.enth.ecomusic.model.entity.Playlist;
 import com.enth.ecomusic.util.DBConnection;
 
 import java.sql.*;
@@ -87,7 +86,7 @@ public class PlaylistDAO {
                 rs.getInt("playlist_id"),
                 rs.getInt("user_id"),
                 rs.getString("name"),
-                rs.getDate("created_at")
+                rs.getTimestamp("created_at").toLocalDateTime()
         );
     }
 }

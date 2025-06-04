@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
-import com.enth.ecomusic.model.User;
+import com.enth.ecomusic.model.entity.User;
 import com.enth.ecomusic.util.CommonUtil;
 import com.enth.ecomusic.util.ToastrType;
 import com.stripe.exception.StripeException;

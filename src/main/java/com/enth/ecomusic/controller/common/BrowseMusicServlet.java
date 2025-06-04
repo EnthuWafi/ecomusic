@@ -8,21 +8,24 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-import com.enth.ecomusic.model.Music;
-import com.enth.ecomusic.model.dao.MusicDAO;
-import com.enth.ecomusic.util.CommonUtil;
+import com.enth.ecomusic.model.dto.MusicDetailDTO;
+import com.enth.ecomusic.service.GenreCacheService;
+import com.enth.ecomusic.service.MoodCacheService;
+import com.enth.ecomusic.service.MusicService;
 
 @WebServlet("/music")
 public class BrowseMusicServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	private MusicDAO musicDAO;
+	private MusicService musicService;
 
 	@Override
 	public void init() throws ServletException {
 		// TODO Auto-generated method stub
 		super.init();
-		musicDAO = new MusicDAO();
+		GenreCacheService genreCacheService = (GenreCacheService) this.getServletContext().getAttribute("genreCacheService");
+		MoodCacheService moodCacheService = (MoodCacheService) this.getServletContext().getAttribute("moodCacheService");
+		this.musicService = new MusicService(genreCacheService, moodCacheService);
 	}
 
 	/**
@@ -48,8 +51,8 @@ public class BrowseMusicServlet extends HttpServlet {
             page = Integer.parseInt(request.getParameter("page"));
         }
 
-        List<Music> musicList = musicDAO.getPaginatedMusic(page, pageSize);
-        int totalRecords = musicDAO.countProducts(); // Implement countProducts()
+        List<MusicDetailDTO> musicList = musicService.getPaginatedMusicDetailDTO(page, pageSize);
+        int totalRecords = musicService.getMusicCount(); 
         int totalPages = (int) Math.ceil(totalRecords / (double) pageSize);
 
         request.setAttribute("currentPage", page);

@@ -1,10 +1,9 @@
 package com.enth.ecomusic.service;
-import com.enth.ecomusic.model.UserSubscription;
-import com.enth.ecomusic.model.SubscriptionPlan;
 import com.enth.ecomusic.model.dao.SubscriptionDAO;
 import com.enth.ecomusic.model.dao.SubscriptionPlanDAO;
+import com.enth.ecomusic.model.entity.SubscriptionPlan;
+import com.enth.ecomusic.model.entity.UserSubscription;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class SubscriptionService {

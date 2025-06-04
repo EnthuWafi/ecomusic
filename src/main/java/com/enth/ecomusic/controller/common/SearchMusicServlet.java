@@ -8,8 +8,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-import com.enth.ecomusic.model.Music;
-import com.enth.ecomusic.model.dao.MusicDAO;
+import com.enth.ecomusic.model.dto.MusicDetailDTO;
+import com.enth.ecomusic.service.GenreCacheService;
+import com.enth.ecomusic.service.MoodCacheService;
+import com.enth.ecomusic.service.MusicService;
 
 /**
  * Servlet implementation class SearchMusicServlet
@@ -18,13 +20,15 @@ import com.enth.ecomusic.model.dao.MusicDAO;
 public class SearchMusicServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
-	private MusicDAO musicDAO;
+	private MusicService musicService;
 
     @Override
     public void init() throws ServletException {
 		// TODO Auto-generated method stub
 		super.init();
-        musicDAO = new MusicDAO();
+		GenreCacheService genreCacheService = (GenreCacheService) this.getServletContext().getAttribute("genreCacheService");
+		MoodCacheService moodCacheService = (MoodCacheService) this.getServletContext().getAttribute("moodCacheService");
+		this.musicService = new MusicService(genreCacheService, moodCacheService);
     }
     /**
      * @see HttpServlet#HttpServlet()
@@ -39,15 +43,29 @@ public class SearchMusicServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		String query = request.getParameter("q"); // e.g., ?q=eminem
-        List<Music> musicList;
+		String query = request.getParameter("q"); 
+        List<MusicDetailDTO> musicList;
 
-        if (query != null && !query.trim().isEmpty()) {
-            musicList = musicDAO.searchMusicByTitleOrArtist(query.trim());
-        } else {
-            musicList = musicDAO.getAllMusic(); // fallback to full list
+        int page = 1;
+        int pageSize = 10;
+        
+        if (request.getParameter("page") != null) {
+            page = Integer.parseInt(request.getParameter("page"));
         }
+        
+        if (query != null && !query.trim().isEmpty()) {
+            musicList = musicService.getPaginatedMusicDetailDTOLikeKeyword(query.trim(), page, pageSize);
+        } else {
+            musicList = musicService.getPaginatedMusicDetailDTO(page, pageSize); 
+        }
+        
+        int totalRecords = musicService.getMusicCount(); 
+        int totalPages = (int) Math.ceil(totalRecords / (double) pageSize);
 
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
+
+        
         request.setAttribute("musicList", musicList);
         request.setAttribute("searchQuery", query);
         request.setAttribute("pageTitle", "Search Results");

@@ -1,0 +1,120 @@
+package com.enth.ecomusic.model.dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.enth.ecomusic.model.entity.Like;
+import com.enth.ecomusic.util.DBConnection;
+
+public class LikeDAO {
+
+
+    public boolean addLike(Like like) {
+        String sql = "INSERT INTO Likes (user_id, music_id) VALUES (?, ?)";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, like.getUserId());
+            stmt.setInt(2, like.getMusicId());
+            return stmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean removeLike(int userId, int musicId) {
+        String sql = "DELETE FROM Likes WHERE user_id = ? AND music_id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, userId);
+            stmt.setInt(2, musicId);
+            return stmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public List<Like> getLikesByUser(int userId) {
+        List<Like> likedList = new ArrayList<>();
+        String sql = "SELECT * FROM Likes WHERE user_id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    likedList.add(new Like(
+                        userId,
+                        rs.getInt("music_id"),
+                        rs.getTimestamp("liked_at").toLocalDateTime()
+                    ));
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return likedList;
+    }
+
+    /**
+     * Returns the number of likes for a given music_id.
+     */
+    public int countLikeByMusicId(int musicId) {
+        String sql = "SELECT COUNT(*) FROM Likes WHERE music_id = ?";
+        int count = 0;
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, musicId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    count = rs.getInt(1);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return count;
+    }
+
+    /**
+     * Returns the number of likes made by a given user_id.
+     */
+    public int countLikeByUserId(int userId) {
+        String sql = "SELECT COUNT(*) FROM Likes WHERE user_id = ?";
+        int count = 0;
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    count = rs.getInt(1);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return count;
+    }
+}

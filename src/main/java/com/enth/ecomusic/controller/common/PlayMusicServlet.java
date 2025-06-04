@@ -6,10 +6,11 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
 
-import com.enth.ecomusic.model.Music;
-import com.enth.ecomusic.model.dao.MusicDAO;
+import com.enth.ecomusic.model.dto.MusicDetailDTO;
+import com.enth.ecomusic.service.GenreCacheService;
+import com.enth.ecomusic.service.MoodCacheService;
+import com.enth.ecomusic.service.MusicService;
 import com.enth.ecomusic.util.CommonUtil;
 
 /**
@@ -19,13 +20,15 @@ import com.enth.ecomusic.util.CommonUtil;
 public class PlayMusicServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
-	private MusicDAO musicDAO;
+	private MusicService musicService;
 
 	@Override
 	public void init() throws ServletException {
 		// TODO Auto-generated method stub
 		super.init();
-		musicDAO = new MusicDAO(); 
+		GenreCacheService genreCacheService = (GenreCacheService) this.getServletContext().getAttribute("genreCacheService");
+		MoodCacheService moodCacheService = (MoodCacheService) this.getServletContext().getAttribute("moodCacheService");
+		this.musicService = new MusicService(genreCacheService, moodCacheService);
 	}
     /**
      * @see HttpServlet#HttpServlet()
@@ -40,23 +43,17 @@ public class PlayMusicServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		String pathInfo = request.getPathInfo(); // e.g., "/5" or "/edit/5" or null
+		String pathInfo = request.getPathInfo();
 		int id = CommonUtil.extractIdFromPath(pathInfo);
 		
 		if (pathInfo.matches("/\\d+")) {
-			Music music = musicDAO.getMusicById(id);
-			//List<Music> recommendedList = musicDAO.getAllRelatedMusic(id, 5);
-			
-			//TODO: Check if user has subscription if premium music
-			
-			
+			MusicDetailDTO music = musicService.getMusicDetailDTOById(id);	
 			
 			request.setAttribute("pageTitle", "Listen to Music");
-			request.setAttribute("music", music);			
+			request.setAttribute("musicDTO", music);			
 			//request.setAttribute("relatedTracks", recommendedList);
 			request.setAttribute("contentPage", "/WEB-INF/views/common/play-music.jsp");
 		} else {
-			// 404 Not Found
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;
 		}

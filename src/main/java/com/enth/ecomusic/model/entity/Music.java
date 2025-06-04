@@ -1,28 +1,35 @@
-package com.enth.ecomusic.model;
+package com.enth.ecomusic.model.entity;
 
-import java.util.Date;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
-public class Music {
+public class Music implements Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private int musicId;
-	private int artistId;
-	private String title;
-	private String genre;
-	private String description;
-	private Date uploadDate;
-	private String audioFileUrl;
-	private String imageUrl;
-	private boolean premiumContent;
+    private int artistId;
+    private String title;
+    private String description;
+    private LocalDateTime uploadDate;
+    private String audioFileUrl;
+    private String imageUrl;
+    private boolean premiumContent;
+    private int genreId;
+    private int moodId;
 
 	
 	
-	public Music(int musicId, int artistId, String title, String genre, String description, Date uploadDate,
+	public Music(int musicId, int artistId, String title, int genreId, int moodId, String description, LocalDateTime uploadDate,
 			String audioFileUrl, String imageUrl, boolean premiumContent) {
 		super();
 		this.musicId = musicId;
 		this.artistId = artistId;
 		this.title = title;
-		this.genre = genre;
+		this.genreId = genreId;
+		this.moodId = moodId;
 		this.description = description;
 		this.uploadDate = uploadDate;
 		this.audioFileUrl = audioFileUrl;
@@ -33,30 +40,19 @@ public class Music {
 
 	//this constructor for database insertion 
 
-	public Music(int artistId, String title, String genre, String description, String audioFileUrl, String imageUrl,
+	public Music(int artistId, String title, int genreId, int moodId, String description, String audioFileUrl, String imageUrl,
 			boolean premiumContent) {
 		super();
 		this.artistId = artistId;
 		this.title = title;
-		this.genre = genre;
+		this.genreId = genreId;
+		this.moodId = moodId;
 		this.description = description;
 		this.audioFileUrl = audioFileUrl;
 		this.imageUrl = imageUrl;
 		this.premiumContent = premiumContent;
 	}
 	
-	//default image constructor
-	public Music(int artistId, String title, String genre, String description, String audioFileUrl,
-			boolean premiumContent) {
-		super();
-		this.artistId = artistId;
-		this.title = title;
-		this.genre = genre;
-		this.description = description;
-		this.audioFileUrl = audioFileUrl;
-		this.premiumContent = premiumContent;
-	}
-
 
 	public Music() {
 		super();
@@ -90,14 +86,6 @@ public class Music {
 		this.title = title;
 	}
 
-	public String getGenre() {
-		return genre;
-	}
-
-	public void setGenre(String genre) {
-		this.genre = genre;
-	}
-
 	public String getDescription() {
 		return description;
 	}
@@ -106,13 +94,37 @@ public class Music {
 		this.description = description;
 	}
 
-	public Date getUploadDate() {
+	
+
+	public LocalDateTime getUploadDate() {
 		return uploadDate;
 	}
 
-	public void setUploadDate(Date uploadDate) {
+
+	public void setUploadDate(LocalDateTime uploadDate) {
 		this.uploadDate = uploadDate;
 	}
+
+
+	public int getGenreId() {
+		return genreId;
+	}
+
+
+	public void setGenreId(Integer genreId) {
+		this.genreId = genreId;
+	}
+
+
+	public int getMoodId() {
+		return moodId;
+	}
+
+
+	public void setMoodId(Integer moodId) {
+		this.moodId = moodId;
+	}
+
 
 	public String getAudioFileUrl() {
 		return audioFileUrl;

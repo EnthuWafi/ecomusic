@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import com.enth.ecomusic.model.UserSubscription;
+import com.enth.ecomusic.model.entity.UserSubscription;
 import com.enth.ecomusic.service.SubscriptionService;
 import com.stripe.Stripe;
 import com.stripe.exception.SignatureVerificationException;

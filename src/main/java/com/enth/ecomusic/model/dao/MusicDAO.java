@@ -1,6 +1,9 @@
 package com.enth.ecomusic.model.dao;
 
-import com.enth.ecomusic.model.Music;
+import com.enth.ecomusic.model.dto.MusicDetailDTO;
+import com.enth.ecomusic.model.entity.Music;
+import com.enth.ecomusic.model.mapper.ResultSetMapper;
+import com.enth.ecomusic.util.DAOUtil;
 import com.enth.ecomusic.util.DBConnection;
 
 import java.sql.*;
@@ -10,16 +13,17 @@ import java.util.List;
 public class MusicDAO {
 	// CREATE
 	public boolean insertMusic(Music music) {
-		String sql = "INSERT INTO Music (artist_id, title, genre, description, audio_file_url, image_url, premium_content) "
-				+ "VALUES (?, ?, ?, ?, ?, ?, ?)";
+		String sql = "INSERT INTO Music (artist_id, title, genre_id, mood_id, description, audio_file_url, image_url, premium_content) "
+				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 		try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 			stmt.setInt(1, music.getArtistId());
 			stmt.setString(2, music.getTitle());
-			stmt.setString(3, music.getGenre());
-			stmt.setString(4, music.getDescription());
-			stmt.setString(5, music.getAudioFileUrl());
-			stmt.setString(6, music.getImageUrl());
-			stmt.setInt(7, music.isPremiumContent() ? 1 : 0);
+			stmt.setInt(3, music.getGenreId());
+			stmt.setInt(4, music.getMoodId());
+			stmt.setString(5, music.getDescription());
+			stmt.setString(6, music.getAudioFileUrl());
+			stmt.setString(7, music.getImageUrl());
+			stmt.setInt(8, music.isPremiumContent() ? 1 : 0);
 
 			return stmt.executeUpdate() > 0;
 		} catch (SQLException e) {
@@ -44,6 +48,24 @@ public class MusicDAO {
 		return null;
 	}
 
+	// READ by artist id
+	public List<Music> getAllMusicByArtistId(int artistId) {
+		List<Music> musicList = new ArrayList<>();
+		String sql = "SELECT * FROM Music WHERE artist_id = ?";
+
+		try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql);) {
+			stmt.setInt(1, artistId);
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next()) {
+				musicList.add(mapResultSetToMusic(rs));
+			}
+		} catch (SQLException e) {
+			System.err.println("Error fetching all music by artist: " + e.getMessage());
+		}
+
+		return musicList;
+	}
+
 	// READ all
 	public List<Music> getAllMusic() {
 		List<Music> musicList = new ArrayList<>();
@@ -63,78 +85,118 @@ public class MusicDAO {
 		return musicList;
 	}
 
-	// READ all
-	public List<Music> getPaginatedMusic(int page, int pageSize) {
-		List<Music> musicList = new ArrayList<>();
-		String sql = "SELECT * FROM (" + "SELECT MUSIC.*, ROW_NUMBER() OVER (ORDER BY MUSIC.music_id) AS rnum "
-				+ "FROM MUSIC)" + "WHERE rnum > ? AND rnum <= ?";
+	// READ all paginated
+	public List<MusicDetailDTO> getPaginatedMusicWithDetail(int page, int pageSize) {
+		String query = """
+			    SELECT
+		        m.music_id, m.artist_id, m.title, m.description, m.audio_file_url,
+		        m.image_url, m.premium_content, m.genre_id, m.mood_id, m.upload_date,
+		        u.username AS artist_username, u.image_url AS artist_image_url,
+		        NVL(l.like_count, 0) AS like_count,
+		        NVL(s.total_plays, 0) AS total_plays,
+		        ROW_NUMBER() OVER (ORDER BY m.upload_date DESC) AS rnum
+		    FROM Music m
+		    JOIN Users u ON m.artist_id = u.user_id
 
-		try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql);) {
-			int lower = (page - 1) * pageSize;
-			int upper = lower + pageSize;
-			stmt.setInt(1, lower);
-			stmt.setInt(2, upper);
+		    LEFT JOIN (
+		        SELECT music_id, COUNT(*) AS like_count
+		        FROM Likes
+		        GROUP BY music_id
+		    ) l ON m.music_id = l.music_id
 
-			try (ResultSet rs = stmt.executeQuery()) {
-				while (rs.next()) {
-					musicList.add(mapResultSetToMusic(rs));
-				}
-			}
-		} catch (SQLException e) {
-			System.err.println("Error fetching paginated music: " + e.getMessage());
-		}
+		    LEFT JOIN (
+		        SELECT music_id, SUM(total_plays) AS total_plays
+		        FROM UserMusicDailyStats
+		        GROUP BY music_id
+		    ) s ON m.music_id = s.music_id
 
-		return musicList;
+			""";
+
+		return DAOUtil.executePaginatedQuery(query, null, page, pageSize, ResultSetMapper::mapToMusicDetailDTO);
 	}
 
-	// READ all related music
-	public List<Music> getAllRelatedMusic(int musicId) {
-		List<Music> musicList = new ArrayList<>();
+	public List<MusicDetailDTO> getPaginatedMusicWithDetailByKeyword(String keyword, int page, int pageSize) {
+		String query = """
+			    SELECT
+			        m.music_id, m.artist_id, m.title, m.description, m.audio_file_url,
+			        m.image_url, m.premium_content, m.genre_id, m.mood_id, m.upload_date,
+			        u.username AS artist_username, u.image_url AS artist_image_url,
+			        NVL(l.like_count, 0) AS like_count,
+			        NVL(s.total_plays, 0) AS total_plays,
+			        ROW_NUMBER() OVER (ORDER BY m.upload_date DESC) AS rnum
+			    FROM Music m
+			    JOIN Users u ON m.artist_id = u.user_id
 
-		String sql = "SELECT * FROM (" + " SELECT m1.* FROM Music m1 " + " JOIN Music m2 ON m1.genre = m2.genre "
-				+ " WHERE m1.music_id = ? AND m1.music_id != m2.music_id " + " ORDER BY m1.upload_date DESC"
-				+ ") WHERE ROWNUM <= 5";
+			    LEFT JOIN (
+			        SELECT music_id, COUNT(*) AS like_count
+			        FROM Likes
+			        GROUP BY music_id
+			    ) l ON m.music_id = l.music_id
 
-		try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-			stmt.setInt(1, musicId);
-//			stmt.setInt(2, limit);
+			    LEFT JOIN (
+			        SELECT music_id, SUM(total_plays) AS total_plays
+			        FROM UserMusicDailyStats
+			        GROUP BY music_id
+			    ) s ON m.music_id = s.music_id
 
-			try (ResultSet rs = stmt.executeQuery()) {
-				while (rs.next()) {
-					musicList.add(mapResultSetToMusic(rs));
-				}
-			}
-		} catch (SQLException e) {
-			System.err.println("Error fetching related music: " + e.getMessage());
-		}
-
-		return musicList;
+			    WHERE m.title LIKE ?
+				""";
+		return DAOUtil.executePaginatedQuery(query, List.of("%" + keyword + "%"), page, pageSize,
+				ResultSetMapper::mapToMusicDetailDTO);
 	}
 
-	// UPDATE
-	public boolean updateMusic(Music music) {
-		String sql = "UPDATE Music SET artist_id = ?, title = ?, genre = ?, description = ?, "
-				+ "audio_file_url = ?, image_url = ?, premium_content = ? WHERE music_id = ?";
+	public List<MusicDetailDTO> getPaginatedMusicWithDetailByArtistId(int artistId, int page, int pageSize) {
+		String query = """
+			    SELECT
+		        m.music_id, m.artist_id, m.title, m.description, m.audio_file_url,
+		        m.image_url, m.premium_content, m.genre_id, m.mood_id, m.upload_date,
+		        u.username AS artist_username, u.image_url AS artist_image_url,
+		        NVL(l.like_count, 0) AS like_count,
+		        NVL(s.total_plays, 0) AS total_plays,
+		        ROW_NUMBER() OVER (ORDER BY m.upload_date DESC) AS rnum
+		    FROM Music m
+		    JOIN Users u ON m.artist_id = u.user_id
+		    
+		    LEFT JOIN (
+		        SELECT music_id, COUNT(*) AS like_count
+		        FROM Likes
+		        GROUP BY music_id
+		    ) l ON m.music_id = l.music_id
 
-		try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-			stmt.setInt(1, music.getArtistId());
-			stmt.setString(2, music.getTitle());
-			stmt.setString(3, music.getGenre());
-			stmt.setString(4, music.getDescription());
-			stmt.setString(5, music.getAudioFileUrl());
-			stmt.setString(6, music.getImageUrl());
-			stmt.setInt(7, music.isPremiumContent() ? 1 : 0);
-			stmt.setInt(8, music.getMusicId());
+		    LEFT JOIN (
+		        SELECT music_id, SUM(total_plays) AS total_plays
+		        FROM UserMusicDailyStats
+		        GROUP BY music_id
+		    ) s ON m.music_id = s.music_id
 
-			return stmt.executeUpdate() > 0;
-		} catch (SQLException e) {
-			System.err.println("Error updating music: " + e.getMessage());
-			return false;
-		}
+		    WHERE m.artist_id = ?
+			""";
+		return DAOUtil.executePaginatedQuery(query, List.of(artistId), page, pageSize, ResultSetMapper::mapToMusicDetailDTO);
 	}
 
 	// count
-	public int countProducts() {
+	public int countMusicByKeyword(String keyword) {
+		String sql = "SELECT COUNT(*) FROM Music WHERE MUSIC.title LIKE ?";
+
+		try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+			stmt.setString(1, "%" + keyword + "%");
+
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) {
+					return rs.getInt(1);
+				}
+			}
+			;
+
+		} catch (SQLException e) {
+			System.err.println("Error counting music: " + e.getMessage());
+		}
+
+		return 0;
+	}
+
+	// count
+	public int countMusic() {
 		String sql = "SELECT COUNT(*) FROM Music";
 
 		try (Connection conn = DBConnection.getConnection();
@@ -151,6 +213,49 @@ public class MusicDAO {
 		return 0;
 	}
 
+	public int countMusicByArtist(int artistId) {
+		String sql = "SELECT COUNT(*) FROM Music WHERE artist_id = ?";
+
+		try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+			stmt.setInt(1, artistId);
+
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) {
+					return rs.getInt(1);
+				}
+			}
+			;
+
+		} catch (SQLException e) {
+			System.err.println("Error counting music: " + e.getMessage());
+		}
+
+		return 0;
+	}
+
+	// UPDATE
+	public boolean updateMusic(Music music) {
+		String sql = "UPDATE Music SET artist_id = ?, title = ?, genre_id = ?, mood_id = ?, description = ?, "
+				+ "audio_file_url = ?, image_url = ?, premium_content = ? WHERE music_id = ?";
+
+		try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+			stmt.setInt(1, music.getArtistId());
+			stmt.setString(2, music.getTitle());
+			stmt.setInt(3, music.getGenreId());
+			stmt.setInt(4, music.getMoodId());
+			stmt.setString(5, music.getDescription());
+			stmt.setString(6, music.getAudioFileUrl());
+			stmt.setString(7, music.getImageUrl());
+			stmt.setInt(8, music.isPremiumContent() ? 1 : 0);
+			stmt.setInt(9, music.getMusicId());
+
+			return stmt.executeUpdate() > 0;
+		} catch (SQLException e) {
+			System.err.println("Error updating music: " + e.getMessage());
+			return false;
+		}
+	}
+
 	// DELETE
 	public boolean deleteMusic(int musicId) {
 		String sql = "DELETE FROM Music WHERE music_id = ?";
@@ -163,33 +268,10 @@ public class MusicDAO {
 		}
 	}
 
-	public List<Music> searchMusicByTitleOrArtist(String keyword) {
-		List<Music> results = new ArrayList<>();
-		String sql = "SELECT m.* FROM Music m " + "INNER JOIN User u ON u.user_id = m.artist_id "
-				+ "WHERE LOWER(m.title) LIKE ? " + "OR LOWER(u.username) LIKE ? " + "ORDER BY m.upload_date DESC";
-
-		try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-			String likeQuery = "%" + keyword.toLowerCase() + "%";
-			stmt.setString(1, likeQuery);
-			stmt.setString(2, likeQuery);
-
-			try (ResultSet rs = stmt.executeQuery()) {
-				while (rs.next()) {
-					results.add(mapResultSetToMusic(rs));
-				}
-			}
-
-		} catch (SQLException e) {
-			System.err.println("Error searching music: " + e.getMessage());
-		}
-
-		return results;
-	}
-
 	// Helper method to map ResultSet to Music object
 	private Music mapResultSetToMusic(ResultSet rs) throws SQLException {
-		return new Music(rs.getInt("music_id"), rs.getInt("artist_id"), rs.getString("title"), rs.getString("genre"),
-				rs.getString("description"), rs.getDate("upload_date"), rs.getString("audio_file_url"),
-				rs.getString("image_url"), rs.getInt("premium_content") == 1);
+		return new Music(rs.getInt("music_id"), rs.getInt("artist_id"), rs.getString("title"), rs.getInt("genre_id"),
+				rs.getInt("mood_id"), rs.getString("description"), rs.getTimestamp("upload_date").toLocalDateTime(),
+				rs.getString("audio_file_url"), rs.getString("image_url"), rs.getInt("premium_content") == 1);
 	}
 }

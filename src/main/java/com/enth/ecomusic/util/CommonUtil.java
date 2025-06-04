@@ -1,12 +1,17 @@
 package com.enth.ecomusic.util;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringWriter;
 import java.security.MessageDigest;
+import java.sql.Clob;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.enth.ecomusic.model.User;
+import org.apache.commons.io.IOUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -15,6 +20,16 @@ public class CommonUtil {
 
 	private CommonUtil() {
 
+	}
+
+	public static String clobToString(Clob clobObject) throws SQLException, IOException {
+		if (clobObject == null) {
+			return null;
+		}
+		try (Reader reader = clobObject.getCharacterStream(); StringWriter writer = new StringWriter()) {
+			IOUtils.copy(reader, writer);
+			return writer.toString();
+		}
 	}
 
 	// Hashing
@@ -41,7 +56,7 @@ public class CommonUtil {
 
 	// Path-ing
 
-	public static int extractIdFromPath(String pathInfo) {
+	public static Integer extractIdFromPath(String pathInfo) {
 		if (pathInfo == null || pathInfo.isBlank()) {
 			return -1;
 		}

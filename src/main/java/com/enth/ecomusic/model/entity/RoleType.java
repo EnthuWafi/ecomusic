@@ -1,4 +1,4 @@
-package com.enth.ecomusic.model;
+package com.enth.ecomusic.model.entity;
 
 import java.util.HashMap;
 import java.util.Map;

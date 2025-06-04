@@ -1,13 +1,12 @@
 package com.enth.ecomusic.service;
 
-import com.enth.ecomusic.model.Music;
-import com.enth.ecomusic.model.Playlist;
-import com.enth.ecomusic.model.PlaylistMusic;
 import com.enth.ecomusic.model.dao.MusicDAO;
 import com.enth.ecomusic.model.dao.PlaylistDAO;
 import com.enth.ecomusic.model.dao.PlaylistMusicDAO;
+import com.enth.ecomusic.model.entity.Music;
+import com.enth.ecomusic.model.entity.Playlist;
+import com.enth.ecomusic.model.entity.PlaylistMusic;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class PlaylistService {

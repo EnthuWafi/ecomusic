@@ -1,5 +1,6 @@
-package com.enth.ecomusic.model;
+package com.enth.ecomusic.model.entity;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -8,8 +9,12 @@ import java.util.List;
 import com.enth.ecomusic.util.JsonUtil;
 import com.google.gson.reflect.TypeToken;
 
-public class SubscriptionPlan {
-    private int subscriptionPlanId;
+public class SubscriptionPlan  implements Serializable{
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private int subscriptionPlanId;
     private String name;
     private String stripePriceId;
     private String billingCycle;
