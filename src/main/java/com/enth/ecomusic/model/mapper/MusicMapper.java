@@ -16,6 +16,8 @@ public interface MusicMapper {
     @Mapping(target = "moodName", ignore=true)
     MusicDTO toDTO(Music music);
     
+    Music toMusic(MusicDTO musicDTO);
+    
     @Mapping(target = "music", source = "music")
     @Mapping(source = "artist.username", target = "artistUsername")
     @Mapping(source = "artist.imageUrl", target = "artistImageUrl")

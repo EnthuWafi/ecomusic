@@ -21,6 +21,31 @@ public class UserDTO implements Serializable{
 	private String imageUrl;
 	private LocalDateTime createdAt;
 	
+	
+	
+	public UserDTO(int userId, String firstName, String lastName, String username, String bio, String email, int roleId,
+			String roleName, String imageUrl, LocalDateTime createdAt) {
+		super();
+		this.userId = userId;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.username = username;
+		this.bio = bio;
+		this.email = email;
+		this.roleId = roleId;
+		this.roleName = roleName;
+		this.imageUrl = imageUrl;
+		this.createdAt = createdAt;
+	}
+	
+	
+
+	public UserDTO() {
+		super();
+	}
+
+
+
 	public int getUserId() {
 		return userId;
 	}

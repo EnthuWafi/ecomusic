@@ -18,9 +18,7 @@ import jakarta.servlet.http.HttpSession;
 
 public class CommonUtil {
 
-	private CommonUtil() {
-
-	}
+	private CommonUtil() {}
 
 	public static String clobToString(Clob clobObject) throws SQLException, IOException {
 		if (clobObject == null) {

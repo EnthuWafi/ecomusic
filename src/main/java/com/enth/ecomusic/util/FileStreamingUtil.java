@@ -1,4 +1,4 @@
-package com.enth.ecomusic.service;
+package com.enth.ecomusic.util;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,9 +9,11 @@ import com.enth.ecomusic.model.dto.StreamRangeDTO;
 
 import jakarta.servlet.http.HttpServletResponse;
 
-public class FileStreamingService {
+public class FileStreamingUtil {
+	
+	private FileStreamingUtil() {}
 
-	public StreamRangeDTO parseRangeHeader(String rangeHeader, long fileLength) {
+	public static StreamRangeDTO parseRangeHeader(String rangeHeader, long fileLength) {
         if (rangeHeader == null || !rangeHeader.startsWith("bytes=")) {
             return new StreamRangeDTO(0, fileLength - 1, fileLength); // full content
         }
@@ -30,7 +32,7 @@ public class FileStreamingService {
     }
 
 
-    public void streamFile(File file, StreamRangeDTO range, HttpServletResponse response, String mimeType) throws IOException {
+    public static void streamFile(File file, StreamRangeDTO range, HttpServletResponse response, String mimeType) throws IOException {
         response.setHeader("Accept-Ranges", "bytes");
         response.setContentType(mimeType);
         response.setContentLengthLong(range.getContentLength());

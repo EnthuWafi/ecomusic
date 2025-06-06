@@ -9,6 +9,8 @@ import org.apache.commons.lang3.math.NumberUtils;
 import jakarta.servlet.http.Part;
 
 public class MultipartUtil {
+	
+	private MultipartUtil() {}
 	/** 
      * Read the entire Part as a UTF-8 String (or return "" on error/null). 
      */

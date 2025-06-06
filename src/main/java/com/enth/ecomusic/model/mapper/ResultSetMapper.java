@@ -30,4 +30,8 @@ public class ResultSetMapper {
 		dto.setViews(rs.getInt("total_plays"));
 		return dto;
 	}
+	
+	public static Integer mapToInt(ResultSet rs) throws SQLException {
+		return rs.getInt(1);
+	}
 }

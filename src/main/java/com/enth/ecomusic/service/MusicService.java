@@ -25,149 +25,229 @@ import net.coobird.thumbnailator.Thumbnails;
 
 public class MusicService {
 
-    private final MusicDAO musicDAO;
-    private final UserDAO userDAO;
-    private final LikeDAO likeDAO;
-    private final UserMusicDailyStatsDAO userMusicDailyStatsDAO;
-    private final GenreCacheService genreCacheService;
-    private final MoodCacheService moodCacheService;
-    
-    public MusicService(GenreCacheService genreCacheService, MoodCacheService moodCacheService) {
-        this.musicDAO = new MusicDAO();
-        this.userDAO = new UserDAO();
-        this.likeDAO = new LikeDAO();
-        this.userMusicDailyStatsDAO = new UserMusicDailyStatsDAO();
-        this.genreCacheService = genreCacheService != null ? genreCacheService : new GenreCacheService();
-        this.moodCacheService = moodCacheService != null? moodCacheService : new MoodCacheService();
-    }
+	private final MusicDAO musicDAO;
+	private final UserDAO userDAO;
+	private final LikeDAO likeDAO;
+	private final UserMusicDailyStatsDAO userMusicDailyStatsDAO;
+	private final GenreCacheService genreCacheService;
+	private final MoodCacheService moodCacheService;
 
-    public boolean uploadMusic(Music music, Part audioPart, Part imagePart) {
-        try {
-            if (audioPart == null || audioPart.getSize() == 0 || 
-            		FileTypeUtil.getAudioExtension((audioPart.getContentType())) == null) {
-                throw new IllegalArgumentException("Invalid audio file");
-            }
+	public MusicService(GenreCacheService genreCacheService, MoodCacheService moodCacheService) {
+		this.musicDAO = new MusicDAO();
+		this.userDAO = new UserDAO();
+		this.likeDAO = new LikeDAO();
+		this.userMusicDailyStatsDAO = new UserMusicDailyStatsDAO();
+		this.genreCacheService = genreCacheService != null ? genreCacheService : new GenreCacheService();
+		this.moodCacheService = moodCacheService != null ? moodCacheService : new MoodCacheService();
+	}
 
-            // === AUDIO FILE HANDLING ===
-            
-            String audioExt = FileTypeUtil.getAudioExtension( (audioPart.getContentType()) );
-            String audioDir = AppConfig.get("audioFilePath");
-            String audioFileName = UUID.randomUUID().toString() + audioExt;
-            String audioPath = audioDir + File.separator + audioFileName;
+	public boolean uploadMusic(Music music, Part audioPart, Part imagePart) {
+		try {
+			if (audioPart == null || audioPart.getSize() == 0
+					|| FileTypeUtil.getAudioExtension((audioPart.getContentType())) == null) {
+				throw new IllegalArgumentException("Invalid audio file");
+			}
 
-            Files.createDirectories(Paths.get(audioDir));
-            audioPart.write(audioPath);
-            music.setAudioFileUrl(audioFileName);
+			// === AUDIO FILE HANDLING ===
 
-            // === OPTIONAL IMAGE FILE HANDLING ===
-            if (imagePart != null && imagePart.getSize() > 0) {
-                String contentType = imagePart.getContentType();
-                if (!contentType.startsWith("image/")) {
-                    throw new IllegalArgumentException("Invalid image file");
-                }
+			String audioExt = FileTypeUtil.getAudioExtension((audioPart.getContentType()));
+			String audioDir = AppConfig.get("audioFilePath");
+			String audioFileName = UUID.randomUUID().toString() + audioExt;
+			String audioPath = audioDir + File.separator + audioFileName;
 
-                String imageDir = AppConfig.get("musicImageFilePath");
-                String imgExt = FileTypeUtil.getImageExtension((imagePart.getContentType()));
-                String imageFileName = UUID.randomUUID().toString() + imgExt;
-                String imagePath = imageDir + File.separator + imageFileName;
+			Files.createDirectories(Paths.get(audioDir));
+			audioPart.write(audioPath);
+			music.setAudioFileUrl(audioFileName);
 
-                Files.createDirectories(Paths.get(imageDir));
-                
-                File imageFile = new File(imagePath);
-                imagePart.write(imageFile.getAbsolutePath());
-                
-                File thumbnailFile = new File(imageDir + File.separator + "thumb_" + imageFileName);
-                Thumbnails.of(imageFile)
-                          .size(300, 300)
-                          .outputFormat(imgExt.replace(".", ""))
-                          .toFile(thumbnailFile);
-                
-                music.setImageUrl(imageFileName);
-            }
+			// === OPTIONAL IMAGE FILE HANDLING ===
+			if (imagePart != null && imagePart.getSize() > 0) {
+				String contentType = imagePart.getContentType();
+				if (!contentType.startsWith("image/")) {
+					throw new IllegalArgumentException("Invalid image file");
+				}
 
-            return musicDAO.insertMusic(music);
+				String imageDir = AppConfig.get("musicImageFilePath");
+				String imgExt = FileTypeUtil.getImageExtension((imagePart.getContentType()));
+				String imageFileName = UUID.randomUUID().toString() + imgExt;
+				String imagePath = imageDir + File.separator + imageFileName;
 
-        } catch (IOException | IllegalArgumentException e) {
-            System.err.println("Error uploading music: " + e.getMessage());
-            return false;
-        }
-    }
-    
-    public MusicDTO getMusicDTOById(int musicId) {
-    	Music music = musicDAO.getMusicById(musicId);
-    	
-    	MusicDTO dto = MusicMapper.INSTANCE.toDTO(music);
-    	dto.setGenreName(genreCacheService.getById(music.getGenreId()).getName());
-    	dto.setMoodName(moodCacheService.getById(music.getMoodId()).getName());
-    	return dto;
-    }
-    
-    public MusicDetailDTO getMusicDetailDTOById(int musicId) {
-    	Music music = musicDAO.getMusicById(musicId);
-    	User user = userDAO.getUserById(music.getArtistId());
-    	int likeCount = likeDAO.countLikeByMusicId(musicId);
-    	int viewCount = userMusicDailyStatsDAO.sumViewsByMusicId(musicId);
-    	
-    	MusicDetailDTO dto = MusicMapper.INSTANCE.toDetailDTO(music, user, likeCount, viewCount);
-    	setGenreAndMoodMusicDTO(dto.getMusic());
-    	return dto;
-    }
-    
-    public List<MusicDTO> getAllMusicDTOsByArtistId(int artistId) {
-        List<Music> musicList = musicDAO.getAllMusicByArtistId(artistId);
-        
-        return musicList.stream().map(music -> {
-            MusicDTO dto = MusicMapper.INSTANCE.toDTO(music);
-            dto.setGenreName(genreCacheService.getById(music.getGenreId()).getName());
-            dto.setMoodName(moodCacheService.getById(music.getMoodId()).getName());
-            return dto;
-        }).collect(Collectors.toList());
-    }
-    
-    
-    public List<MusicDetailDTO> getPaginatedMusicDetailDTO(int page, int pageSize) {
-        List<MusicDetailDTO> musicList = musicDAO.getPaginatedMusicWithDetail(page, pageSize);
+				Files.createDirectories(Paths.get(imageDir));
 
-        for (MusicDetailDTO dto : musicList) {
-        	setGenreAndMoodMusicDTO(dto.getMusic());
-        }
-        return musicList;
-    }
-    
-    public List<MusicDetailDTO> getPaginatedMusicDetailDTOLikeKeyword(String keyword, int page, int pageSize) {
-        List<MusicDetailDTO> musicList = musicDAO.getPaginatedMusicWithDetailByKeyword(keyword, page, pageSize);
+				File imageFile = new File(imagePath);
+				imagePart.write(imageFile.getAbsolutePath());
 
-        for (MusicDetailDTO dto : musicList) {
-        	setGenreAndMoodMusicDTO(dto.getMusic());
-        }
-        return musicList;
-    }
-    
-    public int getMusicCount() {
-    	return musicDAO.countMusic();
-    }
-    
-    public int getMusicCountByKeyword(String keyword) {
-    	return musicDAO.countMusicByKeyword(keyword);
-    }
-    
-    public int getMusicCountByArtist(int artistId) {
-    	return musicDAO.countMusicByArtist(artistId);
-    }
+				File thumbnailFile = new File(imageDir + File.separator + "thumb_" + imageFileName);
+				Thumbnails.of(imageFile).size(300, 300).outputFormat(imgExt.replace(".", "")).toFile(thumbnailFile);
+
+				music.setImageUrl(imageFileName);
+			}
+
+			return musicDAO.insertMusic(music);
+
+		} catch (IOException | IllegalArgumentException e) {
+			System.err.println("Error uploading music: " + e.getMessage());
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	public boolean updateMusic(Music music, Part audioPart, Part imagePart) {
+		try {
+
+			String oldAudioFileName = music.getAudioFileUrl();
+			String oldImageFileName = music.getImageUrl();
+
+			// === AUDIO FILE HANDLING ===
+			if (audioPart != null && audioPart.getSize() > 0) {
+				// New audio file provided
+				String audioExt = FileTypeUtil.getAudioExtension(audioPart.getContentType());
+				if (audioExt == null) {
+					throw new IllegalArgumentException("Invalid audio file format.");
+				}
+
+				String audioDir = AppConfig.get("audioFilePath");
+				String newAudioFileName = UUID.randomUUID().toString() + audioExt;
+				String newAudioPath = audioDir + File.separator + newAudioFileName;
+
+				Files.createDirectories(Paths.get(audioDir));
+				audioPart.write(newAudioPath);
+				music.setAudioFileUrl(newAudioFileName); // Update music object with new URL
+
+				// Delete old audio file if it exists and a new one was uploaded
+				if (oldAudioFileName != null && !oldAudioFileName.isEmpty()) {
+					File oldAudioFile = new File(audioDir + File.separator + oldAudioFileName);
+					if (oldAudioFile.exists()) {
+						Files.delete(oldAudioFile.toPath());
+					}
+				}
+			}
+
+			// === OPTIONAL IMAGE FILE HANDLING ===
+			if (imagePart != null && imagePart.getSize() > 0) {
+				// New image file provided
+				String contentType = imagePart.getContentType();
+				if (!contentType.startsWith("image/")) {
+					throw new IllegalArgumentException("Invalid image file format.");
+				}
+
+				String imageDir = AppConfig.get("musicImageFilePath");
+				String imgExt = FileTypeUtil.getImageExtension(contentType);
+				String newImageFileName = UUID.randomUUID().toString() + imgExt;
+				String newImagePath = imageDir + File.separator + newImageFileName;
+
+				Files.createDirectories(Paths.get(imageDir));
+				File newImageFile = new File(newImagePath);
+				imagePart.write(newImageFile.getAbsolutePath());
+
+				// Generate thumbnail for the new image
+				File newThumbnailFile = new File(imageDir + File.separator + "thumb_" + newImageFileName);
+				Thumbnails.of(newImageFile).size(300, 300).outputFormat(imgExt.replace(".", ""))
+						.toFile(newThumbnailFile);
+
+				music.setImageUrl(newImageFileName); // Update music object with new URL
+
+				// Delete old image files if they exist and a new one was uploaded
+				if (oldImageFileName != null && !oldImageFileName.isEmpty()) {
+					File oldImageFile = new File(imageDir + File.separator + oldImageFileName);
+					File oldThumbnailFile = new File(imageDir + File.separator + "thumb_" + oldImageFileName);
+					if (oldImageFile.exists()) {
+						Files.delete(oldImageFile.toPath());
+					}
+					if (oldThumbnailFile.exists()) {
+						Files.delete(oldThumbnailFile.toPath());
+					}
+				}
+			}
+
+
+			// === DATABASE UPDATE ===
+			// Call your DAO's update method
+			return musicDAO.updateMusic(music);
+
+		} catch (IOException | IllegalArgumentException e) {
+			System.err.println("Error updating music: " + e.getMessage());
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	public MusicDTO getMusicDTOById(int musicId) {
+		Music music = musicDAO.getMusicById(musicId);
+
+		MusicDTO dto = MusicMapper.INSTANCE.toDTO(music);
+		dto.setGenreName(genreCacheService.getById(music.getGenreId()).getName());
+		dto.setMoodName(moodCacheService.getById(music.getMoodId()).getName());
+		return dto;
+	}
+
+	public MusicDetailDTO getMusicDetailDTOById(int musicId) {
+		Music music = musicDAO.getMusicById(musicId);
+		User user = userDAO.getUserById(music.getArtistId());
+		int likeCount = likeDAO.countLikeByMusicId(musicId);
+		int viewCount = userMusicDailyStatsDAO.sumViewsByMusicId(musicId);
+
+		MusicDetailDTO dto = MusicMapper.INSTANCE.toDetailDTO(music, user, likeCount, viewCount);
+		setGenreAndMoodMusicDTO(dto.getMusic());
+		return dto;
+	}
+
+	public List<MusicDTO> getAllMusicDTOsByArtistId(int artistId) {
+		List<Music> musicList = musicDAO.getAllMusicByArtistId(artistId);
+
+		return musicList.stream().map(music -> {
+			MusicDTO dto = MusicMapper.INSTANCE.toDTO(music);
+			dto.setGenreName(genreCacheService.getById(music.getGenreId()).getName());
+			dto.setMoodName(moodCacheService.getById(music.getMoodId()).getName());
+			return dto;
+		}).collect(Collectors.toList());
+	}
+
+	public List<MusicDetailDTO> getPaginatedMusicDetailDTO(int page, int pageSize) {
+		List<MusicDetailDTO> musicList = musicDAO.getRelevantPaginatedMusicWithDetail(page, pageSize);
+
+		for (MusicDetailDTO dto : musicList) {
+			setGenreAndMoodMusicDTO(dto.getMusic());
+		}
+		return musicList;
+	}
+
+	public List<MusicDetailDTO> getPaginatedMusicDetailDTOLikeKeyword(String keyword, List<Integer> genreIds,
+			List<Integer> moodIds, int page, int pageSize) {
+		List<MusicDetailDTO> musicList = musicDAO.getRelevantPaginatedMusicWithDetailByKeyword(keyword, genreIds,
+				moodIds, page, pageSize);
+
+		for (MusicDetailDTO dto : musicList) {
+			setGenreAndMoodMusicDTO(dto.getMusic());
+		}
+		return musicList;
+	}
+
+	public int getMusicCount() {
+		return musicDAO.countMusic();
+	}
+
+	public int getMusicCountByArtist(int artistId) {
+		return musicDAO.countMusicByArtist(artistId);
+	}
 
 	public List<MusicDetailDTO> getPaginatedMusicDetailDTOByArtistId(int artistId, int page, int pageSize) {
 		List<MusicDetailDTO> musicList = musicDAO.getPaginatedMusicWithDetailByArtistId(artistId, page, pageSize);
 
-        for (MusicDetailDTO dto : musicList) {
-        	setGenreAndMoodMusicDTO(dto.getMusic());
-        }
-        return musicList;
+		for (MusicDetailDTO dto : musicList) {
+			setGenreAndMoodMusicDTO(dto.getMusic());
+		}
+		return musicList;
 	}
-	
-    private void setGenreAndMoodMusicDTO(MusicDTO dto) {
-    	dto.setGenreName(genreCacheService.getById(dto.getGenreId()).getName());
-        dto.setMoodName(moodCacheService.getById(dto.getMoodId()).getName());
-    }
-    
-    
+
+	private void setGenreAndMoodMusicDTO(MusicDTO dto) {
+		if (dto != null) {
+			dto.setGenreName(genreCacheService.getById(dto.getGenreId()).getName());
+			dto.setMoodName(moodCacheService.getById(dto.getMoodId()).getName());
+		}
+	}
+
+	public int getMusicCountLikeKeyword(String keyword, List<Integer> genreIdList, List<Integer> moodIdList) {
+		return musicDAO.countMusicByKeyword(keyword, genreIdList, moodIdList);
+	}
+
 }

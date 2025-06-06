@@ -21,6 +21,32 @@ public class MusicDTO implements Serializable{
     private String moodName;
     private LocalDateTime uploadDate;
     
+    
+    
+	public MusicDTO(int musicId, int artistId, String title, String description, String audioFileUrl, String imageUrl,
+			boolean premiumContent, int genreId, int moodId, String genreName, String moodName,
+			LocalDateTime uploadDate) {
+		super();
+		this.musicId = musicId;
+		this.artistId = artistId;
+		this.title = title;
+		this.description = description;
+		this.audioFileUrl = audioFileUrl;
+		this.imageUrl = imageUrl;
+		this.premiumContent = premiumContent;
+		this.genreId = genreId;
+		this.moodId = moodId;
+		this.genreName = genreName;
+		this.moodName = moodName;
+		this.uploadDate = uploadDate;
+	}
+	
+	
+	public MusicDTO() {
+		super();
+	}
+
+
 	// Getters and Setters
     public LocalDateTime getUploadDate() {
 		return uploadDate;

@@ -3,6 +3,9 @@ package com.enth.ecomusic.util;
 import java.util.Map;
 
 public class FileTypeUtil {
+	
+	private FileTypeUtil() {}
+	
 	private static final Map<String, String> IMAGE_MIME_TO_EXT = Map.ofEntries(
 	        Map.entry("image/jpeg", ".jpg"),
 	        Map.entry("image/png", ".png"),
@@ -18,10 +21,10 @@ public class FileTypeUtil {
 	        Map.entry("audio/x-m4a", ".m4a")
 	    );
 	    
-	    public static String getImageExtension(String mimeType) {
-	        return IMAGE_MIME_TO_EXT.getOrDefault(mimeType, ".img");
-	    }
-	    public static String getAudioExtension(String mimeType) {
-	        return AUDIO_MIME_TO_EXT.get(mimeType);
-	    }
+    public static String getImageExtension(String mimeType) {
+        return IMAGE_MIME_TO_EXT.getOrDefault(mimeType, ".img");
+    }
+    public static String getAudioExtension(String mimeType) {
+        return AUDIO_MIME_TO_EXT.get(mimeType);
+    }
 }

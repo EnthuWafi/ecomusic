@@ -12,23 +12,26 @@ import jakarta.servlet.http.Part;
 import java.io.IOException;
 import java.util.List;
 
+import com.enth.ecomusic.model.dto.MusicDTO;
 import com.enth.ecomusic.model.dto.UserDTO;
 import com.enth.ecomusic.model.entity.Genre;
 import com.enth.ecomusic.model.entity.Mood;
 import com.enth.ecomusic.model.entity.Music;
+import com.enth.ecomusic.model.mapper.MusicMapper;
 import com.enth.ecomusic.service.GenreCacheService;
 import com.enth.ecomusic.service.MoodCacheService;
 import com.enth.ecomusic.service.MusicService;
 import com.enth.ecomusic.util.CommonUtil;
+import com.enth.ecomusic.util.JsonUtil;
 import com.enth.ecomusic.util.MultipartUtil;
 import com.enth.ecomusic.util.ToastrType;
 
 /**
- * Servlet implementation class ArtistUploadMusicServlet
+ * Servlet implementation class ArtistEditMusicServlet
  */
 @MultipartConfig
-@WebServlet("/artist/music/upload")
-public class ArtistUploadMusicServlet extends HttpServlet {
+@WebServlet("/artist/music/edit/*")
+public class ArtistEditMusicServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private MusicService musicService;
 	private GenreCacheService genreCacheService;
@@ -43,66 +46,83 @@ public class ArtistUploadMusicServlet extends HttpServlet {
 		this.moodCacheService = (MoodCacheService) this.getServletContext().getAttribute("moodCacheService");
 		this.musicService = new MusicService(genreCacheService, moodCacheService);
 	}
+	
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public ArtistEditMusicServlet() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
 
 	/**
-	 * @see HttpServlet#HttpServlet()
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
-	public ArtistUploadMusicServlet() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-
+		String pathInfo = request.getPathInfo(); 
+		int musicId = CommonUtil.extractIdFromPath(pathInfo);
+		
 		List<Genre> genreList = genreCacheService.getAll();
 		List<Mood> moodList = moodCacheService.getAll();
+		
+		MusicDTO music = musicService.getMusicDTOById(musicId);
 
-		request.setAttribute("pageTitle", "Upload Music");
+		request.setAttribute("pageTitle", "Edit Music");
 		request.setAttribute("genreList", genreList);
 		request.setAttribute("moodList", moodList);
-		request.setAttribute("contentPage", "/WEB-INF/views/artist/upload-music.jsp");
+		request.setAttribute("musicId", musicId);
+		request.setAttribute("musicDTOJson", JsonUtil.toJson(music));
+		request.setAttribute("contentPage", "/WEB-INF/views/artist/edit-music.jsp");
 		request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session = request.getSession();
+		String pathInfo = request.getPathInfo(); 
+		Integer musicId = CommonUtil.extractIdFromPath(pathInfo);
 
-		// Read text fields via MultipartUtils (no more custom partToString / parseInt)
 		int genreId = MultipartUtil.getInt(request.getPart("genreId"), -1);
 		int moodId = MultipartUtil.getInt(request.getPart("moodId"), -1);
 		String title = MultipartUtil.getString(request.getPart("title"));
 		String desc = MultipartUtil.getString(request.getPart("description"));
 		boolean isPremium = MultipartUtil.getBoolean(request.getPart("premiumContent"));
 
+		MusicDTO musicDTO = musicService.getMusicDTOById(musicId);
+		
+		if (musicDTO == null) {
+			CommonUtil.addMessage(session, ToastrType.ERROR, "Invalid music!");
+			response.sendRedirect(request.getContextPath() + "/artist/music");
+			return;
+		}
+		
 		if (genreId == -1 || moodId == -1) {
 			CommonUtil.addMessage(session, ToastrType.ERROR, "Genre and Mood are required!");
-			response.sendRedirect(request.getContextPath() + "/artist/music/upload");
+			response.sendRedirect(request.getContextPath() + "/artist/music/edit/" + musicId);
 			return;
 		}
 
 		Part audioPart = request.getPart("audio");
 		Part imagePart = request.getPart("image");
 
-		UserDTO artist = (UserDTO) session.getAttribute("user");
-		Music music = new Music(artist.getUserId(), title, genreId, moodId, desc, null, null, isPremium);
+		Music music = MusicMapper.INSTANCE.toMusic(musicDTO);
+		music.setTitle(title);
+		music.setDescription(desc);
+		music.setPremiumContent(isPremium);
+		music.setGenreId(genreId);
+		music.setMoodId(moodId);
 
-		boolean success = musicService.uploadMusic(music, audioPart, imagePart);
+		boolean success = musicService.updateMusic(music, audioPart, imagePart);
 		if (success) {
-			CommonUtil.addMessage(session, ToastrType.SUCCESS, "Music successfully uploaded");
+			CommonUtil.addMessage(session, ToastrType.SUCCESS, "Music successfully updated");
 			response.sendRedirect(request.getContextPath() + "/artist/music");
 		} else {
-			CommonUtil.addMessage(session, ToastrType.ERROR, "Music failed to upload!");
-			response.sendRedirect(request.getContextPath() + "/artist/music/upload");
+			CommonUtil.addMessage(session, ToastrType.ERROR, "Music failed to update!");
+			response.sendRedirect(request.getContextPath() + "/artist/music/edit/" + musicId);
 		}
 	}
 

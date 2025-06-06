@@ -12,10 +12,11 @@ import java.io.IOException;
 import com.enth.ecomusic.service.MusicService;
 import com.enth.ecomusic.model.dto.MusicDTO;
 import com.enth.ecomusic.model.dto.StreamRangeDTO;
-import com.enth.ecomusic.service.FileStreamingService;
 import com.enth.ecomusic.service.GenreCacheService;
 import com.enth.ecomusic.service.MoodCacheService;
+import com.enth.ecomusic.util.AppConfig;
 import com.enth.ecomusic.util.CommonUtil;
+import com.enth.ecomusic.util.FileStreamingUtil;
 
 /**
  * Servlet implementation class MusicImageStreamServlet
@@ -25,7 +26,6 @@ public class MusicImageStreamServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	private MusicService musicService;
-	private FileStreamingService fileStreamingService;
 
 	@Override
 	public void init() throws ServletException {
@@ -35,7 +35,6 @@ public class MusicImageStreamServlet extends HttpServlet {
 		GenreCacheService genreCacheService = (GenreCacheService) this.getServletContext().getAttribute("genreCacheService");
 		MoodCacheService moodCacheService = (MoodCacheService) this.getServletContext().getAttribute("moodCacheService");
 		this.musicService = new MusicService(genreCacheService, moodCacheService);
-		fileStreamingService = new FileStreamingService();
 	}
 
 	/**
@@ -55,20 +54,30 @@ public class MusicImageStreamServlet extends HttpServlet {
 
 		String pathInfo = request.getPathInfo(); // e.g., "/42"
 		int musicId = CommonUtil.extractIdFromPath(pathInfo);
+		
+		String requestedSize = request.getParameter("size"); 
 
 		if (musicId == -1) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid music ID.");
 			return;
 		}
 		
+		boolean isThumbnailRequest = "thumb".equalsIgnoreCase(requestedSize);
+		
 		MusicDTO music = musicService.getMusicDTOById(musicId);
 
-		// Get image base path from context
-		String basePath = getServletContext().getAttribute("musicImageFilePath").toString();
-		File imageFile = new File(basePath + music.getImageUrl());
+		String basePath = AppConfig.get("musicImageFilePath");
+		
+		File imageFile = null;
+		if (isThumbnailRequest) {
+			imageFile = new File(basePath + "thumb_" + music.getImageUrl());
+		}
+		else {
+			imageFile = new File(basePath + music.getImageUrl());
+		}
 
 	    if (!imageFile.exists()) {
-	        response.sendRedirect(request.getContextPath() + "/assets/images/default.jpg");
+	        response.sendRedirect(request.getContextPath() + "/assets/images/default-music.jpg");
 	        return;
 	    }
 
@@ -79,8 +88,8 @@ public class MusicImageStreamServlet extends HttpServlet {
 
 	    String rangeHeader = request.getHeader("Range");
 
-	    StreamRangeDTO range = fileStreamingService.parseRangeHeader(rangeHeader, imageFile.length());
-	    fileStreamingService.streamFile(imageFile, range, response, mimeType);
+	    StreamRangeDTO range = FileStreamingUtil.parseRangeHeader(rangeHeader, imageFile.length());
+	    FileStreamingUtil.streamFile(imageFile, range, response, mimeType);
 	}
 
 }

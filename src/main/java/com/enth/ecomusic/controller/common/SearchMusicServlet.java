@@ -6,7 +6,10 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.enth.ecomusic.model.dto.MusicDetailDTO;
 import com.enth.ecomusic.service.GenreCacheService;
@@ -21,13 +24,15 @@ public class SearchMusicServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
 	private MusicService musicService;
+	private GenreCacheService genreCacheService;
+	private MoodCacheService moodCacheService;
 
     @Override
     public void init() throws ServletException {
 		// TODO Auto-generated method stub
 		super.init();
-		GenreCacheService genreCacheService = (GenreCacheService) this.getServletContext().getAttribute("genreCacheService");
-		MoodCacheService moodCacheService = (MoodCacheService) this.getServletContext().getAttribute("moodCacheService");
+		genreCacheService = (GenreCacheService) this.getServletContext().getAttribute("genreCacheService");
+		moodCacheService = (MoodCacheService) this.getServletContext().getAttribute("moodCacheService");
 		this.musicService = new MusicService(genreCacheService, moodCacheService);
     }
     /**
@@ -44,22 +49,54 @@ public class SearchMusicServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		String query = request.getParameter("q"); 
-        List<MusicDetailDTO> musicList;
+		String[] genreIds = request.getParameterValues("genre");
+		String[] moodIds = request.getParameterValues("mood");
+		
+		String cleanQuery = query != null ? query.trim().replaceAll("\\s+", " ").replaceAll("[&|*!~{}]", "") : null;
+        if (StringUtils.isBlank(cleanQuery)) {
+            cleanQuery = null;
+        }
+          
+		List<Integer> genreIdList = new ArrayList<>();
+		if (genreIds != null) {
+		    for (String id : genreIds) {
+		        if (StringUtils.isNumeric(id)) {
+		        	int parsedId = Integer.parseInt(id);
+		        	if (genreCacheService.getById(parsedId) != null) {
+		                genreIdList.add(parsedId);
+		            }
+		        }
+		    }
+		}
 
+		List<Integer> moodIdList = new ArrayList<>();
+		if (moodIds != null) {
+		    for (String id : moodIds) {
+		        if (StringUtils.isNumeric(id)) {
+		        	int parsedId = Integer.parseInt(id);
+		            if (moodCacheService.getById(parsedId) != null) {
+		                moodIdList.add(parsedId);
+		            }
+		        }
+		    }
+		}
+        List<MusicDetailDTO> musicList;
+        int totalRecords = 0;
         int page = 1;
         int pageSize = 10;
         
         if (request.getParameter("page") != null) {
             page = Integer.parseInt(request.getParameter("page"));
         }
-        
-        if (query != null && !query.trim().isEmpty()) {
-            musicList = musicService.getPaginatedMusicDetailDTOLikeKeyword(query.trim(), page, pageSize);
+         
+        if (cleanQuery != null) {
+            musicList = musicService.getPaginatedMusicDetailDTOLikeKeyword(cleanQuery, genreIdList, moodIdList, page, pageSize);
+            totalRecords = musicService.getMusicCountLikeKeyword(cleanQuery, genreIdList, moodIdList); 
         } else {
             musicList = musicService.getPaginatedMusicDetailDTO(page, pageSize); 
+            totalRecords = musicService.getMusicCount(); 
         }
         
-        int totalRecords = musicService.getMusicCount(); 
         int totalPages = (int) Math.ceil(totalRecords / (double) pageSize);
 
         request.setAttribute("currentPage", page);
@@ -69,7 +106,7 @@ public class SearchMusicServlet extends HttpServlet {
         request.setAttribute("musicList", musicList);
         request.setAttribute("searchQuery", query);
         request.setAttribute("pageTitle", "Search Results");
-        request.setAttribute("contentPage", "/WEB-INF/views/common/browse-music.jsp");
+        request.setAttribute("contentPage", "/WEB-INF/views/common/search-music.jsp");
 
         request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
 	}

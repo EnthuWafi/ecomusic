@@ -3,14 +3,21 @@ package com.enth.ecomusic.model.dao;
 import com.enth.ecomusic.model.dto.MusicDetailDTO;
 import com.enth.ecomusic.model.entity.Music;
 import com.enth.ecomusic.model.mapper.ResultSetMapper;
+import com.enth.ecomusic.util.CommonUtil;
 import com.enth.ecomusic.util.DAOUtil;
 import com.enth.ecomusic.util.DBConnection;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MusicDAO {
+	private static final double TEXT_SCORE_WEIGHT = 0.5;
+	private static final double LIKE_COUNT_WEIGHT = 0.3;
+	private static final double TOTAL_PLAYS_WEIGHT = 0.15;
+	private static final double FRESHNESS_WEIGHT = -0.05;
+
 	// CREATE
 	public boolean insertMusic(Music music) {
 		String sql = "INSERT INTO Music (artist_id, title, genre_id, mood_id, description, audio_file_url, image_url, premium_content) "
@@ -69,7 +76,7 @@ public class MusicDAO {
 	// READ all
 	public List<Music> getAllMusic() {
 		List<Music> musicList = new ArrayList<>();
-		String sql = "SELECT * FROM Music ORDER BY upload_date DESC";
+		String sql = "SELECT * FROM Music";
 
 		try (Connection conn = DBConnection.getConnection();
 				PreparedStatement stmt = conn.prepareStatement(sql);
@@ -85,132 +92,210 @@ public class MusicDAO {
 		return musicList;
 	}
 
-	// READ all paginated
-	public List<MusicDetailDTO> getPaginatedMusicWithDetail(int page, int pageSize) {
-		String query = """
-			    SELECT
-		        m.music_id, m.artist_id, m.title, m.description, m.audio_file_url,
-		        m.image_url, m.premium_content, m.genre_id, m.mood_id, m.upload_date,
-		        u.username AS artist_username, u.image_url AS artist_image_url,
-		        NVL(l.like_count, 0) AS like_count,
-		        NVL(s.total_plays, 0) AS total_plays,
-		        ROW_NUMBER() OVER (ORDER BY m.upload_date DESC) AS rnum
-		    FROM Music m
-		    JOIN Users u ON m.artist_id = u.user_id
-
-		    LEFT JOIN (
-		        SELECT music_id, COUNT(*) AS like_count
-		        FROM Likes
-		        GROUP BY music_id
-		    ) l ON m.music_id = l.music_id
-
-		    LEFT JOIN (
-		        SELECT music_id, SUM(total_plays) AS total_plays
-		        FROM UserMusicDailyStats
-		        GROUP BY music_id
-		    ) s ON m.music_id = s.music_id
-
-			""";
-
-		return DAOUtil.executePaginatedQuery(query, null, page, pageSize, ResultSetMapper::mapToMusicDetailDTO);
-	}
-
-	public List<MusicDetailDTO> getPaginatedMusicWithDetailByKeyword(String keyword, int page, int pageSize) {
-		String query = """
-			    SELECT
-			        m.music_id, m.artist_id, m.title, m.description, m.audio_file_url,
-			        m.image_url, m.premium_content, m.genre_id, m.mood_id, m.upload_date,
-			        u.username AS artist_username, u.image_url AS artist_image_url,
-			        NVL(l.like_count, 0) AS like_count,
-			        NVL(s.total_plays, 0) AS total_plays,
-			        ROW_NUMBER() OVER (ORDER BY m.upload_date DESC) AS rnum
-			    FROM Music m
-			    JOIN Users u ON m.artist_id = u.user_id
-
-			    LEFT JOIN (
-			        SELECT music_id, COUNT(*) AS like_count
-			        FROM Likes
-			        GROUP BY music_id
-			    ) l ON m.music_id = l.music_id
-
-			    LEFT JOIN (
-			        SELECT music_id, SUM(total_plays) AS total_plays
-			        FROM UserMusicDailyStats
-			        GROUP BY music_id
-			    ) s ON m.music_id = s.music_id
-
-			    WHERE m.title LIKE ?
-				""";
-		return DAOUtil.executePaginatedQuery(query, List.of("%" + keyword + "%"), page, pageSize,
-				ResultSetMapper::mapToMusicDetailDTO);
-	}
-
-	public List<MusicDetailDTO> getPaginatedMusicWithDetailByArtistId(int artistId, int page, int pageSize) {
-		String query = """
-			    SELECT
-		        m.music_id, m.artist_id, m.title, m.description, m.audio_file_url,
-		        m.image_url, m.premium_content, m.genre_id, m.mood_id, m.upload_date,
-		        u.username AS artist_username, u.image_url AS artist_image_url,
-		        NVL(l.like_count, 0) AS like_count,
-		        NVL(s.total_plays, 0) AS total_plays,
-		        ROW_NUMBER() OVER (ORDER BY m.upload_date DESC) AS rnum
-		    FROM Music m
-		    JOIN Users u ON m.artist_id = u.user_id
-		    
-		    LEFT JOIN (
-		        SELECT music_id, COUNT(*) AS like_count
-		        FROM Likes
-		        GROUP BY music_id
-		    ) l ON m.music_id = l.music_id
-
-		    LEFT JOIN (
-		        SELECT music_id, SUM(total_plays) AS total_plays
-		        FROM UserMusicDailyStats
-		        GROUP BY music_id
-		    ) s ON m.music_id = s.music_id
-
-		    WHERE m.artist_id = ?
-			""";
-		return DAOUtil.executePaginatedQuery(query, List.of(artistId), page, pageSize, ResultSetMapper::mapToMusicDetailDTO);
-	}
-
-	// count
-	public int countMusicByKeyword(String keyword) {
-		String sql = "SELECT COUNT(*) FROM Music WHERE MUSIC.title LIKE ?";
-
-		try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-			stmt.setString(1, "%" + keyword + "%");
-
-			try (ResultSet rs = stmt.executeQuery()) {
-				if (rs.next()) {
-					return rs.getInt(1);
-				}
-			}
-			;
-
-		} catch (SQLException e) {
-			System.err.println("Error counting music: " + e.getMessage());
-		}
-
-		return 0;
-	}
-
-	// count
-	public int countMusic() {
-		String sql = "SELECT COUNT(*) FROM Music";
+	public List<Music> getAllValidMusic() {
+		List<Music> musicList = new ArrayList<>();
+		String sql = "SELECT m.* FROM Music m " + "JOIN Users u ON m.artist_id = u.user_id "
+				+ "JOIN roles r ON u.role_id = r.role_id AND r.role_name = 'artist'";
 
 		try (Connection conn = DBConnection.getConnection();
 				PreparedStatement stmt = conn.prepareStatement(sql);
 				ResultSet rs = stmt.executeQuery()) {
 
-			if (rs.next()) {
-				return rs.getInt(1);
+			while (rs.next()) {
+				musicList.add(mapResultSetToMusic(rs));
 			}
 		} catch (SQLException e) {
-			System.err.println("Error counting music: " + e.getMessage());
+			System.err.println("Error fetching all music: " + e.getMessage());
 		}
 
-		return 0;
+		return musicList;
+	}
+
+	public List<Music> getPaginatedMusic(int page, int pageSize) {
+		String query = "SELECT *, ROW_NUMBER() OVER (ORDER BY m.upload_date DESC) AS rnum " + "FROM Music";
+
+		return DAOUtil.executePaginatedQuery(query, this::mapResultSetToMusic, page, pageSize);
+	}
+
+	// READ all paginated
+	public List<MusicDetailDTO> getRelevantPaginatedMusicWithDetail(int page, int pageSize) {
+		String query = """
+				WITH RankedData AS (
+
+				   SELECT
+				       m.music_id, m.artist_id, m.title, m.description, m.audio_file_url,
+				       m.image_url, m.premium_content, m.genre_id, m.mood_id, m.upload_date,
+				       u.username AS artist_username, u.image_url AS artist_image_url,
+				       NVL(l.like_count, 0) AS like_count,
+				       NVL(s.total_plays, 0) AS total_plays,
+				       (
+				        NVL(l.like_count, 0) * %.2f +
+				        NVL(s.total_plays, 0) * %.2f +
+				        (SYSDATE - m.upload_date) * %.2f
+				    ) AS relevance_score
+				   FROM Music m
+				   JOIN Users u ON m.artist_id = u.user_id
+				   JOIN roles r ON u.role_id = r.role_id AND r.role_name = 'artist'
+				   
+				   LEFT JOIN (
+				       SELECT music_id, COUNT(*) AS like_count
+				       FROM Likes
+				       GROUP BY music_id
+				   ) l ON m.music_id = l.music_id
+
+				   LEFT JOIN (
+				       SELECT music_id, SUM(total_plays) AS total_plays
+				       FROM UserMusicDailyStats
+				       GROUP BY music_id
+				   ) s ON m.music_id = s.music_id
+
+				   )
+				SELECT
+				    r.*,
+				    ROW_NUMBER() OVER (ORDER BY r.relevance_score DESC) AS rnum
+				FROM
+				    RankedData r
+				""";
+
+		query = query.formatted(LIKE_COUNT_WEIGHT, TOTAL_PLAYS_WEIGHT, FRESHNESS_WEIGHT);
+
+		return DAOUtil.executePaginatedQuery(query, ResultSetMapper::mapToMusicDetailDTO, page, pageSize);
+	}
+
+	public List<MusicDetailDTO> getRelevantPaginatedMusicWithDetailByKeyword(String keyword, List<Integer> genreIds,
+			List<Integer> moodIds, int page, int pageSize) {
+		String genreInClause = genreIds.isEmpty() ? "null" : genreIds.stream().map(g -> "?").collect(Collectors.joining(", "));
+		String moodInClause = moodIds.isEmpty() ? "null" : moodIds.stream().map(g -> "?").collect(Collectors.joining(", "));
+		
+		String query = """
+				WITH RankedData AS (
+
+				   SELECT
+				       m.music_id, m.artist_id, m.title, m.description, m.audio_file_url,
+				       m.image_url, m.premium_content, m.genre_id, m.mood_id, m.upload_date,
+				       u.username AS artist_username, u.image_url AS artist_image_url,
+				       NVL(l.like_count, 0) AS like_count,
+				       NVL(s.total_plays, 0) AS total_plays,
+				       (
+				        SCORE(1) * %.2f +
+				        NVL(l.like_count, 0) * %.2f +
+				        NVL(s.total_plays, 0) * %.2f +
+				        (SYSDATE - m.upload_date) * %.2f
+				    ) AS relevance_score
+				   FROM Music m
+				   JOIN Users u ON m.artist_id = u.user_id
+				   JOIN roles r ON u.role_id = r.role_id AND r.role_name = 'artist'
+
+				   LEFT JOIN (
+				       SELECT music_id, COUNT(*) AS like_count
+				       FROM Likes
+				       GROUP BY music_id
+				   ) l ON m.music_id = l.music_id
+
+				   LEFT JOIN (
+				       SELECT music_id, SUM(total_plays) AS total_plays
+				       FROM UserMusicDailyStats
+				       GROUP BY music_id
+				   ) s ON m.music_id = s.music_id
+
+				   WHERE (CONTAINS(m.title, ?, 1) > 0)
+				   AND (? IS NULL OR m.genre_id IN (%s))
+				   AND (? IS NULL OR m.mood_id IN (%s))
+
+				)
+				SELECT
+				    r.*,
+				    ROW_NUMBER() OVER (ORDER BY r.relevance_score DESC) AS rnum
+				FROM
+				    RankedData r
+				""";
+
+		query = query.formatted(TEXT_SCORE_WEIGHT, LIKE_COUNT_WEIGHT, TOTAL_PLAYS_WEIGHT, FRESHNESS_WEIGHT,
+				genreInClause, moodInClause);
+
+		List<Object> params = new ArrayList<>();
+
+		params.add(DAOUtil.buildOracleTextQuery(keyword));
+
+		params.add(genreIds.isEmpty() ? null : 1);
+		params.addAll(genreIds); 
+
+		params.add(moodIds.isEmpty() ? null : 1);
+		params.addAll(moodIds);
+
+		return DAOUtil.executePaginatedQuery(query, ResultSetMapper::mapToMusicDetailDTO, page, pageSize,
+				params.toArray());
+	}
+
+	public List<MusicDetailDTO> getPaginatedMusicWithDetailByArtistId(int artistId, int page, int pageSize) {
+		String query = """
+				    SELECT
+				       m.music_id, m.artist_id, m.title, m.description, m.audio_file_url,
+				       m.image_url, m.premium_content, m.genre_id, m.mood_id, m.upload_date,
+				       u.username AS artist_username, u.image_url AS artist_image_url,
+				       NVL(l.like_count, 0) AS like_count,
+				       NVL(s.total_plays, 0) AS total_plays,
+				       ROW_NUMBER() OVER (ORDER BY m.upload_date DESC) AS rnum
+				   FROM Music m
+				   JOIN Users u ON m.artist_id = u.user_id
+
+				   LEFT JOIN (
+				       SELECT music_id, COUNT(*) AS like_count
+				       FROM Likes
+				       GROUP BY music_id
+				   ) l ON m.music_id = l.music_id
+
+				   LEFT JOIN (
+				       SELECT music_id, SUM(total_plays) AS total_plays
+				       FROM UserMusicDailyStats
+				       GROUP BY music_id
+				   ) s ON m.music_id = s.music_id
+
+				   WHERE m.artist_id = ?
+				""";
+		return DAOUtil.executePaginatedQuery(query, ResultSetMapper::mapToMusicDetailDTO, page, pageSize, artistId);
+	}
+
+	// count
+	public int countMusicByKeyword(String keyword, List<Integer> genreIds, List<Integer> moodIds) {
+		String genreInClause = genreIds.isEmpty() ? "null" : genreIds.stream().map(g -> "?").collect(Collectors.joining(", "));
+		String moodInClause = moodIds.isEmpty() ? "null" : moodIds.stream().map(g -> "?").collect(Collectors.joining(", "));
+		
+		String sql = """
+				SELECT COUNT(*) FROM Music m
+				JOIN Users u ON m.artist_id = u.user_id
+				JOIN roles r ON u.role_id = r.role_id AND r.role_name = 'artist'
+				WHERE (CONTAINS(m.title, ?, 1) > 0)
+				AND (? IS NULL OR m.genre_id IN (%s))
+				AND (? IS NULL OR m.mood_id IN (%s)) 
+				""";
+		
+		sql = sql.formatted(genreInClause, moodInClause);
+	
+		List<Object> params = new ArrayList<>();
+
+		params.add(DAOUtil.buildOracleTextQuery(keyword));
+		
+		params.add(genreIds.isEmpty() ? null : 1);
+		params.addAll(genreIds); 
+
+		params.add(moodIds.isEmpty() ? null : 1);
+		params.addAll(moodIds);
+
+		Integer result = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt, params.toArray()); 
+		
+		return (result != null) ? result : 0;
+	}
+
+	// count
+	public int countMusic() {
+		String sql = "SELECT COUNT(*) FROM Music m "
+				+ "JOIN Users u ON m.artist_id = u.user_id "
+				+ "JOIN roles r ON u.role_id = r.role_id AND r.role_name = 'artist' ";
+
+		Integer result = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt); 
+		
+		return (result != null) ? result : 0;
 	}
 
 	public int countMusicByArtist(int artistId) {
