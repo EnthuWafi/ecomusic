@@ -2,11 +2,10 @@ package com.enth.ecomusic.model.entity;
 
 import java.io.Serializable;
 
-public class Mood implements Serializable{
+public class Mood{
     /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
 	private int moodId;
     private String name;
 

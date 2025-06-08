@@ -2,11 +2,10 @@ package com.enth.ecomusic.model.entity;
 
 import java.io.Serializable;
 
-public class Genre implements Serializable {
+public class Genre {
     /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
 	private int genreId;
     private String name;
 

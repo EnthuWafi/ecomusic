@@ -1,9 +1,11 @@
 package com.enth.ecomusic.model.dao;
 
 import com.enth.ecomusic.model.entity.Playlist;
+import com.enth.ecomusic.model.enums.VisibilityType;
 import com.enth.ecomusic.util.DBConnection;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,11 +84,19 @@ public class PlaylistDAO {
 
     // Helper
     private Playlist mapResultSetToPlaylist(ResultSet rs) throws SQLException {
+        // Extracting values from ResultSet, ensuring order and types match the constructor signature
+        int playlistId = rs.getInt("playlist_id");
+        int userId = rs.getInt("user_id");
+        String name = rs.getString("name");
+        LocalDateTime createdAt = rs.getTimestamp("created_at").toLocalDateTime();    
+        VisibilityType visibility = VisibilityType.fromString(rs.getString("visibility"));
+       
         return new Playlist(
-                rs.getInt("playlist_id"),
-                rs.getInt("user_id"),
-                rs.getString("name"),
-                rs.getTimestamp("created_at").toLocalDateTime()
+            playlistId,
+            userId,
+            name,
+            createdAt,
+            visibility 
         );
     }
 }

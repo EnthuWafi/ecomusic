@@ -14,7 +14,8 @@ public class User{
 	private int roleId; 
 	private String imageUrl;
 	private LocalDateTime createdAt;
-
+	
+	private Role role;
 	
 	public User() {
 		super();
@@ -150,6 +151,16 @@ public class User{
 	public void setCreatedAt(LocalDateTime createdAt) {
 		this.createdAt = createdAt;
 	}
+
+	public Role getRole() {
+		return role;
+	}
+
+	public void setRole(Role role) {
+		this.role = role;
+	}
+	
+	
 
 	
 }

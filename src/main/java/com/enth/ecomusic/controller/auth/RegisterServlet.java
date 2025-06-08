@@ -3,7 +3,7 @@ package com.enth.ecomusic.controller.auth;
 import java.io.IOException;
 
 import com.enth.ecomusic.model.dto.UserDTO;
-import com.enth.ecomusic.model.entity.RoleType;
+import com.enth.ecomusic.model.enums.RoleType;
 import com.enth.ecomusic.service.RoleCacheService;
 import com.enth.ecomusic.service.UserService;
 import com.enth.ecomusic.util.CommonUtil;

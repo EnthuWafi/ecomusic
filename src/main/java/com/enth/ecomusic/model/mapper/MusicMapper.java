@@ -12,16 +12,14 @@ import org.mapstruct.factory.Mappers;
 public interface MusicMapper {
     MusicMapper INSTANCE = Mappers.getMapper(MusicMapper.class);
     
-    @Mapping(target = "genreName", ignore=true)
-    @Mapping(target = "moodName", ignore=true)
+    @Mapping(source = "genre.name", target = "genreName")
+    @Mapping(source = "mood.name", target = "moodName")
     MusicDTO toDTO(Music music);
     
     Music toMusic(MusicDTO musicDTO);
     
-    @Mapping(target = "music", source = "music")
+    @Mapping(source = "music", target = "music")
     @Mapping(source = "artist.username", target = "artistUsername")
     @Mapping(source = "artist.imageUrl", target = "artistImageUrl")
-    @Mapping(source = "like_count", target = "likes")
-    @Mapping(source = "view_count", target = "views")
-    MusicDetailDTO toDetailDTO(Music music, User artist, int like_count, int view_count);
+    MusicDetailDTO toDetailDTO(Music music, User artist);
 }

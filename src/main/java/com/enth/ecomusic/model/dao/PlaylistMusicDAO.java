@@ -11,10 +11,11 @@ public class PlaylistMusicDAO {
 
     // ADD music to playlist (unchanged)
     public boolean addMusicToPlaylist(PlaylistMusic playlistMusic) {
-        String sql = "INSERT INTO PlaylistMusic (playlist_id, music_id) VALUES (?, ?)";
+        String sql = "INSERT INTO PlaylistMusic (playlist_id, music_id, position) VALUES (?, ?, ?)";
         try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, playlistMusic.getPlaylistId());
             stmt.setInt(2, playlistMusic.getMusicId());
+            stmt.setInt(3, playlistMusic.getPosition());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error adding music to playlist: " + e.getMessage());
@@ -25,14 +26,15 @@ public class PlaylistMusicDAO {
     // GET all PlaylistMusic entries for a playlist (pure DAO)
     public List<PlaylistMusic> getPlaylistMusicByPlaylistId(int playlistId) {
         List<PlaylistMusic> list = new ArrayList<>();
-        String sql = "SELECT * FROM PlaylistMusic WHERE playlist_id = ? ORDER BY added_at";
+        String sql = "SELECT * FROM PlaylistMusic WHERE playlist_id = ? ORDER BY position";
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, playlistId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     PlaylistMusic pm = new PlaylistMusic(rs.getInt("playlist_id"), 
-                    		rs.getInt("music_id"), rs.getTimestamp("added_at").toLocalDateTime());
+                    		rs.getInt("music_id"), rs.getTimestamp("added_at").toLocalDateTime(),
+                    		rs.getInt("position"));
                     list.add(pm);
                 }
             }

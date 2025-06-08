@@ -3,8 +3,7 @@ package com.enth.ecomusic.model.entity;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class PlayHistory implements Serializable {
-	private static final long serialVersionUID = 1L;
+public class PlayHistory {
 
     private int playId;
     private int userId;

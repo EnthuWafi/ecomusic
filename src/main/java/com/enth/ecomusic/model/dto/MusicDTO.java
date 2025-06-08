@@ -3,6 +3,8 @@ package com.enth.ecomusic.model.dto;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+import com.enth.ecomusic.model.enums.VisibilityType;
+
 public class MusicDTO implements Serializable{
     /**
 	 * 
@@ -19,13 +21,16 @@ public class MusicDTO implements Serializable{
     private int moodId;
     private String genreName;
     private String moodName;
+    private int likeCount;
+    private int totalPlayCount;
+    private VisibilityType visibility;
     private LocalDateTime uploadDate;
     
-    
-    
+	
+
 	public MusicDTO(int musicId, int artistId, String title, String description, String audioFileUrl, String imageUrl,
-			boolean premiumContent, int genreId, int moodId, String genreName, String moodName,
-			LocalDateTime uploadDate) {
+			boolean premiumContent, int genreId, int moodId, String genreName, String moodName, int likeCount,
+			int totalPlayCount, VisibilityType visibility, LocalDateTime uploadDate) {
 		super();
 		this.musicId = musicId;
 		this.artistId = artistId;
@@ -38,10 +43,13 @@ public class MusicDTO implements Serializable{
 		this.moodId = moodId;
 		this.genreName = genreName;
 		this.moodName = moodName;
+		this.likeCount = likeCount;
+		this.totalPlayCount = totalPlayCount;
+		this.visibility = visibility;
 		this.uploadDate = uploadDate;
 	}
-	
-	
+
+
 	public MusicDTO() {
 		super();
 	}
@@ -98,4 +106,37 @@ public class MusicDTO implements Serializable{
 
     public String getMoodName() { return moodName; }
     public void setMoodName(String moodName) { this.moodName = moodName; }
+
+
+	public int getLikeCount() {
+		return likeCount;
+	}
+
+
+	public void setLikeCount(int likeCount) {
+		this.likeCount = likeCount;
+	}
+
+
+	public int getTotalPlayCount() {
+		return totalPlayCount;
+	}
+
+
+	public void setTotalPlayCount(int totalPlayCount) {
+		this.totalPlayCount = totalPlayCount;
+	}
+
+
+	public VisibilityType getVisibility() {
+		return visibility;
+	}
+
+
+	public void setVisibility(VisibilityType visibility) {
+		this.visibility = visibility;
+	}
+	
+	
+    
 }

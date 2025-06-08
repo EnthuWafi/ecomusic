@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 import com.enth.ecomusic.model.dao.RoleDAO;
 import com.enth.ecomusic.model.entity.Role;
-import com.enth.ecomusic.model.entity.RoleType;
+import com.enth.ecomusic.model.enums.RoleType;
 
 public class RoleCacheService {
     private Map<Integer, Role> roleById;

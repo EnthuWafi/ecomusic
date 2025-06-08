@@ -9,11 +9,10 @@ import java.util.List;
 import com.enth.ecomusic.util.JsonUtil;
 import com.google.gson.reflect.TypeToken;
 
-public class SubscriptionPlan  implements Serializable{
+public class SubscriptionPlan{
     /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
 	private int subscriptionPlanId;
     private String name;
     private String stripePriceId;

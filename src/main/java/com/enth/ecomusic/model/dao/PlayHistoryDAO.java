@@ -114,6 +114,11 @@ public class PlayHistoryDAO {
             rs.getInt("was_skipped") == 1
         );
     }
+
+	public int countPlaysByMusicId(int musicId) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 	
 	
 }

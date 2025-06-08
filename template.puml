@@ -1,0 +1,7 @@
+@startuml
+skinparam linetype polyline
+
+' Pattern comments that will be processed by GenUML:
+'!gen_java com.enth.ecomusic.model.entity.User
+
+@enduml

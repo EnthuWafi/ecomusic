@@ -3,11 +3,10 @@ package com.enth.ecomusic.model.entity;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class Like implements Serializable{
+public class Like{
     /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
 	private int userId;
     private int musicId;
     private LocalDateTime likedAt;

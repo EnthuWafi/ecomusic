@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
+import com.enth.ecomusic.model.dto.MusicDTO;
 import com.enth.ecomusic.model.dto.MusicDetailDTO;
 import com.enth.ecomusic.model.dto.UserDTO;
 import com.enth.ecomusic.service.GenreCacheService;
@@ -54,7 +55,7 @@ public class ArtistMusicServlet extends HttpServlet {
         }
 		
 		UserDTO user = (UserDTO) request.getSession().getAttribute("user");
-		List<MusicDetailDTO> musicList = musicService.getPaginatedMusicDetailDTOByArtistId(user.getUserId(), page, pageSize);
+		List<MusicDTO> musicList = musicService.getPaginatedMusicDTOByArtistId(user.getUserId(), page, pageSize);
 		int totalRecords = musicService.getMusicCountByArtist(user.getUserId()); 
         int totalPages = (int) Math.ceil(totalRecords / (double) pageSize);
 		

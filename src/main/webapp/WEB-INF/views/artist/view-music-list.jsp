@@ -16,14 +16,14 @@
 
   <!-- (2) List of tracks -->
   <div class="list-group">
-    <c:forEach var="musicDTO" items="${musicList}">
+    <c:forEach var="music" items="${musicList}">
       <div
         class="list-group-item list-group-item-action d-flex align-items-center py-3"
       >
         <!-- Left: cover image -->
         <div class="me-3">
           <img
-            src="${pageContext.request.contextPath}/stream/image/music/${musicDTO.music.musicId}"
+            src="${pageContext.request.contextPath}/stream/image/music/${music.musicId}"
             class="rounded"
             style="width: 80px; height: 80px; object-fit: cover;"
           />
@@ -33,29 +33,29 @@
         <div class="flex-fill">
           <!-- Title + Premium badge -->
           <div class="d-flex justify-content-between align-items-start">
-            <h5 class="mb-1">${musicDTO.music.title}</h5>
-            <c:if test="${musicDTO.music.premiumContent}">
+            <h5 class="mb-1">${music.title}</h5>
+            <c:if test="${music.premiumContent}">
               <span class="badge bg-warning text-dark">Premium</span>
             </c:if>
           </div>
           
           <!-- Genre • Mood -->
           <small class="text-muted d-block mb-1">
-            ${musicDTO.music.genreName} • ${musicDTO.music.moodName}
+            ${music.genreName} • ${music.moodName}
           </small>
           
           <!-- Likes & Views -->
           <div class="text-muted">
-            <i class="bi bi-hand-thumbs-up me-1"></i> ${musicDTO.likes}
+            <i class="bi bi-hand-thumbs-up me-1"></i> ${music.likeCount}
             <span class="mx-2">|</span>
-            <i class="bi bi-eye me-1"></i> ${musicDTO.views}
+            <i class="bi bi-eye me-1"></i> ${music.totalPlayCount}
           </div>
         </div>
 
         <!-- Right: Edit button -->
         <div>
           <a
-            href="${pageContext.request.contextPath}/artist/music/edit/${musicDTO.music.musicId}"
+            href="${pageContext.request.contextPath}/artist/music/edit/${music.musicId}"
             class="btn btn-outline-secondary btn-sm"
           >
             <i class="bi bi-pencil-square me-1"></i> Edit

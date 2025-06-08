@@ -10,8 +10,8 @@ import java.util.stream.Collectors;
 
 import com.enth.ecomusic.model.dao.LikeDAO;
 import com.enth.ecomusic.model.dao.MusicDAO;
+import com.enth.ecomusic.model.dao.PlayHistoryDAO;
 import com.enth.ecomusic.model.dao.UserDAO;
-import com.enth.ecomusic.model.dao.UserMusicDailyStatsDAO;
 import com.enth.ecomusic.model.dto.MusicDTO;
 import com.enth.ecomusic.model.dto.MusicDetailDTO;
 import com.enth.ecomusic.model.entity.Music;
@@ -28,7 +28,7 @@ public class MusicService {
 	private final MusicDAO musicDAO;
 	private final UserDAO userDAO;
 	private final LikeDAO likeDAO;
-	private final UserMusicDailyStatsDAO userMusicDailyStatsDAO;
+	private final PlayHistoryDAO playDAO;
 	private final GenreCacheService genreCacheService;
 	private final MoodCacheService moodCacheService;
 
@@ -36,7 +36,7 @@ public class MusicService {
 		this.musicDAO = new MusicDAO();
 		this.userDAO = new UserDAO();
 		this.likeDAO = new LikeDAO();
-		this.userMusicDailyStatsDAO = new UserMusicDailyStatsDAO();
+		this.playDAO = new PlayHistoryDAO();
 		this.genreCacheService = genreCacheService != null ? genreCacheService : new GenreCacheService();
 		this.moodCacheService = moodCacheService != null ? moodCacheService : new MoodCacheService();
 	}
@@ -159,9 +159,6 @@ public class MusicService {
 				}
 			}
 
-
-			// === DATABASE UPDATE ===
-			// Call your DAO's update method
 			return musicDAO.updateMusic(music);
 
 		} catch (IOException | IllegalArgumentException e) {
@@ -173,21 +170,20 @@ public class MusicService {
 
 	public MusicDTO getMusicDTOById(int musicId) {
 		Music music = musicDAO.getMusicById(musicId);
-
+		setGenreMood(music);
+		
 		MusicDTO dto = MusicMapper.INSTANCE.toDTO(music);
-		dto.setGenreName(genreCacheService.getById(music.getGenreId()).getName());
-		dto.setMoodName(moodCacheService.getById(music.getMoodId()).getName());
+
 		return dto;
 	}
 
 	public MusicDetailDTO getMusicDetailDTOById(int musicId) {
 		Music music = musicDAO.getMusicById(musicId);
 		User user = userDAO.getUserById(music.getArtistId());
-		int likeCount = likeDAO.countLikeByMusicId(musicId);
-		int viewCount = userMusicDailyStatsDAO.sumViewsByMusicId(musicId);
+		
+		setGenreMood(music);
 
-		MusicDetailDTO dto = MusicMapper.INSTANCE.toDetailDTO(music, user, likeCount, viewCount);
-		setGenreAndMoodMusicDTO(dto.getMusic());
+		MusicDetailDTO dto = MusicMapper.INSTANCE.toDetailDTO(music, user);
 		return dto;
 	}
 
@@ -195,9 +191,8 @@ public class MusicService {
 		List<Music> musicList = musicDAO.getAllMusicByArtistId(artistId);
 
 		return musicList.stream().map(music -> {
+			setGenreMood(music);
 			MusicDTO dto = MusicMapper.INSTANCE.toDTO(music);
-			dto.setGenreName(genreCacheService.getById(music.getGenreId()).getName());
-			dto.setMoodName(moodCacheService.getById(music.getMoodId()).getName());
 			return dto;
 		}).collect(Collectors.toList());
 	}
@@ -205,9 +200,6 @@ public class MusicService {
 	public List<MusicDetailDTO> getPaginatedMusicDetailDTO(int page, int pageSize) {
 		List<MusicDetailDTO> musicList = musicDAO.getRelevantPaginatedMusicWithDetail(page, pageSize);
 
-		for (MusicDetailDTO dto : musicList) {
-			setGenreAndMoodMusicDTO(dto.getMusic());
-		}
 		return musicList;
 	}
 
@@ -216,9 +208,6 @@ public class MusicService {
 		List<MusicDetailDTO> musicList = musicDAO.getRelevantPaginatedMusicWithDetailByKeyword(keyword, genreIds,
 				moodIds, page, pageSize);
 
-		for (MusicDetailDTO dto : musicList) {
-			setGenreAndMoodMusicDTO(dto.getMusic());
-		}
 		return musicList;
 	}
 
@@ -230,24 +219,22 @@ public class MusicService {
 		return musicDAO.countMusicByArtist(artistId);
 	}
 
-	public List<MusicDetailDTO> getPaginatedMusicDetailDTOByArtistId(int artistId, int page, int pageSize) {
-		List<MusicDetailDTO> musicList = musicDAO.getPaginatedMusicWithDetailByArtistId(artistId, page, pageSize);
+	public List<MusicDTO> getPaginatedMusicDTOByArtistId(int artistId, int page, int pageSize) {
+		List<MusicDTO> musicList = musicDAO.getPaginatedMusicByArtistId(artistId, page, pageSize);
 
-		for (MusicDetailDTO dto : musicList) {
-			setGenreAndMoodMusicDTO(dto.getMusic());
-		}
 		return musicList;
-	}
-
-	private void setGenreAndMoodMusicDTO(MusicDTO dto) {
-		if (dto != null) {
-			dto.setGenreName(genreCacheService.getById(dto.getGenreId()).getName());
-			dto.setMoodName(moodCacheService.getById(dto.getMoodId()).getName());
-		}
 	}
 
 	public int getMusicCountLikeKeyword(String keyword, List<Integer> genreIdList, List<Integer> moodIdList) {
 		return musicDAO.countMusicByKeyword(keyword, genreIdList, moodIdList);
 	}
+	
+	private void setGenreMood(Music music) {
+		if (music != null) {
+			music.setGenre(genreCacheService.getById(music.getGenreId()));
+			music.setMood(moodCacheService.getById(music.getMoodId()));
+		}
+	}
+
 
 }

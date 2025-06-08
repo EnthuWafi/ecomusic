@@ -12,20 +12,15 @@ public class MusicDetailDTO implements Serializable {
 	private String artistUsername;
 	private String artistImageUrl;
 
-	private int likes;
-	private int views;
-
 	private MusicDTO music;
 
 	
 	// Getters and Setters
 
-	public MusicDetailDTO(String artistUsername, String artistImageUrl, int likes, int views, MusicDTO music) {
+	public MusicDetailDTO(String artistUsername, String artistImageUrl, MusicDTO music) {
 		super();
 		this.artistUsername = artistUsername;
 		this.artistImageUrl = artistImageUrl;
-		this.likes = likes;
-		this.views = views;
 		this.music = music;
 	}
 	
@@ -58,20 +53,5 @@ public class MusicDetailDTO implements Serializable {
 		this.artistImageUrl = artistImageUrl;
 	}
 
-	public int getLikes() {
-		return likes;
-	}
-
-	public void setLikes(int likes) {
-		this.likes = likes;
-	}
-
-	public int getViews() {
-		return views;
-	}
-
-	public void setViews(int views) {
-		this.views = views;
-	}
 
 }

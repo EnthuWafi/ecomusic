@@ -5,8 +5,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 
-public class UserSubscription implements Serializable{
-	private static final long serialVersionUID = 1L;
+public class UserSubscription{
+	
 	private int subscriptionId;
     private int userId;
     private LocalDate startDate;

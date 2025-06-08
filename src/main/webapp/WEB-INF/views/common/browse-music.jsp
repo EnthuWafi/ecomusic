@@ -27,9 +27,9 @@
 
 						</p>
 						<div class="text-muted">
-							<i class="bi bi-hand-thumbs-up me-1"></i> ${musicDTO.likes} <span
+							<i class="bi bi-hand-thumbs-up me-1"></i> ${musicDTO.music.likeCount} <span
 								class="mx-2">|</span> <i class="bi bi-eye me-1"></i>
-							${musicDTO.views}
+							${musicDTO.music.totalPlayCount}
 						</div>
 						<p class="card-text">
 							<span

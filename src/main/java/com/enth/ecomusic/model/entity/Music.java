@@ -3,12 +3,13 @@ package com.enth.ecomusic.model.entity;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class Music implements Serializable{
+import com.enth.ecomusic.model.enums.VisibilityType;
+
+public class Music{
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
 	private int musicId;
     private int artistId;
     private String title;
@@ -19,26 +20,32 @@ public class Music implements Serializable{
     private boolean premiumContent;
     private int genreId;
     private int moodId;
-
+    private int likeCount;
+    private int totalPlayCount;
+    private VisibilityType visibility;
+    
+	private Genre genre;
+	private Mood mood;
 	
-	
-	public Music(int musicId, int artistId, String title, int genreId, int moodId, String description, LocalDateTime uploadDate,
-			String audioFileUrl, String imageUrl, boolean premiumContent) {
+	public Music(int musicId, int artistId, String title, String description, LocalDateTime uploadDate,
+			String audioFileUrl, String imageUrl, boolean premiumContent, int genreId, int moodId, int likeCount,
+			int totalPlayCount, VisibilityType visibility) {
 		super();
 		this.musicId = musicId;
 		this.artistId = artistId;
 		this.title = title;
-		this.genreId = genreId;
-		this.moodId = moodId;
 		this.description = description;
 		this.uploadDate = uploadDate;
 		this.audioFileUrl = audioFileUrl;
 		this.imageUrl = imageUrl;
 		this.premiumContent = premiumContent;
+		this.genreId = genreId;
+		this.moodId = moodId;
+		this.likeCount = likeCount;
+		this.totalPlayCount = totalPlayCount;
+		this.visibility = visibility;
 	}
 
-
-	//this constructor for database insertion 
 
 	public Music(int artistId, String title, int genreId, int moodId, String description, String audioFileUrl, String imageUrl,
 			boolean premiumContent) {
@@ -111,7 +118,7 @@ public class Music implements Serializable{
 	}
 
 
-	public void setGenreId(Integer genreId) {
+	public void setGenreId(int genreId) {
 		this.genreId = genreId;
 	}
 
@@ -121,7 +128,7 @@ public class Music implements Serializable{
 	}
 
 
-	public void setMoodId(Integer moodId) {
+	public void setMoodId(int moodId) {
 		this.moodId = moodId;
 	}
 
@@ -152,5 +159,59 @@ public class Music implements Serializable{
 	public void setPremiumContent(boolean premiumContent) {
 		this.premiumContent = premiumContent;
 	}
+
+	
+
+	public int getLikeCount() {
+		return likeCount;
+	}
+
+
+	public void setLikeCount(int likeCount) {
+		this.likeCount = likeCount;
+	}
+
+
+	public int getTotalPlayCount() {
+		return totalPlayCount;
+	}
+
+
+	public void setTotalPlayCount(int totalPlayCount) {
+		this.totalPlayCount = totalPlayCount;
+	}
+
+
+	public VisibilityType getVisibility() {
+		return visibility;
+	}
+
+
+	public void setVisibility(VisibilityType visibility) {
+		this.visibility = visibility;
+	}
+
+
+	public Genre getGenre() {
+		return genre;
+	}
+
+
+	public void setGenre(Genre genre) {
+		this.genre = genre;
+	}
+
+
+	public Mood getMood() {
+		return mood;
+	}
+
+
+	public void setMood(Mood mood) {
+		this.mood = mood;
+	}
+	
+	
+	
 
 }

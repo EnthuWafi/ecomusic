@@ -8,15 +8,21 @@ public class PlaylistMusic  implements Serializable{
 	private int playlistId;
 	private int musicId;
 	private LocalDateTime addedAt;
-	// experimental
+	private int position;
+	
 	private Music music;
+	
+	
 
-	public PlaylistMusic(int playlistId, int musicId, LocalDateTime addedAt) {
+	public PlaylistMusic(int playlistId, int musicId, LocalDateTime addedAt, int position) {
 		super();
 		this.playlistId = playlistId;
 		this.musicId = musicId;
 		this.addedAt = addedAt;
+		this.position = position;
 	}
+
+
 
 	public PlaylistMusic(int playlistId, int musicId) {
 		super();
@@ -58,5 +64,19 @@ public class PlaylistMusic  implements Serializable{
 	public void setMusic(Music music) {
 		this.music = music;
 	}
+
+
+
+	public int getPosition() {
+		return position;
+	}
+
+
+
+	public void setPosition(int position) {
+		this.position = position;
+	}
+	
+	
 
 }
