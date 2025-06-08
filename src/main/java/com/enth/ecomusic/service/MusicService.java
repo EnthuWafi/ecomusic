@@ -28,7 +28,6 @@ public class MusicService {
 	private final MusicDAO musicDAO;
 	private final UserDAO userDAO;
 	private final LikeDAO likeDAO;
-	private final PlayHistoryDAO playDAO;
 	private final GenreCacheService genreCacheService;
 	private final MoodCacheService moodCacheService;
 
@@ -36,7 +35,6 @@ public class MusicService {
 		this.musicDAO = new MusicDAO();
 		this.userDAO = new UserDAO();
 		this.likeDAO = new LikeDAO();
-		this.playDAO = new PlayHistoryDAO();
 		this.genreCacheService = genreCacheService != null ? genreCacheService : new GenreCacheService();
 		this.moodCacheService = moodCacheService != null ? moodCacheService : new MoodCacheService();
 	}
@@ -168,20 +166,22 @@ public class MusicService {
 		}
 	}
 
-	public MusicDTO getMusicDTOById(int musicId) {
+	public Music getMusicById(int musicId) {
 		Music music = musicDAO.getMusicById(musicId);
 		setGenreMood(music);
-		
+		return music;
+	}
+	
+	public MusicDTO getMusicDTOById(int musicId) {
+		Music music = this.getMusicById(musicId);		
 		MusicDTO dto = MusicMapper.INSTANCE.toDTO(music);
 
 		return dto;
 	}
 
 	public MusicDetailDTO getMusicDetailDTOById(int musicId) {
-		Music music = musicDAO.getMusicById(musicId);
+		Music music = this.getMusicById(musicId);	
 		User user = userDAO.getUserById(music.getArtistId());
-		
-		setGenreMood(music);
 
 		MusicDetailDTO dto = MusicMapper.INSTANCE.toDetailDTO(music, user);
 		return dto;

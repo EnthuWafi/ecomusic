@@ -60,7 +60,7 @@
 							<a href="${pageContext.request.contextPath}/admin">Dashboard</a> |
            				</c:when>
 						<c:when test="${sessionScope.user.roleName == 'artist'}">
-							<a href="${pageContext.request.contextPath}/artist">Panel</a> |
+							<a href="${pageContext.request.contextPath}/artist/music">Panel</a> |
            				</c:when>
 					</c:choose>
 

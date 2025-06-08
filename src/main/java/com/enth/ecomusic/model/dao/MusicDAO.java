@@ -133,7 +133,7 @@ public class MusicDAO {
 				   JOIN Users u ON m.artist_id = u.user_id
 				   JOIN genres g ON m.genre_id = g.genre_id
 				   JOIN moods mo ON m.mood_id = mo.mood_id
-				   WHERE m.visiblility = 'public'
+				   WHERE m.visibility = 'public'
 
 				   )
 				SELECT
@@ -257,8 +257,7 @@ public class MusicDAO {
 
 	// count
 	public int countMusic() {
-		String sql = "SELECT COUNT(*) FROM Music m " + "JOIN Users u ON m.artist_id = u.user_id "
-				+ "JOIN roles r ON u.role_id = r.role_id AND r.role_name = 'artist'";
+		String sql = "SELECT COUNT(*) FROM Music m WHERE visibility = 'public'";
 
 		Integer result = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt);
 
@@ -276,7 +275,6 @@ public class MusicDAO {
 					return rs.getInt(1);
 				}
 			}
-			;
 
 		} catch (SQLException e) {
 			System.err.println("Error counting music: " + e.getMessage());
