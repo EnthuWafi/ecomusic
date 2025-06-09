@@ -58,14 +58,15 @@ public class PlaylistDAO {
     }
 
     // UPDATE
-    public boolean updatePlaylistName(int playlistId, String newName) {
-        String sql = "UPDATE Playlists SET name = ? WHERE playlist_id = ?";
+    public boolean updatePlaylist(Playlist playlist) {
+        String sql = "UPDATE Playlists SET name = ?, visibility = ? WHERE playlist_id = ?";
         try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, newName);
-            stmt.setInt(2, playlistId);
+            stmt.setString(1, playlist.getName());
+            stmt.setString(2, playlist.getVisibility().getValue());
+            stmt.setInt(3, playlist.getPlaylistId());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Error updating playlist name: " + e.getMessage());
+            System.err.println("Error updating playlist: " + e.getMessage());
             return false;
         }
     }

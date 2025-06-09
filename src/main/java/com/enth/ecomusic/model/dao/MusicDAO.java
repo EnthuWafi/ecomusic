@@ -95,7 +95,7 @@ public class MusicDAO {
 		return musicList;
 	}
 
-	public List<Music> getAllValidMusic() {
+	public List<Music> getAllPublicMusic() {
 		List<Music> musicList = new ArrayList<>();
 		String sql = "SELECT m.* FROM Music m WHERE m.visibility = 'public'";
 
@@ -256,7 +256,7 @@ public class MusicDAO {
 	}
 
 	// count
-	public int countMusic() {
+	public Integer countMusic() {
 		String sql = "SELECT COUNT(*) FROM Music m WHERE visibility = 'public'";
 
 		Integer result = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt);
@@ -264,7 +264,7 @@ public class MusicDAO {
 		return (result != null) ? result : 0;
 	}
 
-	public int countMusicByArtist(int artistId) {
+	public Integer countMusicByArtist(int artistId) {
 		String sql = "SELECT COUNT(*) FROM Music WHERE artist_id = ?";
 
 		try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
