@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.enth.ecomusic.model.dao.LikeDAO;
-import com.enth.ecomusic.model.dao.MusicDAO;
 import com.enth.ecomusic.model.dto.LikeDTO;
 import com.enth.ecomusic.model.entity.Like;
 import com.enth.ecomusic.model.mapper.LikeMapper;
@@ -12,15 +11,12 @@ import com.enth.ecomusic.model.mapper.LikeMapper;
 public class LikeService {
 
     private final LikeDAO likeDAO;
-    private final MusicDAO musicDAO;
-    private final GenreCacheService genreCacheService;
-	private final MoodCacheService moodCacheService;
+    private final MusicService musicService;
 
-    public LikeService(GenreCacheService genreCacheService, MoodCacheService moodCacheService) {
+    public LikeService(MusicService musicService) {
         this.likeDAO = new LikeDAO();
-        this.musicDAO = new MusicDAO();
-        this.genreCacheService = genreCacheService != null ? genreCacheService : new GenreCacheService();
-		this.moodCacheService = moodCacheService != null ? moodCacheService : new MoodCacheService();
+        this.musicService = musicService;
+
     }
 
     /**
@@ -68,6 +64,7 @@ public class LikeService {
     	List<Like> likeList = likeDAO.getLikedSongsByUserId(userId);
     	List<LikeDTO> likeDTOList = new ArrayList<>();
     	for (Like like : likeList) {
+    		like.setMusic(musicService.getMusicById(like.getMusicId()));
     		likeDTOList.add(LikeMapper.INSTANCE.toDTO(like));
     	}
         

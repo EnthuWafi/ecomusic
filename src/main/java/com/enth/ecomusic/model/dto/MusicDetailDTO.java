@@ -1,7 +1,5 @@
 package com.enth.ecomusic.model.dto;
 
-import java.io.Serializable;
-
 public class MusicDetailDTO {
 
 	/**

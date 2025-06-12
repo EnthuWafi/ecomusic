@@ -5,6 +5,7 @@ import com.enth.ecomusic.model.dto.SubscriptionDTO;
 import com.enth.ecomusic.model.dto.SubscriptionPlanDTO;
 import com.enth.ecomusic.model.entity.SubscriptionPlan;
 import com.enth.ecomusic.model.entity.UserSubscription;
+import com.enth.ecomusic.model.enums.RoleType;
 import com.enth.ecomusic.model.mapper.SubscriptionMapper;
 
 import java.util.ArrayList;
@@ -15,16 +16,35 @@ public class SubscriptionService {
 
     private final SubscriptionDAO subscriptionDAO;
     private final SubscriptionPlanDAO subscriptionPlanDAO;
+    private final UserService userService;
 
-    public SubscriptionService() {
+    public SubscriptionService(UserService userService) {
         this.subscriptionDAO = new SubscriptionDAO();
         this.subscriptionPlanDAO = new SubscriptionPlanDAO();
+        this.userService = userService;
     }
 
     // CREATE
-    public boolean createSubscription(UserSubscription sub) {
+    public boolean createSubscriptionForArtist(UserSubscription sub) {
+    	//TODO: do operations with userService (update user -> artist)
+    	// RoleType.ARTIST
+    	boolean inserted = subscriptionDAO.insertSubscription(sub);
+        if (inserted) {
+            userService.updateUserWithRoleName(sub.getUserId(), RoleType.ARTIST);
+        }
         return subscriptionDAO.insertSubscription(sub);
     }
+    
+    public boolean createSubscriptionForPremiumUser(UserSubscription sub) {
+    	//TODO: do operations with userService (update user -> premium artist)
+    	// RoleType.PREMIUMUSER
+    	boolean inserted = subscriptionDAO.insertSubscription(sub);
+        if (inserted) {
+            userService.updateUserWithRoleName(sub.getUserId(), RoleType.PREMIUMUSER);
+        }
+        return subscriptionDAO.insertSubscription(sub);
+    }
+
 
     // GET by subscription ID (with plan loaded)
     public SubscriptionDTO getSubscriptionById(int id) {

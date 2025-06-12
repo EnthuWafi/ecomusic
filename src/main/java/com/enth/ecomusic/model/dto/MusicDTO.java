@@ -1,6 +1,5 @@
 package com.enth.ecomusic.model.dto;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import com.enth.ecomusic.model.enums.VisibilityType;

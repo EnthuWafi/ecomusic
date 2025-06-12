@@ -1,18 +1,13 @@
 package com.enth.ecomusic.service;
 
 import com.enth.ecomusic.model.dto.SubscriptionPlanDTO;
-import com.enth.ecomusic.util.AppConfig;
-import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
 
 public class StripeService {
 	
-	public StripeService() {
-		Stripe.apiKey = AppConfig.get("stripeSecretKey");
-	}
-
+	//Embedded
 	public String createCheckoutSessionForPlan(SubscriptionPlanDTO plan, String returnUrl, String userId, String email)
 			throws StripeException {
 		SessionCreateParams params = SessionCreateParams.builder().setUiMode(SessionCreateParams.UiMode.EMBEDDED)
@@ -28,6 +23,7 @@ public class StripeService {
 		return session.getClientSecret();
 	}
 	
+	//Redirect
 	public String createRedirectCheckoutSessionForPlan(SubscriptionPlanDTO plan, String returnUrl, String userId, String email)
 	        throws StripeException {
 	    SessionCreateParams params = SessionCreateParams.builder()

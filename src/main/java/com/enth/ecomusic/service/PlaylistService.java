@@ -1,9 +1,7 @@
 package com.enth.ecomusic.service;
 
-import com.enth.ecomusic.model.dao.MusicDAO;
 import com.enth.ecomusic.model.dao.PlaylistDAO;
 import com.enth.ecomusic.model.dao.PlaylistMusicDAO;
-import com.enth.ecomusic.model.dao.UserDAO;
 import com.enth.ecomusic.model.dto.PlaylistDTO;
 import com.enth.ecomusic.model.entity.Music;
 import com.enth.ecomusic.model.entity.Playlist;
@@ -20,18 +18,14 @@ public class PlaylistService {
 
 	private final PlaylistDAO playlistDAO;
 	private final PlaylistMusicDAO playlistMusicDAO;
-	private final MusicDAO musicDAO;
-	private final UserDAO userDAO;
-	private final GenreCacheService genreCacheService;
-	private final MoodCacheService moodCacheService;
+	private final MusicService musicService;
+	private final UserService userService;
 
-	public PlaylistService(GenreCacheService genreCacheService, MoodCacheService moodCacheService) {
+	public PlaylistService(MusicService musicService, UserService userService) {
 		this.playlistDAO = new PlaylistDAO();
 		this.playlistMusicDAO = new PlaylistMusicDAO();
-		this.musicDAO = new MusicDAO();
-		this.userDAO = new UserDAO();
-		this.genreCacheService = genreCacheService != null ? genreCacheService : new GenreCacheService();
-		this.moodCacheService = moodCacheService != null ? moodCacheService : new MoodCacheService();
+		this.musicService = musicService;
+		this.userService = userService;
 	}
 
 	private void loadMusicForPlaylist(Playlist playlist) {
@@ -39,12 +33,10 @@ public class PlaylistService {
 				.getPlaylistMusicListByPlaylistId(playlist.getPlaylistId());
 
 		for (PlaylistMusic pm : playlistMusicList) {
-			Music music = musicDAO.getMusicById(pm.getMusicId());
-			User user = userDAO.getUserById(music.getArtistId());
+			Music music = musicService.getMusicById(pm.getMusicId());
+			User user = userService.getUserById(music.getArtistId());
 			if (music != null) {
 				music.setArtist(user);
-				music.setGenre(genreCacheService.getById(music.getGenreId()));
-				music.setMood(moodCacheService.getById(music.getMoodId()));
 				pm.setMusic(music);
 			}
 		}

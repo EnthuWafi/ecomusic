@@ -13,9 +13,8 @@ import java.io.OutputStream;
 import com.enth.ecomusic.model.dto.MusicDTO;
 import com.enth.ecomusic.model.dto.StreamRangeDTO;
 import com.enth.ecomusic.service.FileStreamingService;
-import com.enth.ecomusic.service.GenreCacheService;
-import com.enth.ecomusic.service.MoodCacheService;
 import com.enth.ecomusic.service.MusicService;
+import com.enth.ecomusic.util.AppContext;
 import com.enth.ecomusic.util.CommonUtil;
 
 /**
@@ -33,9 +32,9 @@ public class AudioStreamServlet extends HttpServlet {
 		// TODO Auto-generated method stub
 		super.init();
 		
-		GenreCacheService genreCacheService = (GenreCacheService) this.getServletContext().getAttribute("genreCacheService");
-		MoodCacheService moodCacheService = (MoodCacheService) this.getServletContext().getAttribute("moodCacheService");
-		this.musicService = new MusicService(genreCacheService, moodCacheService);
+		AppContext ctx = (AppContext) this.getServletContext().getAttribute("appContext");
+		this.musicService = ctx.getMusicService();
+		
 		this.fileStreamingService = new FileStreamingService();
 	}
 

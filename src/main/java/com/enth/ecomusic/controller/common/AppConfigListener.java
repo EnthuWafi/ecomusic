@@ -1,10 +1,9 @@
 package com.enth.ecomusic.controller.common;
 
-import com.enth.ecomusic.service.GenreCacheService;
-import com.enth.ecomusic.service.MoodCacheService;
-import com.enth.ecomusic.service.RoleCacheService;
 import com.enth.ecomusic.util.AppConfig;
+import com.enth.ecomusic.util.AppContext;
 import com.enth.ecomusic.util.DBConnection;
+import com.stripe.Stripe;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
@@ -29,14 +28,11 @@ public class AppConfigListener implements ServletContextListener {
         // Get the ServletContext to store global settings
         ServletContext context = sce.getServletContext();
 
-        for (String key : AppConfig.getProperties().stringPropertyNames()) {
-            context.setAttribute(key, AppConfig.get(key));
-        }
-
-        //RoleCache
-        context.setAttribute("roleCacheService", new RoleCacheService());   
-        context.setAttribute("genreCacheService", new GenreCacheService());      
-        context.setAttribute("moodCacheService", new MoodCacheService());      
+        //App Context
+        context.setAttribute("appContext", new AppContext());  
+        
+        //stripe
+        Stripe.apiKey = AppConfig.get("stripeSecretKey");
         // Optional: log the initialization
         System.out.println("ServletContext Initialized: Global settings set.");
 

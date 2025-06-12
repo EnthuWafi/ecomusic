@@ -97,6 +97,19 @@ public class UserDAO {
 			return false;
 		}
 	}
+	
+	public boolean updateUserRole(int userId, int roleId) {
+		String sql = "UPDATE Users SET role_id = ? WHERE user_id = ?";
+		try (Connection conn = DBConnection.getConnection(); 
+		     PreparedStatement stmt = conn.prepareStatement(sql)) {
+			stmt.setInt(1, roleId);
+			stmt.setInt(2, userId);
+			return stmt.executeUpdate() > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
 
 	// DELETE
 	public boolean deleteUser(int id) {

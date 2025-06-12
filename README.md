@@ -15,7 +15,7 @@ A Java-based web application for music streaming and artist subscriptions built 
 
 The diagram below shows a snapshot of the core domain model, automatically generated from compiled Java `.class` files using [GenUML](https://github.com/samuller/genuml):
 
-![Class Diagram](output.png)
+![Class Diagram](target/uml/class-diagram.png)
 
 
 ## 🚀 Features

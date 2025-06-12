@@ -10,6 +10,7 @@ import java.util.List;
 
 import com.enth.ecomusic.model.dto.SubscriptionPlanDTO;
 import com.enth.ecomusic.service.SubscriptionService;
+import com.enth.ecomusic.util.AppContext;
 
 /**
  * Servlet implementation class PurchasePremiumServlet
@@ -23,7 +24,8 @@ public class PurchasePremiumServlet extends HttpServlet {
 	public void init() throws ServletException {
 		// TODO Auto-generated method stub
 		super.init();
-		subscriptionService = new SubscriptionService();
+		AppContext ctx = (AppContext) this.getServletContext().getAttribute("appContext");
+		subscriptionService = ctx.getSubscriptionService();
 	}
 
 	/**

@@ -13,6 +13,7 @@ import com.enth.ecomusic.model.dto.SubscriptionPlanDTO;
 import com.enth.ecomusic.model.entity.User;
 import com.enth.ecomusic.service.StripeService;
 import com.enth.ecomusic.service.SubscriptionService;
+import com.enth.ecomusic.util.AppContext;
 import com.enth.ecomusic.util.CommonUtil;
 import com.stripe.exception.StripeException;
 
@@ -29,8 +30,9 @@ public class SubscriptionCheckoutServlet extends HttpServlet {
 	public void init() throws ServletException {
 		// TODO Auto-generated method stub
 		super.init();
-		subscriptionService = new SubscriptionService();
-		stripeService = new StripeService();
+		AppContext ctx = (AppContext) this.getServletContext().getAttribute("appContext");
+		subscriptionService = ctx.getSubscriptionService();
+		stripeService = ctx.getStripeService();
 	}
 
 	/**

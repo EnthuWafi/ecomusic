@@ -9,7 +9,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.enth.ecomusic.model.dao.MusicDAO;
-import com.enth.ecomusic.model.dao.UserDAO;
 import com.enth.ecomusic.model.dto.MusicDTO;
 import com.enth.ecomusic.model.dto.MusicDetailDTO;
 import com.enth.ecomusic.model.entity.Music;
@@ -28,9 +27,9 @@ public class MusicService {
 	private final GenreCacheService genreCacheService;
 	private final MoodCacheService moodCacheService;
 
-	public MusicService(RoleCacheService roleCacheService, GenreCacheService genreCacheService, MoodCacheService moodCacheService) {
+	public MusicService(UserService userService, GenreCacheService genreCacheService, MoodCacheService moodCacheService) {
 		this.musicDAO = new MusicDAO();
-		this.userService = new UserService(roleCacheService);
+		this.userService = userService;
 		this.genreCacheService = genreCacheService != null ? genreCacheService : new GenreCacheService();
 		this.moodCacheService = moodCacheService != null ? moodCacheService : new MoodCacheService();
 	}
@@ -164,16 +163,14 @@ public class MusicService {
 
 
 	public MusicDTO getMusicDTOById(int musicId) {
-		Music music = musicDAO.getMusicById(musicId);
-		setGenreMood(music);
+		Music music = this.getMusicById(musicId);
 		MusicDTO dto = MusicMapper.INSTANCE.toDTO(music);
 
 		return dto;
 	}
 
 	public MusicDetailDTO getMusicDetailDTOById(int musicId) {
-		Music music = musicDAO.getMusicById(musicId);
-		setGenreMood(music);
+		Music music = this.getMusicById(musicId);
 		User user = userService.getUserById(music.getArtistId());
 		music.setArtist(user);
 
@@ -182,15 +179,15 @@ public class MusicService {
 	}
 
 	public List<MusicDTO> getAllMusicDTOsByArtistId(int artistId) {
-		List<Music> musicList = musicDAO.getAllMusicByArtistId(artistId);
+		List<Music> musicList = this.getAllMusicByArtistId(artistId);
 
 		return musicList.stream().map(music -> {
-			setGenreMood(music);
 			MusicDTO dto = MusicMapper.INSTANCE.toDTO(music);
 			return dto;
 		}).collect(Collectors.toList());
 	}
 
+	//special case
 	public List<MusicDetailDTO> getPaginatedMusicDetailDTO(int page, int pageSize) {
 		List<MusicDetailDTO> musicList = musicDAO.getRelevantPaginatedMusicWithDetail(page, pageSize);
 
@@ -228,6 +225,20 @@ public class MusicService {
 			music.setGenre(genreCacheService.getById(music.getGenreId()));
 			music.setMood(moodCacheService.getById(music.getMoodId()));
 		}
+	}
+
+	public Music getMusicById(int musicId) {
+		Music music = musicDAO.getMusicById(musicId);
+		setGenreMood(music);
+		return music;
+	}
+	
+	public List<Music> getAllMusicByArtistId(int artistId) {
+		List<Music> musicList = musicDAO.getAllMusicByArtistId(artistId);
+		for (Music music : musicList) {
+			setGenreMood(music);
+		}
+		return musicList;
 	}
 
 

@@ -116,11 +116,10 @@ public class UserService {
 		return userDAO.updateUser(user);
 	}
 
-	public boolean updateUserWithRoleName(User user, RoleType roleType) {
+	public boolean updateUserWithRoleName(int userId, RoleType roleType) {
 		Role role = roleCacheService.getByType(roleType);
 		if (role != null) {
-			user.setRoleId(role.getRoleId());
-			return userDAO.updateUser(user);
+			return userDAO.updateUserRole(userId, role.getRoleId());
 		}
 		return false;
 	}
@@ -135,10 +134,16 @@ public class UserService {
 
 	
 	public User getUserById(int userId) {
-		return userDAO.getUserById(userId);
+		User user = userDAO.getUserById(userId);
+		fetchRole(user);
+		return user;
 	}
 	
 	public List<User> getAllUsers(){
-		return userDAO.getAllUsers();
+		List<User> userList = userDAO.getAllUsers();
+		for (User user : userList) {
+			fetchRole(user);
+		}
+		return userList;
 	}
 }

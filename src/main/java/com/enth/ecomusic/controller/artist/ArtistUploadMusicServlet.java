@@ -19,6 +19,7 @@ import com.enth.ecomusic.model.entity.Music;
 import com.enth.ecomusic.service.GenreCacheService;
 import com.enth.ecomusic.service.MoodCacheService;
 import com.enth.ecomusic.service.MusicService;
+import com.enth.ecomusic.util.AppContext;
 import com.enth.ecomusic.util.CommonUtil;
 import com.enth.ecomusic.util.MultipartUtil;
 import com.enth.ecomusic.util.ToastrType;
@@ -39,9 +40,10 @@ public class ArtistUploadMusicServlet extends HttpServlet {
 		// TODO Auto-generated method stub
 		super.init();
 
-		this.genreCacheService = (GenreCacheService) this.getServletContext().getAttribute("genreCacheService");
-		this.moodCacheService = (MoodCacheService) this.getServletContext().getAttribute("moodCacheService");
-		this.musicService = new MusicService(genreCacheService, moodCacheService);
+		AppContext ctx = (AppContext) this.getServletContext().getAttribute("appContext");
+		this.genreCacheService = ctx.getGenreCacheService();
+		this.moodCacheService = ctx.getMoodCacheService();
+		this.musicService = ctx.getMusicService();
 	}
 
 	/**

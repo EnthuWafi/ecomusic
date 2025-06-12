@@ -8,9 +8,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import com.enth.ecomusic.model.dto.MusicDetailDTO;
-import com.enth.ecomusic.service.GenreCacheService;
-import com.enth.ecomusic.service.MoodCacheService;
 import com.enth.ecomusic.service.MusicService;
+import com.enth.ecomusic.util.AppContext;
 import com.enth.ecomusic.util.CommonUtil;
 
 /**
@@ -26,9 +25,8 @@ public class PlayMusicServlet extends HttpServlet {
 	public void init() throws ServletException {
 		// TODO Auto-generated method stub
 		super.init();
-		GenreCacheService genreCacheService = (GenreCacheService) this.getServletContext().getAttribute("genreCacheService");
-		MoodCacheService moodCacheService = (MoodCacheService) this.getServletContext().getAttribute("moodCacheService");
-		this.musicService = new MusicService(genreCacheService, moodCacheService);
+		AppContext ctx = (AppContext) this.getServletContext().getAttribute("appContext");
+		this.musicService = ctx.getMusicService();
 	}
     /**
      * @see HttpServlet#HttpServlet()

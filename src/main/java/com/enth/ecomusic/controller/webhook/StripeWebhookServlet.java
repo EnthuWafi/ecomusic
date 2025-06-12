@@ -10,7 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import com.enth.ecomusic.model.entity.UserSubscription;
 import com.enth.ecomusic.service.SubscriptionService;
 import com.enth.ecomusic.util.AppConfig;
-import com.stripe.Stripe;
+import com.enth.ecomusic.util.AppContext;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Event;
@@ -39,8 +39,8 @@ public class StripeWebhookServlet extends HttpServlet {
 
 	@Override
 	public void init() throws ServletException {
-		Stripe.apiKey = (String) getServletContext().getAttribute("stripeSecretKey");
-		subscriptionService = new SubscriptionService();
+		AppContext ctx = (AppContext) this.getServletContext().getAttribute("appContext");
+		subscriptionService = ctx.getSubscriptionService();
 	}
 
 	/**
@@ -118,7 +118,7 @@ public class StripeWebhookServlet extends HttpServlet {
 			UserSubscription sub = new UserSubscription(Integer.parseInt(userId), today, null, amountPaid, paymentStatus,
 					stripeSubId, Integer.parseInt(planIdStr));
 
-			subscriptionService.createSubscription(sub);
+			subscriptionService.createSubscriptionForArtist(sub);
 
 			logger.info("Subscription recorded for user ID: " + userId);
 
