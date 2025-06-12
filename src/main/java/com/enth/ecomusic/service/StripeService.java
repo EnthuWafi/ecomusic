@@ -1,6 +1,6 @@
 package com.enth.ecomusic.service;
 
-import com.enth.ecomusic.model.entity.SubscriptionPlan;
+import com.enth.ecomusic.model.dto.SubscriptionPlanDTO;
 import com.enth.ecomusic.util.AppConfig;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
@@ -8,11 +8,12 @@ import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
 
 public class StripeService {
-	static {
+	
+	public StripeService() {
 		Stripe.apiKey = AppConfig.get("stripeSecretKey");
 	}
 
-	public static String createCheckoutSessionForPlan(SubscriptionPlan plan, String returnUrl, String userId, String email)
+	public String createCheckoutSessionForPlan(SubscriptionPlanDTO plan, String returnUrl, String userId, String email)
 			throws StripeException {
 		SessionCreateParams params = SessionCreateParams.builder().setUiMode(SessionCreateParams.UiMode.EMBEDDED)
 				.setMode(SessionCreateParams.Mode.SUBSCRIPTION)
@@ -27,7 +28,7 @@ public class StripeService {
 		return session.getClientSecret();
 	}
 	
-	public static String createRedirectCheckoutSessionForPlan(SubscriptionPlan plan, String returnUrl, String userId, String email)
+	public String createRedirectCheckoutSessionForPlan(SubscriptionPlanDTO plan, String returnUrl, String userId, String email)
 	        throws StripeException {
 	    SessionCreateParams params = SessionCreateParams.builder()
 	            .setMode(SessionCreateParams.Mode.SUBSCRIPTION)

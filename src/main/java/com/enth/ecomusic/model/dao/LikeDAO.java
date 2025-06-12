@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.enth.ecomusic.model.entity.Like;
+import com.enth.ecomusic.model.mapper.ResultSetMapper;
+import com.enth.ecomusic.util.DAOUtil;
 import com.enth.ecomusic.util.DBConnection;
 
 public class LikeDAO {
@@ -45,7 +47,7 @@ public class LikeDAO {
         }
     }
 
-    public List<Like> getLikesByUser(int userId) {
+    public List<Like> getLikedSongsByUserId(int userId) {
         List<Like> likedList = new ArrayList<>();
         String sql = "SELECT * FROM Likes WHERE user_id = ?";
 
@@ -117,4 +119,13 @@ public class LikeDAO {
 
         return count;
     }
+
+	public boolean isSongLikedByUser(int userId, int musicId) {
+		// TODO Auto-generated method stub
+		String sql = "SELECT * FROM Likes WHERE user_id = ? AND music_id";
+		
+		Integer result = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt, userId, musicId);
+		
+		return result != null ? true : false;
+	}
 }

@@ -13,9 +13,11 @@ import com.enth.ecomusic.model.entity.PlaylistMusic;
 public interface PlaylistMapper {
 	PlaylistMapper INSTANCE = Mappers.getMapper(PlaylistMapper.class);
 	
-	@Mapping(source = "playlistMusic", target = "playlistMusic")
+	@Mapping(source = "musicList", target = "musicList")
 	PlaylistDTO toDTO(Playlist playlist);
 	
-	@Mapping(source = "music", target = "musicDetail")
+	@Mapping(source = "music", target = "music")
+	@Mapping(source = "music.artist.username", target = "artistUsername")
+    @Mapping(source = "music.artist.imageUrl", target = "artistImageUrl")
 	PlaylistMusicDTO toDTO(PlaylistMusic playlistMusic);
 }

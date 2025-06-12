@@ -102,6 +102,14 @@
 			<artifactId>gson-javatime-serialisers</artifactId>
 			<version>1.1.2</version>
 		</dependency>
+		<!--
+		https://mvnrepository.com/artifact/de.elnarion.maven/plantuml-generator-maven-plugin -->
+		<dependency>
+			<groupId>de.elnarion.maven</groupId>
+			<artifactId>plantuml-generator-maven-plugin</artifactId>
+			<version>3.0.1</version>
+		</dependency>
+
 	</dependencies>
 
 
@@ -111,6 +119,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.13.0</version>
 				<configuration>
+					<parameters>true</parameters>
+					<testCompilerArgument>-parameters</testCompilerArgument>
 					<release>21</release>
 					<source>21</source> <!-- depending on your project -->
 					<target>21</target> <!-- depending on your project -->
@@ -128,7 +138,37 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<version>3.2.3</version>
 			</plugin>
-
+			<plugin>
+				<groupId>de.elnarion.maven</groupId>
+				<artifactId>plantuml-generator-maven-plugin</artifactId>
+				<version>3.0.1</version>
+				<executions>
+					<execution>
+						<id>generate-uml-diagram</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<scanPackages>
+								<scanPackage>com.enth.ecomusic.model.entity</scanPackage>
+								<scanPackage>com.enth.ecomusic.model.dto</scanPackage>
+								<scanPackage>com.enth.ecomusic.model.dao</scanPackage>
+								<scanPackage>com.enth.ecomusic.service</scanPackage>
+								<scanPackage>com.enth.ecomusic.model.enums</scanPackage>
+							</scanPackages>
+							<outputDirectory>${project.build.directory}/uml</outputDirectory>
+							<outputFilename>class-diagram.puml</outputFilename>
+							<useShortClassNamesInFieldsAndMethods>true</useShortClassNamesInFieldsAndMethods>
+							<additionalPlantUmlConfigs>
+								<additionalPlantUmlConfig>skinparam linetype polyline</additionalPlantUmlConfig>
+								<additionalPlantUmlConfig>left to right direction</additionalPlantUmlConfig>
+								<additionalPlantUmlConfig>scale 2/3</additionalPlantUmlConfig>
+							</additionalPlantUmlConfigs>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 </project>

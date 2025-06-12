@@ -1,10 +1,15 @@
 package com.enth.ecomusic.service;
 import com.enth.ecomusic.model.dao.SubscriptionDAO;
 import com.enth.ecomusic.model.dao.SubscriptionPlanDAO;
+import com.enth.ecomusic.model.dto.SubscriptionDTO;
+import com.enth.ecomusic.model.dto.SubscriptionPlanDTO;
 import com.enth.ecomusic.model.entity.SubscriptionPlan;
 import com.enth.ecomusic.model.entity.UserSubscription;
+import com.enth.ecomusic.model.mapper.SubscriptionMapper;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SubscriptionService {
 
@@ -22,19 +27,22 @@ public class SubscriptionService {
     }
 
     // GET by subscription ID (with plan loaded)
-    public UserSubscription getSubscriptionById(int id) {
+    public SubscriptionDTO getSubscriptionById(int id) {
         UserSubscription sub = subscriptionDAO.getSubscriptionById(id);
         attachPlanIfAvailable(sub);
-        return sub;
+        
+        return SubscriptionMapper.INSTANCE.toDTO(sub);
     }
 
     // GET all user subscriptions (with plans)
-    public List<UserSubscription> getSubscriptionsByUserId(int userId) {
+    public List<SubscriptionDTO> getSubscriptionsByUserId(int userId) {
         List<UserSubscription> subs = subscriptionDAO.getSubscriptionsByUserId(userId);
+        List<SubscriptionDTO> subsDTO = new ArrayList<>();
         for (UserSubscription sub : subs) {
             attachPlanIfAvailable(sub);
+            subsDTO.add(SubscriptionMapper.INSTANCE.toDTO(sub));
         }
-        return subs;
+        return subsDTO;
     }
 
     // UPDATE
@@ -55,24 +63,32 @@ public class SubscriptionService {
         }
     }
 
-    // Optional — get all available plans
-    public List<SubscriptionPlan> getAllSubscriptionPlans() {
-        return subscriptionPlanDAO.getAllSubscriptionPlans();
-    }
-    
-    public List<SubscriptionPlan> getAllSubscriptionPlansForListener() {
-        return subscriptionPlanDAO.getAllSubscriptionPlansByPlanType("listener");
-    }
-    
-    public List<SubscriptionPlan> getAllSubscriptionPlansForCreator() {
-        return subscriptionPlanDAO.getAllSubscriptionPlansByPlanType("creator");
+ // Optional — get all available plans
+    public List<SubscriptionPlanDTO> getAllSubscriptionPlans() {
+        return subscriptionPlanDAO.getAllSubscriptionPlans().stream()
+                .map(SubscriptionMapper.INSTANCE::toDTO)
+                .collect(Collectors.toList());
     }
 
-    public SubscriptionPlan getSubscriptionPlanById(int planId) {
-        return subscriptionPlanDAO.getSubscriptionPlanById(planId);
+    public List<SubscriptionPlanDTO> getAllSubscriptionPlansForListener() {
+        return subscriptionPlanDAO.getAllSubscriptionPlansByPlanType("listener").stream()
+                .map(SubscriptionMapper.INSTANCE::toDTO)
+                .collect(Collectors.toList());
     }
 
-    public SubscriptionPlan getSubscriptionPlanByStripeId(String stripePriceId) {
-        return subscriptionPlanDAO.getSubscriptionPlanByStripePriceId(stripePriceId);
+    public List<SubscriptionPlanDTO> getAllSubscriptionPlansForCreator() {
+        return subscriptionPlanDAO.getAllSubscriptionPlansByPlanType("creator").stream()
+                .map(SubscriptionMapper.INSTANCE::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public SubscriptionPlanDTO getSubscriptionPlanById(int planId) {
+        SubscriptionPlan subscriptionPlan = subscriptionPlanDAO.getSubscriptionPlanById(planId);
+        return subscriptionPlan != null ? SubscriptionMapper.INSTANCE.toDTO(subscriptionPlan) : null;
+    }
+
+    public SubscriptionPlanDTO getSubscriptionPlanByStripeId(String stripePriceId) {
+        SubscriptionPlan subscriptionPlan = subscriptionPlanDAO.getSubscriptionPlanByStripePriceId(stripePriceId);
+        return subscriptionPlan != null ? SubscriptionMapper.INSTANCE.toDTO(subscriptionPlan) : null;
     }
 }

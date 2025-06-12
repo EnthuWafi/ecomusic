@@ -1,6 +1,5 @@
 package com.enth.ecomusic.model.entity;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import com.enth.ecomusic.model.enums.VisibilityType;
@@ -26,6 +25,7 @@ public class Music{
     
 	private Genre genre;
 	private Mood mood;
+	private User artist;
 	
 	public Music(int musicId, int artistId, String title, String description, LocalDateTime uploadDate,
 			String audioFileUrl, String imageUrl, boolean premiumContent, int genreId, int moodId, int likeCount,
@@ -209,6 +209,16 @@ public class Music{
 
 	public void setMood(Mood mood) {
 		this.mood = mood;
+	}
+
+
+	public User getArtist() {
+		return artist;
+	}
+
+
+	public void setArtist(User artist) {
+		this.artist = artist;
 	}
 	
 	

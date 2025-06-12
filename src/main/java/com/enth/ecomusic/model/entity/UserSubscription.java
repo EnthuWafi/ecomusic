@@ -1,6 +1,5 @@
 package com.enth.ecomusic.model.entity;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 

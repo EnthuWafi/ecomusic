@@ -10,6 +10,7 @@ import com.enth.ecomusic.model.entity.Mood;
 
 public class MoodCacheService {
 
+	private MoodDAO moodDAO;
     private Map<Integer, Mood> moodById;
 
     public MoodCacheService() {
@@ -17,7 +18,9 @@ public class MoodCacheService {
     }
 
     public void refresh() {
-        MoodDAO moodDAO = new MoodDAO();
+    	if (moodDAO == null) {
+    	    this.moodDAO = new MoodDAO();
+    	}
         List<Mood> moods = moodDAO.getAllMoods();
         this.moodById = new ConcurrentHashMap<>(moods.stream()
                 .collect(Collectors.toMap(Mood::getMoodId, mood -> mood)));

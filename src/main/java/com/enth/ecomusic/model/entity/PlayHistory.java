@@ -1,6 +1,5 @@
 package com.enth.ecomusic.model.entity;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 public class PlayHistory {
@@ -11,6 +10,8 @@ public class PlayHistory {
     private LocalDateTime playedAt;
     private long listenDuration;
     private boolean wasSkipped;
+    
+    private Music music;
     
 	public PlayHistory(int playId, int userId, int musicId, LocalDateTime playedAt, long listenDuration,
 			boolean wasSkipped) {
@@ -61,7 +62,14 @@ public class PlayHistory {
 	public void setWasSkipped(boolean wasSkipped) {
 		this.wasSkipped = wasSkipped;
 	}
+	public Music getMusic() {
+		return music;
+	}
+	public void setMusic(Music music) {
+		this.music = music;
+	}
     
+	
     
 
 }

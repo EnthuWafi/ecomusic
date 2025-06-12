@@ -8,13 +8,14 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import com.enth.ecomusic.model.dto.StreamRangeDTO;
 import com.enth.ecomusic.model.dto.UserDTO;
+import com.enth.ecomusic.service.FileStreamingService;
 import com.enth.ecomusic.service.RoleCacheService;
 import com.enth.ecomusic.service.UserService;
 import com.enth.ecomusic.util.CommonUtil;
-import com.enth.ecomusic.util.FileStreamingUtil;
 
 /**
  * Servlet implementation class ImageStreamServlet
@@ -24,12 +25,14 @@ public class UserImageStreamServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	private UserService userService;
+	private FileStreamingService fileStreamingService;
 
 	@Override
 	public void init() throws ServletException {
 		// TODO Auto-generated method stub
 		RoleCacheService roleCache = (RoleCacheService) getServletContext().getAttribute("roleCacheService");
 		userService = new UserService(roleCache);
+		fileStreamingService = new FileStreamingService();
 	}
 
 	/**
@@ -79,8 +82,21 @@ public class UserImageStreamServlet extends HttpServlet {
 
 		String rangeHeader = request.getHeader("Range");
 
-		StreamRangeDTO range = FileStreamingUtil.parseRangeHeader(rangeHeader, imageFile.length());
-		FileStreamingUtil.streamFile(imageFile, range, response, mimeType);
+		StreamRangeDTO range = fileStreamingService.parseRangeHeader(rangeHeader, imageFile.length());
+		
+
+		response.setHeader("Accept-Ranges", "bytes");
+        response.setContentType(mimeType);
+        response.setContentLengthLong(range.getContentLength());
+
+        if (range.getStart() > 0 || range.getEnd() < range.getTotalLength() - 1) {
+            response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+            response.setHeader("Content-Range", "bytes " + range.getStart() + "-" + range.getEnd() + "/" + range.getTotalLength());
+        }
+        
+        try (OutputStream out = response.getOutputStream()) {
+            fileStreamingService.streamFile(imageFile, range, out);
+        }
 	}
 
 }

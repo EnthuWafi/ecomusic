@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.List;
 
 import com.enth.ecomusic.model.dto.MusicDTO;
-import com.enth.ecomusic.model.dto.MusicDetailDTO;
 import com.enth.ecomusic.model.dto.UserDTO;
 import com.enth.ecomusic.service.GenreCacheService;
 import com.enth.ecomusic.service.MoodCacheService;

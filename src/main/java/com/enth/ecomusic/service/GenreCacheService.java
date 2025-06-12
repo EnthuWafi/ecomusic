@@ -9,6 +9,7 @@ import com.enth.ecomusic.model.dao.GenreDAO;
 import com.enth.ecomusic.model.entity.Genre;
 
 public class GenreCacheService {
+	private GenreDAO genreDAO;
 	private Map<Integer, Genre> genreById;
 
     public GenreCacheService() {
@@ -16,7 +17,9 @@ public class GenreCacheService {
     }
 
     public void refresh() {
-        GenreDAO genreDAO = new GenreDAO();
+        if (genreDAO == null) {
+        	genreDAO = new GenreDAO();
+        }
         List<Genre> genres = genreDAO.getAllGenres();
         this.genreById = new ConcurrentHashMap<>(genres.stream()
                 .collect(Collectors.toMap(Genre::getGenreId, genre -> genre)));

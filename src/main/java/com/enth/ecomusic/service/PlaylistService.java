@@ -3,10 +3,12 @@ package com.enth.ecomusic.service;
 import com.enth.ecomusic.model.dao.MusicDAO;
 import com.enth.ecomusic.model.dao.PlaylistDAO;
 import com.enth.ecomusic.model.dao.PlaylistMusicDAO;
+import com.enth.ecomusic.model.dao.UserDAO;
 import com.enth.ecomusic.model.dto.PlaylistDTO;
 import com.enth.ecomusic.model.entity.Music;
 import com.enth.ecomusic.model.entity.Playlist;
 import com.enth.ecomusic.model.entity.PlaylistMusic;
+import com.enth.ecomusic.model.entity.User;
 import com.enth.ecomusic.model.mapper.PlaylistMapper;
 import com.enth.ecomusic.model.transaction.TransactionTemplate;
 
@@ -19,6 +21,7 @@ public class PlaylistService {
 	private final PlaylistDAO playlistDAO;
 	private final PlaylistMusicDAO playlistMusicDAO;
 	private final MusicDAO musicDAO;
+	private final UserDAO userDAO;
 	private final GenreCacheService genreCacheService;
 	private final MoodCacheService moodCacheService;
 
@@ -26,15 +29,9 @@ public class PlaylistService {
 		this.playlistDAO = new PlaylistDAO();
 		this.playlistMusicDAO = new PlaylistMusicDAO();
 		this.musicDAO = new MusicDAO();
+		this.userDAO = new UserDAO();
 		this.genreCacheService = genreCacheService != null ? genreCacheService : new GenreCacheService();
 		this.moodCacheService = moodCacheService != null ? moodCacheService : new MoodCacheService();
-	}
-
-	private void setGenreMood(Music music) {
-		if (music != null) {
-			music.setGenre(genreCacheService.getById(music.getGenreId()));
-			music.setMood(moodCacheService.getById(music.getMoodId()));
-		}
 	}
 
 	private void loadMusicForPlaylist(Playlist playlist) {
@@ -43,8 +40,11 @@ public class PlaylistService {
 
 		for (PlaylistMusic pm : playlistMusicList) {
 			Music music = musicDAO.getMusicById(pm.getMusicId());
+			User user = userDAO.getUserById(music.getArtistId());
 			if (music != null) {
-				setGenreMood(music);
+				music.setArtist(user);
+				music.setGenre(genreCacheService.getById(music.getGenreId()));
+				music.setMood(moodCacheService.getById(music.getMoodId()));
 				pm.setMusic(music);
 			}
 		}

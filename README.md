@@ -9,7 +9,7 @@ A Java-based web application for music streaming and artist subscriptions built 
 - **Tomcat**
 - **Stripe API for subscriptions**
 - **MapStruct for DTO mapping**
-- **PlantUML + GenUML for class diagrams**
+- **PlantUML + PlantUML Maven Plugin for class diagrams**
 
 ## 📐 UML Class Diagram
 
@@ -32,4 +32,5 @@ The diagram below shows a snapshot of the core domain model, automatically gener
 ```bash
 # Generate UML
 genuml insert --class-dir target/ecomusic-0.0.1-SNAPSHOT/WEB-INF/classes template.puml > output.puml 
-java -jar plantuml.jar output.puml 
+java -jar plantuml.jar target/uml/output.puml
+java -jar plantuml.jar target/uml/class-diagram.puml 

@@ -30,7 +30,7 @@ public class AdminUserServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		// Show all users
-		List<UserDTO> userList = userService.getAllUsers();
+		List<UserDTO> userList = userService.getAllUserDTO();
 		request.setAttribute("userList", userList);
 		request.setAttribute("pageTitle", "User List");
 		request.setAttribute("contentPage", "/WEB-INF/views/admin/view-user-list.jsp");

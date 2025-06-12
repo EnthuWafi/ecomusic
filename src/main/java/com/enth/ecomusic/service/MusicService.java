@@ -8,9 +8,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.enth.ecomusic.model.dao.LikeDAO;
 import com.enth.ecomusic.model.dao.MusicDAO;
-import com.enth.ecomusic.model.dao.PlayHistoryDAO;
 import com.enth.ecomusic.model.dao.UserDAO;
 import com.enth.ecomusic.model.dto.MusicDTO;
 import com.enth.ecomusic.model.dto.MusicDetailDTO;
@@ -26,13 +24,13 @@ import net.coobird.thumbnailator.Thumbnails;
 public class MusicService {
 
 	private final MusicDAO musicDAO;
-	private final UserDAO userDAO;
+	private final UserService userService;
 	private final GenreCacheService genreCacheService;
 	private final MoodCacheService moodCacheService;
 
-	public MusicService(GenreCacheService genreCacheService, MoodCacheService moodCacheService) {
+	public MusicService(RoleCacheService roleCacheService, GenreCacheService genreCacheService, MoodCacheService moodCacheService) {
 		this.musicDAO = new MusicDAO();
-		this.userDAO = new UserDAO();
+		this.userService = new UserService(roleCacheService);
 		this.genreCacheService = genreCacheService != null ? genreCacheService : new GenreCacheService();
 		this.moodCacheService = moodCacheService != null ? moodCacheService : new MoodCacheService();
 	}
@@ -176,9 +174,10 @@ public class MusicService {
 	public MusicDetailDTO getMusicDetailDTOById(int musicId) {
 		Music music = musicDAO.getMusicById(musicId);
 		setGenreMood(music);
-		User user = userDAO.getUserById(music.getArtistId());
+		User user = userService.getUserById(music.getArtistId());
+		music.setArtist(user);
 
-		MusicDetailDTO dto = MusicMapper.INSTANCE.toDetailDTO(music, user);
+		MusicDetailDTO dto = MusicMapper.INSTANCE.toDetailDTO(music);
 		return dto;
 	}
 

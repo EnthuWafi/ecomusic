@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import com.enth.ecomusic.model.entity.UserSubscription;
 import com.enth.ecomusic.service.SubscriptionService;
+import com.enth.ecomusic.util.AppConfig;
 import com.stripe.Stripe;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
@@ -32,7 +33,7 @@ import java.util.logging.Logger;
 public class StripeWebhookServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	//stripe listen --forward-to localhost:8081/ecomusic/webhook/stripe
-	private static final String STRIPE_WEBHOOK_SECRET = "whsec_555ab27a8876b601deb279f6b20c238110e68060d74af0651118ce2679deaa68";
+	private static final String STRIPE_WEBHOOK_SECRET = AppConfig.get("stripeWebhookKey");
 	private static final Logger logger = Logger.getLogger(StripeWebhookServlet.class.getName());
 	private SubscriptionService subscriptionService;
 

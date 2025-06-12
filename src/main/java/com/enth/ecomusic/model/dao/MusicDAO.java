@@ -5,7 +5,7 @@ import com.enth.ecomusic.model.dto.MusicDetailDTO;
 import com.enth.ecomusic.model.entity.Music;
 import com.enth.ecomusic.model.enums.VisibilityType;
 import com.enth.ecomusic.model.mapper.ResultSetMapper;
-import com.enth.ecomusic.util.CommonUtil;
+import com.enth.ecomusic.util.AppConfig;
 import com.enth.ecomusic.util.DAOUtil;
 import com.enth.ecomusic.util.DBConnection;
 
@@ -16,10 +16,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class MusicDAO {
-	private static final double TEXT_SCORE_WEIGHT = 0.5;
-	private static final double LIKE_COUNT_WEIGHT = 0.3;
-	private static final double TOTAL_PLAYS_WEIGHT = 0.15;
-	private static final double FRESHNESS_WEIGHT = -0.05;
+	private static final double TEXT_SCORE_WEIGHT = Double.parseDouble(AppConfig.get("music.score.weight.textScore"));
+	private static final double LIKE_COUNT_WEIGHT = Double.parseDouble(AppConfig.get("music.score.weight.likeCount"));
+	private static final double TOTAL_PLAYS_WEIGHT = Double.parseDouble(AppConfig.get("music.score.weight.totalPlays"));
+	private static final double FRESHNESS_WEIGHT = Double.parseDouble(AppConfig.get("music.score.weight.freshness"));
 
 	// CREATE
 	public boolean insertMusic(Music music) {

@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-import com.enth.ecomusic.model.entity.SubscriptionPlan;
+import com.enth.ecomusic.model.dto.SubscriptionPlanDTO;
 import com.enth.ecomusic.service.SubscriptionService;
 
 /**
@@ -41,7 +41,7 @@ public class PurchasePremiumServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		List<SubscriptionPlan> plans = subscriptionService.getAllSubscriptionPlansForListener();
+		List<SubscriptionPlanDTO> plans = subscriptionService.getAllSubscriptionPlansForListener();
 
 		request.setAttribute("subscriptionPlanList", plans);
 		request.setAttribute("pageTitle", "Become a Premium User");

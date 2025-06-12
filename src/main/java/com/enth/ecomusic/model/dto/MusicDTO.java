@@ -5,11 +5,11 @@ import java.time.LocalDateTime;
 
 import com.enth.ecomusic.model.enums.VisibilityType;
 
-public class MusicDTO implements Serializable{
+public class MusicDTO{
     /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+
 	private int musicId;
     private int artistId;
     private String title;
@@ -50,71 +50,69 @@ public class MusicDTO implements Serializable{
 	}
 
 
-	public MusicDTO() {
-		super();
+
+	public int getMusicId() {
+		return musicId;
 	}
 
 
-	// Getters and Setters
-    public LocalDateTime getUploadDate() {
-		return uploadDate;
-	}
-	public void setUploadDate(LocalDateTime uploadDate) {
-		this.uploadDate = uploadDate;
-	}
-   
-    public int getMusicId() { return musicId; }
-
-	public void setMusicId(int musicId) { this.musicId = musicId; }
-
-    public int getArtistId() {
+	public int getArtistId() {
 		return artistId;
 	}
-	public void setArtistId(int artistId) {
-		this.artistId = artistId;
+
+
+	public String getTitle() {
+		return title;
 	}
-	public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
 
-    public String getAudioFileUrl() { return audioFileUrl; }
-    public void setAudioFileUrl(String audioFileUrl) { this.audioFileUrl = audioFileUrl; }
+	public String getDescription() {
+		return description;
+	}
 
-    public String getImageUrl() { return imageUrl; }
-    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
-    public boolean isPremiumContent() { return premiumContent; }
-    public void setPremiumContent(boolean premiumContent) { this.premiumContent = premiumContent; }
+	public String getAudioFileUrl() {
+		return audioFileUrl;
+	}
 
-    
-    public int getGenreId() {
+
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+
+	public boolean isPremiumContent() {
+		return premiumContent;
+	}
+
+
+	public int getGenreId() {
 		return genreId;
 	}
-	public void setGenreId(int genreId) {
-		this.genreId = genreId;
-	}
+
+
 	public int getMoodId() {
 		return moodId;
 	}
-	public void setMoodId(int moodId) {
-		this.moodId = moodId;
-	}
-	public String getGenreName() { return genreName; }
-    public void setGenreName(String genreName) { this.genreName = genreName; }
 
-    public String getMoodName() { return moodName; }
-    public void setMoodName(String moodName) { this.moodName = moodName; }
+	
+	
+
+	public String getGenreName() {
+		return genreName;
+	}
+
+
+
+
+	public String getMoodName() {
+		return moodName;
+	}
+
 
 
 	public int getLikeCount() {
 		return likeCount;
-	}
-
-
-	public void setLikeCount(int likeCount) {
-		this.likeCount = likeCount;
 	}
 
 
@@ -123,20 +121,15 @@ public class MusicDTO implements Serializable{
 	}
 
 
-	public void setTotalPlayCount(int totalPlayCount) {
-		this.totalPlayCount = totalPlayCount;
-	}
-
-
 	public VisibilityType getVisibility() {
 		return visibility;
 	}
 
 
-	public void setVisibility(VisibilityType visibility) {
-		this.visibility = visibility;
+	public LocalDateTime getUploadDate() {
+		return uploadDate;
 	}
-	
+
 	
     
 }

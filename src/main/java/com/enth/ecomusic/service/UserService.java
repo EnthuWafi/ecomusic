@@ -79,41 +79,35 @@ public class UserService {
 
 	public UserDTO getUserDTOById(int userId) {
 		User user = userDAO.getUserById(userId);
+		fetchRole(user);
 		UserDTO dto = UserMapper.INSTANCE.toDTO(user);
-		if (dto != null) {
-			fetchRoleName(dto);
-		}
 		return dto;
 	}
 
 	public UserDTO getUserDTOByUsernameOrEmail(String identifier) {
 		User user = userDAO.getUserByUsernameOrEmail(identifier);
+		fetchRole(user);
 		UserDTO dto = UserMapper.INSTANCE.toDTO(user);
-		if (dto != null) {
-			fetchRoleName(dto);
-		}
 		return dto;
 	}
 
 	public UserDTO authenticateUser(String usernameOrEmail, String password) {
 		User user = userDAO.getUserByUsernameOrEmail(usernameOrEmail);
+		fetchRole(user);
 		if (user != null && CommonUtil.checkPassword(password, user.getPassword())) {
 			UserDTO dto = UserMapper.INSTANCE.toDTO(user);
-			if (dto != null) {
-				fetchRoleName(dto);
-			}
 			return dto;
 		}
 		;
 		return null;
 	}
 
-	public List<UserDTO> getAllUsers() {
+	public List<UserDTO> getAllUserDTO() {
 		List<User> userList = userDAO.getAllUsers();
 
 		return userList.stream().map(user -> {
+			fetchRole(user);
 			UserDTO dto = UserMapper.INSTANCE.toDTO(user);
-			fetchRoleName(dto);
 			return dto;
 		}).collect(Collectors.toList());
 	}
@@ -135,7 +129,16 @@ public class UserService {
 		return userDAO.deleteUser(userId);
 	}
 
-	private void fetchRoleName(UserDTO dto) {
-		dto.setRoleName(roleCacheService.getById((dto.getRoleId())).getRoleName());
+	private void fetchRole(User user) {
+		user.setRole(roleCacheService.getById(user.getRoleId()));
+	}
+
+	
+	public User getUserById(int userId) {
+		return userDAO.getUserById(userId);
+	}
+	
+	public List<User> getAllUsers(){
+		return userDAO.getAllUsers();
 	}
 }

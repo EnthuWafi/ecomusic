@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.enth.ecomusic.model.entity.SubscriptionPlan;
+import com.enth.ecomusic.model.dto.SubscriptionPlanDTO;
 import com.enth.ecomusic.model.entity.User;
 import com.enth.ecomusic.service.StripeService;
 import com.enth.ecomusic.service.SubscriptionService;
@@ -28,12 +28,14 @@ import com.stripe.exception.StripeException;
 public class CreateSubscriptionSessionAPIServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private SubscriptionService subscriptionService;
+	private StripeService stripeService;
 
 	@Override
 	public void init() throws ServletException {
 		// TODO Auto-generated method stub
 		super.init();
 		subscriptionService = new SubscriptionService();
+		stripeService = new StripeService();
 	}
   
     /**
@@ -67,11 +69,11 @@ public class CreateSubscriptionSessionAPIServlet extends HttpServlet {
 	    String email = user.getEmail();
 	    String returnUrl = CommonUtil.getBaseUrl(request) + "/user/subscription/return";
 
-	    SubscriptionPlan plan = subscriptionService.getSubscriptionPlanById(subscriptionPlanId);
+	    SubscriptionPlanDTO plan = subscriptionService.getSubscriptionPlanById(subscriptionPlanId);
 
 		try {
 
-			String clientSecret = StripeService.createCheckoutSessionForPlan(plan, returnUrl, userId, email);
+			String clientSecret = stripeService.createCheckoutSessionForPlan(plan, returnUrl, userId, email);
 
 			response.setContentType("application/json");
 			

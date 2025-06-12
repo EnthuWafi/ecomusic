@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.util.List;
 
 import com.enth.ecomusic.model.dto.MusicDTO;
-import com.enth.ecomusic.model.dto.UserDTO;
 import com.enth.ecomusic.model.entity.Genre;
 import com.enth.ecomusic.model.entity.Mood;
 import com.enth.ecomusic.model.entity.Music;

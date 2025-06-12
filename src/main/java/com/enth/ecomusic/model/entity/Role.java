@@ -1,7 +1,5 @@
 package com.enth.ecomusic.model.entity;
 
-import java.io.Serializable;
-
 public class Role{
 	
 	private int roleId;

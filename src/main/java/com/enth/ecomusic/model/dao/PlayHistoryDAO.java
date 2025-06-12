@@ -4,6 +4,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import com.enth.ecomusic.model.entity.PlayHistory;
+import com.enth.ecomusic.model.mapper.ResultSetMapper;
+import com.enth.ecomusic.util.DAOUtil;
 import com.enth.ecomusic.util.DBConnection;
 
 public class PlayHistoryDAO {
@@ -117,7 +119,27 @@ public class PlayHistoryDAO {
 
 	public int countPlaysByMusicId(int musicId) {
 		// TODO Auto-generated method stub
-		return 0;
+		String sql = "SELECT COUNT(*) FROM PlayHistory WHERE music_id = ?";
+		
+		Integer result = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt, musicId);
+		
+		return result != null ? result : 0;
+
+	}
+
+	public boolean deletePlayHistoryByUserId(int userId) {
+		String sql = "DELETE FROM PlayHistory WHERE user_id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, userId);
+            return stmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+        	System.err.println("Failed to delete play history by user_id: " + e.getMessage());
+            return false;
+        }
 	}
 	
 	

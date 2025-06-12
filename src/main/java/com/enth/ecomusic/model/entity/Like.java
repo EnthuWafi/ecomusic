@@ -1,6 +1,5 @@
 package com.enth.ecomusic.model.entity;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 public class Like{
@@ -11,6 +10,8 @@ public class Like{
     private int musicId;
     private LocalDateTime likedAt;
  
+    private Music music;
+    
     public Like() {
 		super();
 	}
@@ -29,4 +30,12 @@ public class Like{
 
     public LocalDateTime getLikedAt() { return likedAt; }
     public void setLikedAt(LocalDateTime likedAt) { this.likedAt = likedAt; }
+	public Music getMusic() {
+		return music;
+	}
+	public void setMusic(Music music) {
+		this.music = music;
+	}
+    
+    
 }

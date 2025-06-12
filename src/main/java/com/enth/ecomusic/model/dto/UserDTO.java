@@ -37,11 +37,10 @@ public class UserDTO implements Serializable{
 		this.imageUrl = imageUrl;
 		this.createdAt = createdAt;
 	}
-	
-	
 
-	public UserDTO() {
-		super();
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
 	}
 
 
@@ -50,82 +49,61 @@ public class UserDTO implements Serializable{
 		return userId;
 	}
 
-	public void setUserId(int userId) {
-		this.userId = userId;
-	}
+
 
 	public String getFirstName() {
 		return firstName;
 	}
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
+
 
 	public String getLastName() {
 		return lastName;
 	}
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
+
 
 	public String getUsername() {
 		return username;
 	}
 
-	public void setUsername(String username) {
-		this.username = username;
-	}
+
 
 	public String getBio() {
 		return bio;
 	}
 
-	public void setBio(String bio) {
-		this.bio = bio;
-	}
+
 
 	public String getEmail() {
 		return email;
 	}
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+
 
 	public int getRoleId() {
 		return roleId;
 	}
 
-	public void setRoleId(int roleId) {
-		this.roleId = roleId;
+
+
+	public String getRoleName() {
+		return roleName;
 	}
+
+
 
 	public String getImageUrl() {
 		return imageUrl;
 	}
 
-	public void setImageUrl(String imageUrl) {
-		this.imageUrl = imageUrl;
-	}
+
 
 	public LocalDateTime getCreatedAt() {
 		return createdAt;
 	}
 
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
-	}
-	
-	
-	public String getRoleName() {
-		return roleName;
-	}
 
-	public void setRoleName(String roleName) {
-		this.roleName = roleName;
-	}
 
 	//role checking
 	public boolean hasRole(RoleType roleType) {

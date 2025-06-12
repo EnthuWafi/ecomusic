@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
-import com.enth.ecomusic.model.entity.SubscriptionPlan;
+import com.enth.ecomusic.model.dto.SubscriptionPlanDTO;
 import com.enth.ecomusic.model.entity.User;
 import com.enth.ecomusic.service.StripeService;
 import com.enth.ecomusic.service.SubscriptionService;
@@ -23,12 +23,14 @@ import com.stripe.exception.StripeException;
 public class SubscriptionCheckoutServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private SubscriptionService subscriptionService;
+	private StripeService stripeService;
 
 	@Override
 	public void init() throws ServletException {
 		// TODO Auto-generated method stub
 		super.init();
 		subscriptionService = new SubscriptionService();
+		stripeService = new StripeService();
 	}
 
 	/**
@@ -51,7 +53,7 @@ public class SubscriptionCheckoutServlet extends HttpServlet {
 
 		String subscriptionPlanId = request.getParameter("planId");
 
-		SubscriptionPlan plan = subscriptionService.getSubscriptionPlanById(Integer.parseInt(subscriptionPlanId));
+		SubscriptionPlanDTO plan = subscriptionService.getSubscriptionPlanById(Integer.parseInt(subscriptionPlanId));
 
 		// Originally intended to make this a checkout embed, but going to try redirect
 //		request.setAttribute("subscriptionPlan", plan);
@@ -69,7 +71,7 @@ public class SubscriptionCheckoutServlet extends HttpServlet {
 	    String returnUrl = CommonUtil.getBaseUrl(request) + "/user/subscription/return";
 
 		try {
-			String sessionURL = StripeService.createRedirectCheckoutSessionForPlan(plan, returnUrl, userId, email);
+			String sessionURL = stripeService.createRedirectCheckoutSessionForPlan(plan, returnUrl, userId, email);
 
 			response.sendRedirect(sessionURL);
 		} catch (StripeException e) {

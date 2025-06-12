@@ -8,18 +8,21 @@ public class PlaylistMusicDTO {
 	private int musicId;
 	private LocalDateTime addedAt;
 	private int position;
+	private String artistUsername;
+	private String artistImageUrl;
 	
-	private MusicDetailDTO musicDetail;
+	private MusicDTO music;
 
-	
-	
-	public PlaylistMusicDTO(int playlistId, int musicId, LocalDateTime addedAt, int position, MusicDetailDTO musicDetail) {
+	public PlaylistMusicDTO(int playlistId, int musicId, LocalDateTime addedAt, int position, String artistUsername,
+			String artistImageUrl, MusicDTO music) {
 		super();
 		this.playlistId = playlistId;
 		this.musicId = musicId;
 		this.addedAt = addedAt;
 		this.position = position;
-		this.musicDetail = musicDetail;
+		this.artistUsername = artistUsername;
+		this.artistImageUrl = artistImageUrl;
+		this.music = music;
 	}
 
 	public int getPlaylistId() {
@@ -38,9 +41,18 @@ public class PlaylistMusicDTO {
 		return position;
 	}
 
-	public MusicDetailDTO getMusicDetail() {
-		return musicDetail;
+	public String getArtistUsername() {
+		return artistUsername;
 	}
+
+	public String getArtistImageUrl() {
+		return artistImageUrl;
+	}
+
+	public MusicDTO getMusic() {
+		return music;
+	}
+
 	
 	
 }

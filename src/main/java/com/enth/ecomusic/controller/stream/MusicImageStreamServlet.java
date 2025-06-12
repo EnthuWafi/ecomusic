@@ -8,15 +8,16 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import com.enth.ecomusic.service.MusicService;
 import com.enth.ecomusic.model.dto.MusicDTO;
 import com.enth.ecomusic.model.dto.StreamRangeDTO;
+import com.enth.ecomusic.service.FileStreamingService;
 import com.enth.ecomusic.service.GenreCacheService;
 import com.enth.ecomusic.service.MoodCacheService;
 import com.enth.ecomusic.util.AppConfig;
 import com.enth.ecomusic.util.CommonUtil;
-import com.enth.ecomusic.util.FileStreamingUtil;
 
 /**
  * Servlet implementation class MusicImageStreamServlet
@@ -26,6 +27,7 @@ public class MusicImageStreamServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	private MusicService musicService;
+	private FileStreamingService fileStreamingService;
 
 	@Override
 	public void init() throws ServletException {
@@ -35,6 +37,7 @@ public class MusicImageStreamServlet extends HttpServlet {
 		GenreCacheService genreCacheService = (GenreCacheService) this.getServletContext().getAttribute("genreCacheService");
 		MoodCacheService moodCacheService = (MoodCacheService) this.getServletContext().getAttribute("moodCacheService");
 		this.musicService = new MusicService(genreCacheService, moodCacheService);
+		this.fileStreamingService = new FileStreamingService();
 	}
 
 	/**
@@ -87,9 +90,21 @@ public class MusicImageStreamServlet extends HttpServlet {
 	    }
 
 	    String rangeHeader = request.getHeader("Range");
+	    
+	    StreamRangeDTO range = fileStreamingService.parseRangeHeader(rangeHeader, imageFile.length());
+	    
+		response.setHeader("Accept-Ranges", "bytes");
+        response.setContentType(mimeType);
+        response.setContentLengthLong(range.getContentLength());
 
-	    StreamRangeDTO range = FileStreamingUtil.parseRangeHeader(rangeHeader, imageFile.length());
-	    FileStreamingUtil.streamFile(imageFile, range, response, mimeType);
+        if (range.getStart() > 0 || range.getEnd() < range.getTotalLength() - 1) {
+            response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+            response.setHeader("Content-Range", "bytes " + range.getStart() + "-" + range.getEnd() + "/" + range.getTotalLength());
+        }
+        
+        try (OutputStream out = response.getOutputStream()) {
+            fileStreamingService.streamFile(imageFile, range, out);
+        }
 	}
 
 }

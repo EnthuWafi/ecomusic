@@ -11,7 +11,7 @@
 			<div class="col">
 				<div class="card h-100 shadow-sm">
 					<img
-						src="${pageContext.request.contextPath}/stream/image/music/${musicDTO.music.musicId}"
+						src="${pageContext.request.contextPath}/stream/image/music/${musicDTO.music.musicId}?size=thumb"
 						class="card-img-top" alt="${musicDTO.music.title}"
 						style="height: 200px; object-fit: cover;">
 					<div class="card-body">
