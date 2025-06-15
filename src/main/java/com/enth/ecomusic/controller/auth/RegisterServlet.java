@@ -3,9 +3,10 @@ package com.enth.ecomusic.controller.auth;
 import java.io.IOException;
 
 import com.enth.ecomusic.model.dto.UserDTO;
+import com.enth.ecomusic.model.entity.User;
 import com.enth.ecomusic.model.enums.RoleType;
-import com.enth.ecomusic.service.RoleCacheService;
 import com.enth.ecomusic.service.UserService;
+import com.enth.ecomusic.util.AppContext;
 import com.enth.ecomusic.util.CommonUtil;
 import com.enth.ecomusic.util.ToastrType;
 
@@ -28,8 +29,8 @@ public class RegisterServlet extends HttpServlet {
 	public void init() throws ServletException {
 		super.init();
 		
-		RoleCacheService roleCache = (RoleCacheService) getServletContext().getAttribute("roleCacheService");
-		userService = new UserService(roleCache);
+		AppContext ctx = (AppContext) this.getServletContext().getAttribute("appContext");
+		userService = ctx.getUserService();
 	}
 
 	@Override
@@ -59,7 +60,8 @@ public class RegisterServlet extends HttpServlet {
 	        return;
 	    }
 
-	    boolean success = userService.registerUserAccount(fname, lname, username, null, email, password, null, RoleType.USER);
+	    User user = new User(fname, lname, username, null, email, password);
+	    boolean success = userService.registerUserAccount(user, null, RoleType.USER);
 
 	    if (success) {
 	        CommonUtil.addMessage(session, ToastrType.SUCCESS, "Registration successful. Please log in.");

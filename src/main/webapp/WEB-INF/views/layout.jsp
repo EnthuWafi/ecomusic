@@ -52,26 +52,33 @@
 
 			<c:choose>
 				<c:when test="${not empty sessionScope.user}">
-
 					<span>Welcome, ${sessionScope.user.username}!</span>
 
 					<c:choose>
 						<c:when test="${sessionScope.user.roleName == 'admin'}">
 							<a href="${pageContext.request.contextPath}/admin">Dashboard</a> |
-           				</c:when>
+            			</c:when>
+
 						<c:when test="${sessionScope.user.roleName == 'artist'}">
 							<a href="${pageContext.request.contextPath}/artist/music">Panel</a> |
-           				</c:when>
+            			</c:when>
+
+						<c:otherwise>
+							<a href="${pageContext.request.contextPath}/user/library">Library</a> |
+                			<a
+								href="${pageContext.request.contextPath}/user/profile">Profile</a> |
+            		</c:otherwise>
 					</c:choose>
 
-					<a href="${pageContext.request.contextPath}/profile">Profile</a> |
-                <a href="${pageContext.request.contextPath}/logout">Logout</a>
-				</c:when>
-				<c:otherwise>
+					<a href="${pageContext.request.contextPath}/logout">Logout</a>
+							</c:when>
+	
+					<c:otherwise>
 					<a href="${pageContext.request.contextPath}/login">Login</a> |
-                <a href="${pageContext.request.contextPath}/register">Register</a>
-				</c:otherwise>
+        			<a href="${pageContext.request.contextPath}/register">Register</a>
+					</c:otherwise>
 			</c:choose>
+
 
 			<form class="d-flex" role="search"
 				action="${pageContext.request.contextPath}/music/search">
@@ -100,13 +107,11 @@
 
 	<c:if test="${not empty flashMessages}">
 		<script>
-		
 			<c:forEach var="msg" items="${flashMessages}">
 
 			toastr["${msg.type}"]("${msg.message}");
 
 			</c:forEach>
-			
 		</script>
 	</c:if>
 

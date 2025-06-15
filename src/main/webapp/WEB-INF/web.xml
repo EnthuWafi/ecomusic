@@ -9,18 +9,57 @@
 		<welcome-file>index.jsp</welcome-file>
 	</welcome-file-list>
 
-	<!--  
-	<error-page>
-		<error-code>404</error-code>
-		<location>/WEB-INF/error-pages/not-found.jsp</location>
-	</error-page>
-	<error-page>
-		<error-code>500</error-code>
-		<location>/WEB-INF/error-pages/general-error.jsp</location>
-	</error-page>
-	<error-page>
-		<location>/WEB-INF/error-pages/unknown-error.jsp</location>
-	</error-page>
-	 -->
+
+	<filter>
+		<filter-name>APIAuthFilter</filter-name>
+		<filter-class>com.enth.ecomusic.filter.APIAuthFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>APIAuthFilter</filter-name>
+		<url-pattern>/api/*</url-pattern>
+	</filter-mapping>
+
+	<filter>
+		<filter-name>AuthFilter</filter-name>
+		<filter-class>com.enth.ecomusic.filter.AuthFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>AuthFilter</filter-name>
+		<url-pattern>/user/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>AuthFilter</filter-name>
+		<url-pattern>/admin/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>AuthFilter</filter-name>
+		<url-pattern>/artist/*</url-pattern>
+	</filter-mapping>
+
+	<filter>
+		<filter-name>RoleFilter</filter-name>
+		<filter-class>com.enth.ecomusic.filter.RoleFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>RoleFilter</filter-name>
+		<url-pattern>/user/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>RoleFilter</filter-name>
+		<url-pattern>/admin/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>RoleFilter</filter-name>
+		<url-pattern>/artist/*</url-pattern>
+	</filter-mapping>
+
+	<!-- <error-page> <error-code>404</error-code> <location>/WEB-INF/error-pages/not-found.jsp</location> 
+		</error-page> <error-page> <error-code>500</error-code> <location>/WEB-INF/error-pages/general-error.jsp</location> 
+		</error-page> <error-page> <location>/WEB-INF/error-pages/unknown-error.jsp</location> 
+		</error-page> -->
 
 </web-app>

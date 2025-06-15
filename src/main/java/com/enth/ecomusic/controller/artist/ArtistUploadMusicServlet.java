@@ -16,6 +16,7 @@ import com.enth.ecomusic.model.dto.UserDTO;
 import com.enth.ecomusic.model.entity.Genre;
 import com.enth.ecomusic.model.entity.Mood;
 import com.enth.ecomusic.model.entity.Music;
+import com.enth.ecomusic.model.enums.VisibilityType;
 import com.enth.ecomusic.service.GenreCacheService;
 import com.enth.ecomusic.service.MoodCacheService;
 import com.enth.ecomusic.service.MusicService;
@@ -84,6 +85,7 @@ public class ArtistUploadMusicServlet extends HttpServlet {
 		int moodId = MultipartUtil.getInt(request.getPart("moodId"), -1);
 		String title = MultipartUtil.getString(request.getPart("title"));
 		String desc = MultipartUtil.getString(request.getPart("description"));
+		VisibilityType visibility = VisibilityType.fromString(MultipartUtil.getString(request.getPart("visibility")).toLowerCase());
 		boolean isPremium = MultipartUtil.getBoolean(request.getPart("premiumContent"));
 
 		if (genreId == -1 || moodId == -1) {
@@ -97,6 +99,7 @@ public class ArtistUploadMusicServlet extends HttpServlet {
 
 		UserDTO artist = (UserDTO) session.getAttribute("user");
 		Music music = new Music(artist.getUserId(), title, genreId, moodId, desc, null, null, isPremium);
+		music.setVisibility(visibility);
 
 		boolean success = musicService.uploadMusic(music, audioPart, imagePart);
 		if (success) {

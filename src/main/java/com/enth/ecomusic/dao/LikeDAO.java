@@ -1,4 +1,4 @@
-package com.enth.ecomusic.model.dao;
+package com.enth.ecomusic.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

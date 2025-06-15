@@ -57,7 +57,7 @@ public class SubscriptionCheckoutServlet extends HttpServlet {
 
 		SubscriptionPlanDTO plan = subscriptionService.getSubscriptionPlanById(Integer.parseInt(subscriptionPlanId));
 
-		// Originally intended to make this a checkout embed, but going to try redirect
+		// Originally intended to make this a checkout embed, but lets just do redirect
 //		request.setAttribute("subscriptionPlan", plan);
 //		
 //		request.setAttribute("stripePublicKey", getServletContext().getAttribute("stripePublicKey"));

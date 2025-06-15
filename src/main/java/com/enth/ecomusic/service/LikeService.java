@@ -3,7 +3,7 @@ package com.enth.ecomusic.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.enth.ecomusic.model.dao.LikeDAO;
+import com.enth.ecomusic.dao.LikeDAO;
 import com.enth.ecomusic.model.dto.LikeDTO;
 import com.enth.ecomusic.model.entity.Like;
 import com.enth.ecomusic.model.mapper.LikeMapper;

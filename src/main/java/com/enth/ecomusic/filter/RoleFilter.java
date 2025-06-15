@@ -22,8 +22,7 @@ import com.enth.ecomusic.util.ToastrType;
 /**
  * Servlet Filter implementation class RoleFilter
  */
-@WebFilter({ "/admin/*", "/artist/*" })
-@Priority(2)
+@WebFilter({ "/admin/*", "/artist/*", "/user/*"})
 public class RoleFilter extends HttpFilter implements Filter {
 
 	/**

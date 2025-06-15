@@ -11,6 +11,7 @@ import jakarta.servlet.http.Part;
 import java.io.IOException;
 
 import com.enth.ecomusic.model.dto.UserDTO;
+import com.enth.ecomusic.model.entity.User;
 import com.enth.ecomusic.model.enums.RoleType;
 import com.enth.ecomusic.service.RoleCacheService;
 import com.enth.ecomusic.service.UserService;
@@ -76,7 +77,8 @@ public class AdminAddUserServlet extends HttpServlet {
 	
 		RoleType role = RoleType.fromString(userType);
 		
-		boolean success = userService.registerUserAccount(fname, lname, username, null, email, password, imagePart, role);
+		User user = new User(fname, lname, username, null, email, password);
+		boolean success = userService.registerUserAccount(user, imagePart, role);
 
 		if (success) {
 			CommonUtil.addMessage(session, ToastrType.SUCCESS, "Registration successful. Please log in.");

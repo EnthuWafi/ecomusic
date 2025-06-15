@@ -6,14 +6,29 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
+
+import com.enth.ecomusic.model.dto.PlaylistDTO;
+import com.enth.ecomusic.model.dto.UserDTO;
+import com.enth.ecomusic.service.PlaylistService;
+import com.enth.ecomusic.util.AppContext;
 
 /**
  * Servlet implementation class LibraryServlet
  */
-@WebServlet("/LibraryServlet")
+@WebServlet("/user/library")
 public class LibraryServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
+	
+	private PlaylistService playlistService;
+	
+	@Override
+	public void init() throws ServletException {
+		// TODO Auto-generated method stub
+		super.init();
+		AppContext ctx = (AppContext) this.getServletContext().getAttribute("appContext");
+		this.playlistService = ctx.getPlaylistService();
+	}
     /**
      * @see HttpServlet#HttpServlet()
      */
@@ -26,16 +41,15 @@ public class LibraryServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+		
+		UserDTO user = (UserDTO) request.getSession().getAttribute("user");
+		List<PlaylistDTO> playlists = playlistService.getUserPlaylistWithMusicByUserId(user.getUserId());
+		
+        request.setAttribute("pageTitle", "Library");
+        request.setAttribute("playlists", playlists);
+        request.setAttribute("contentPage", "/WEB-INF/views/user/library.jsp");
+        request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
-	}
 
 }

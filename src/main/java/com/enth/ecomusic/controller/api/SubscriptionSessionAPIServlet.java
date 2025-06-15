@@ -26,7 +26,7 @@ import com.stripe.exception.StripeException;
  * Servlet implementation class SubscriptionAPIServlet
  */
 @WebServlet("/api/subscription/create")
-public class CreateSubscriptionSessionAPIServlet extends HttpServlet {
+public class SubscriptionSessionAPIServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private SubscriptionService subscriptionService;
 	private StripeService stripeService;
@@ -43,7 +43,7 @@ public class CreateSubscriptionSessionAPIServlet extends HttpServlet {
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public CreateSubscriptionSessionAPIServlet() {
+    public SubscriptionSessionAPIServlet() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -82,7 +82,6 @@ public class CreateSubscriptionSessionAPIServlet extends HttpServlet {
 			Map<String, Object> responseData = new HashMap<>();
 			responseData.put("clientSecret", clientSecret);
 
-			response.setContentType("application/json");
 			response.getWriter().write(JsonUtil.toJson(responseData));
 		} catch (StripeException e) {
 			e.printStackTrace();

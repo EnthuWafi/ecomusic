@@ -1,4 +1,4 @@
-package com.enth.ecomusic.model.dao;
+package com.enth.ecomusic.dao;
 
 import com.enth.ecomusic.model.dto.MusicDTO;
 import com.enth.ecomusic.model.dto.MusicDetailDTO;
@@ -23,8 +23,8 @@ public class MusicDAO {
 
 	// CREATE
 	public boolean insertMusic(Music music) {
-		String sql = "INSERT INTO Music (artist_id, title, genre_id, mood_id, description, audio_file_url, image_url, premium_content) "
-				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+		String sql = "INSERT INTO Music (artist_id, title, genre_id, mood_id, description, audio_file_url, image_url, premium_content, visibility) "
+				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 			stmt.setInt(1, music.getArtistId());
 			stmt.setString(2, music.getTitle());
@@ -34,6 +34,7 @@ public class MusicDAO {
 			stmt.setString(6, music.getAudioFileUrl());
 			stmt.setString(7, music.getImageUrl());
 			stmt.setInt(8, music.isPremiumContent() ? 1 : 0);
+			stmt.setString(9, music.getVisibility().getValue());
 
 			return stmt.executeUpdate() > 0;
 		} catch (SQLException e) {
@@ -231,11 +232,10 @@ public class MusicDAO {
 
 		String sql = """
 				SELECT COUNT(*) FROM Music m
-				JOIN Users u ON m.artist_id = u.user_id
-				JOIN roles r ON u.role_id = r.role_id AND r.role_name = 'artist'
 				WHERE (CONTAINS(m.title, ?, 1) > 0)
 				AND (? IS NULL OR m.genre_id IN (%s))
 				AND (? IS NULL OR m.mood_id IN (%s))
+				AND m.visibility = 'public'
 				""";
 
 		sql = sql.formatted(genreInClause, moodInClause);
@@ -255,8 +255,8 @@ public class MusicDAO {
 		return (result != null) ? result : 0;
 	}
 
-	// count
-	public Integer countMusic() {
+	// count (public)
+	public Integer countPublicMusic() {
 		String sql = "SELECT COUNT(*) FROM Music m WHERE visibility = 'public'";
 
 		Integer result = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt);
@@ -286,7 +286,7 @@ public class MusicDAO {
 	// UPDATE
 	public boolean updateMusic(Music music) {
 		String sql = "UPDATE Music SET artist_id = ?, title = ?, genre_id = ?, mood_id = ?, description = ?, "
-				+ "audio_file_url = ?, image_url = ?, premium_content = ? WHERE music_id = ?";
+				+ "audio_file_url = ?, image_url = ?, premium_content = ?, visibility = ? WHERE music_id = ?";
 
 		try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 			stmt.setInt(1, music.getArtistId());
@@ -297,7 +297,8 @@ public class MusicDAO {
 			stmt.setString(6, music.getAudioFileUrl());
 			stmt.setString(7, music.getImageUrl());
 			stmt.setInt(8, music.isPremiumContent() ? 1 : 0);
-			stmt.setInt(9, music.getMusicId());
+			stmt.setString(9, music.getVisibility().getValue());
+			stmt.setInt(10, music.getMusicId());
 
 			return stmt.executeUpdate() > 0;
 		} catch (SQLException e) {

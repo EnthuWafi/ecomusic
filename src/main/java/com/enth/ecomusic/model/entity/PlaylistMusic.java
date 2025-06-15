@@ -29,6 +29,9 @@ public class PlaylistMusic{
 		this.musicId = musicId;
 	}
 
+	public PlaylistMusic() {
+		super();
+	}
 
 
 	// Getters & Setters

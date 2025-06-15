@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.enth.ecomusic.model.dao.MusicDAO;
+import com.enth.ecomusic.dao.MusicDAO;
 import com.enth.ecomusic.model.dto.MusicDTO;
 import com.enth.ecomusic.model.dto.MusicDetailDTO;
 import com.enth.ecomusic.model.entity.Music;
@@ -203,7 +203,7 @@ public class MusicService {
 	}
 
 	public int getMusicCount() {
-		return musicDAO.countMusic();
+		return musicDAO.countPublicMusic();
 	}
 
 	public int getMusicCountByArtist(int artistId) {

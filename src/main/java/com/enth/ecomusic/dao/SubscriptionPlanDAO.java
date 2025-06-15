@@ -1,4 +1,4 @@
-package com.enth.ecomusic.model.dao;
+package com.enth.ecomusic.dao;
 
 import com.enth.ecomusic.model.entity.SubscriptionPlan;
 import com.enth.ecomusic.util.DBConnection;

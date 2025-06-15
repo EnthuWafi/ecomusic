@@ -4,11 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Connection;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.enth.ecomusic.model.dao.UserDAO;
+import com.enth.ecomusic.dao.UserDAO;
 import com.enth.ecomusic.model.dto.UserDTO;
 import com.enth.ecomusic.model.entity.Role;
 import com.enth.ecomusic.model.entity.User;
@@ -32,12 +33,10 @@ public class UserService {
 	}
 
 	// Register new user
-	public boolean registerUserAccount(String fname, String lname, String username, String bio, String email,
-			String password, Part imagePart, RoleType roleType) {
+	public boolean registerUserAccount(User user, Part imagePart, RoleType roleType) {
 
-		String hashedPassword = CommonUtil.hashPassword(password);
-		User user = new User(fname, lname, username, bio, email, hashedPassword);
-
+		String hashedPassword = CommonUtil.hashPassword(user.getPassword());
+		user.setPassword(hashedPassword);
 		try {
 			if (imagePart != null && imagePart.getSize() > 0) {
 				String contentType = imagePart.getContentType();
@@ -93,8 +92,9 @@ public class UserService {
 
 	public UserDTO authenticateUser(String usernameOrEmail, String password) {
 		User user = userDAO.getUserByUsernameOrEmail(usernameOrEmail);
-		fetchRole(user);
+		
 		if (user != null && CommonUtil.checkPassword(password, user.getPassword())) {
+			fetchRole(user);
 			UserDTO dto = UserMapper.INSTANCE.toDTO(user);
 			return dto;
 		}
@@ -116,10 +116,11 @@ public class UserService {
 		return userDAO.updateUser(user);
 	}
 
-	public boolean updateUserWithRoleName(int userId, RoleType roleType) {
+	//for transaction
+	public boolean updateUserWithRoleName(int userId, RoleType roleType, Connection conn) {
 		Role role = roleCacheService.getByType(roleType);
 		if (role != null) {
-			return userDAO.updateUserRole(userId, role.getRoleId());
+			return userDAO.updateUserRole(userId, role.getRoleId(), conn);
 		}
 		return false;
 	}

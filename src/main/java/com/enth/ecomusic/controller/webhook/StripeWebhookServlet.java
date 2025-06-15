@@ -7,23 +7,17 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import com.enth.ecomusic.model.entity.UserSubscription;
+import com.enth.ecomusic.service.StripeService;
 import com.enth.ecomusic.service.SubscriptionService;
 import com.enth.ecomusic.util.AppConfig;
 import com.enth.ecomusic.util.AppContext;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Event;
-import com.stripe.model.Invoice;
-import com.stripe.model.checkout.Session;
-import com.stripe.model.Subscription;
 import com.stripe.net.Webhook;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
 import java.util.logging.Logger;
 
 /**
@@ -32,15 +26,15 @@ import java.util.logging.Logger;
 @WebServlet("/webhook/stripe")
 public class StripeWebhookServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	//stripe listen --forward-to localhost:8081/ecomusic/webhook/stripe
+	// stripe listen --forward-to localhost:8081/ecomusic/webhook/stripe
 	private static final String STRIPE_WEBHOOK_SECRET = AppConfig.get("stripeWebhookKey");
 	private static final Logger logger = Logger.getLogger(StripeWebhookServlet.class.getName());
-	private SubscriptionService subscriptionService;
+	private StripeService stripeService;
 
 	@Override
 	public void init() throws ServletException {
 		AppContext ctx = (AppContext) this.getServletContext().getAttribute("appContext");
-		subscriptionService = ctx.getSubscriptionService();
+		stripeService = ctx.getStripeService();
 	}
 
 	/**
@@ -56,7 +50,7 @@ public class StripeWebhookServlet extends HttpServlet {
 		ServletInputStream inputStream = request.getInputStream();
 		byte[] payloadBytes = inputStream.readAllBytes();
 		String payload = new String(payloadBytes, StandardCharsets.UTF_8);
-		
+
 		String sigHeader = request.getHeader("Stripe-Signature");
 
 		Event event = null;
@@ -89,38 +83,8 @@ public class StripeWebhookServlet extends HttpServlet {
 
 	private void handleCheckoutCompleted(Event event) {
 		try {
-			Session session = (Session) event.getDataObjectDeserializer().getObject().orElse(null);
-			if (session == null) {
-				logger.warning("Session data could not be deserialized.");
-				return;
-			}
-
-			String userId = session.getClientReferenceId();
-			String stripeSubId = session.getSubscription(); // e.g., "sub_123..."
-			String planIdStr = session.getMetadata().get("subscription_plan_id");
-
-			LocalDate today = LocalDate.now();
-
-			Subscription stripeSub = Subscription.retrieve(stripeSubId);
-
-			String latestInvoiceId = stripeSub.getLatestInvoice();
-			Invoice invoice = Invoice.retrieve(latestInvoiceId);
-
-			long cents = invoice.getAmountPaid();
-			String paymentStatus = invoice.getStatus();
-
-			 //Convert cents > ringgit with BigDecimal
-			BigDecimal bd = BigDecimal.valueOf(cents, 2);
-			bd = bd.setScale(2, RoundingMode.HALF_UP);
-			double amountPaid = bd.doubleValue();
-			
-
-			UserSubscription sub = new UserSubscription(Integer.parseInt(userId), today, null, amountPaid, paymentStatus,
-					stripeSubId, Integer.parseInt(planIdStr));
-
-			subscriptionService.createSubscriptionForArtist(sub);
-
-			logger.info("Subscription recorded for user ID: " + userId);
+			stripeService.processCheckoutCompleted(event);
+			logger.info("Checkout completed event processed successfully");
 
 		} catch (StripeException | NumberFormatException e) {
 			logger.severe("Error processing checkout.session.completed: " + e.getMessage());

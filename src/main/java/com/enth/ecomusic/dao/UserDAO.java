@@ -1,4 +1,4 @@
-package com.enth.ecomusic.model.dao;
+package com.enth.ecomusic.dao;
 
 import java.sql.*;
 import java.util.*;
@@ -98,10 +98,9 @@ public class UserDAO {
 		}
 	}
 	
-	public boolean updateUserRole(int userId, int roleId) {
+	public boolean updateUserRole(int userId, int roleId, Connection conn) {
 		String sql = "UPDATE Users SET role_id = ? WHERE user_id = ?";
-		try (Connection conn = DBConnection.getConnection(); 
-		     PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (PreparedStatement stmt = conn.prepareStatement(sql)) {
 			stmt.setInt(1, roleId);
 			stmt.setInt(2, userId);
 			return stmt.executeUpdate() > 0;

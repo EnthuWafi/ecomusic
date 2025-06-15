@@ -14,25 +14,21 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
-import com.enth.ecomusic.util.CommonUtil;
-import com.enth.ecomusic.util.ToastrType;
+import com.enth.ecomusic.util.JsonUtil;
 
 /**
- * Servlet Filter implementation class AuthFilter
+ * Servlet Filter implementation class APIAuthFilter
  */
-@WebFilter({"/user/*", "/admin/*", "/artist/*"})
-public class AuthFilter extends HttpFilter implements Filter {
+@WebFilter("/api/*")
+public class APIAuthFilter extends HttpFilter implements Filter {
        
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
-	/**
      * @see HttpFilter#HttpFilter()
      */
-    public AuthFilter() {
+    public APIAuthFilter() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -48,25 +44,30 @@ public class AuthFilter extends HttpFilter implements Filter {
 	 * @see Filter#doFilter(ServletRequest, ServletResponse, FilterChain)
 	 */
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        HttpServletRequest httpRequest = (HttpServletRequest) request;
-        HttpServletResponse httpResponse = (HttpServletResponse) response;
-
-        HttpSession session = httpRequest.getSession(false);
-        boolean loggedIn = session != null && session.getAttribute("user") != null;
-
-        if (!loggedIn) {
-        	String requestedUri = httpRequest.getRequestURI();
-        	
-            session = httpRequest.getSession();
-            session.setAttribute("redirectAfterLogin", requestedUri);
+		// TODO Auto-generated method stub
+		// place your code here
+		HttpServletRequest httpRequest = (HttpServletRequest) request;
+		HttpServletResponse httpResponse = (HttpServletResponse) response;
+		
+		HttpSession session = httpRequest.getSession(false);
+		
+		httpResponse.setContentType("application/json");
+		httpResponse.setCharacterEncoding("UTF-8");
+		
+		//check if session cookie exists
+		if (session == null || session.getAttribute("user") == null) {
+            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             
-            CommonUtil.addMessage(session, ToastrType.WARNING, "You must log in first!");
-            httpResponse.sendRedirect(httpRequest.getContextPath() + "/login");
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("error", "Unauthorized access");
+            
+            httpResponse.getWriter().write(JsonUtil.toJson(responseData));
             return;
         }
+		// pass the request along the filter chain
+		chain.doFilter(request, response);
+	}
 
-        chain.doFilter(request, response);
-    }
 	/**
 	 * @see Filter#init(FilterConfig)
 	 */

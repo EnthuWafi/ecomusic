@@ -1,4 +1,4 @@
-package com.enth.ecomusic.model.dao;
+package com.enth.ecomusic.dao;
 
 import com.enth.ecomusic.model.entity.Playlist;
 import com.enth.ecomusic.model.enums.VisibilityType;
@@ -13,10 +13,11 @@ public class PlaylistDAO {
 
     // CREATE
     public boolean insertPlaylist(Playlist playlist) {
-        String sql = "INSERT INTO Playlists (user_id, name) VALUES (?, ?)";
+        String sql = "INSERT INTO Playlists (user_id, name, visibility) VALUES (?, ?, ?)";
         try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, playlist.getUserId());
             stmt.setString(2, playlist.getName());
+            stmt.setString(3, playlist.getVisibility().getValue());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error inserting playlist: " + e.getMessage());

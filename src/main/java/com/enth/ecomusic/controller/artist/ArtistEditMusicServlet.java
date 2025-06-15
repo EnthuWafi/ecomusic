@@ -16,6 +16,7 @@ import com.enth.ecomusic.model.dto.MusicDTO;
 import com.enth.ecomusic.model.entity.Genre;
 import com.enth.ecomusic.model.entity.Mood;
 import com.enth.ecomusic.model.entity.Music;
+import com.enth.ecomusic.model.enums.VisibilityType;
 import com.enth.ecomusic.model.mapper.MusicMapper;
 import com.enth.ecomusic.service.GenreCacheService;
 import com.enth.ecomusic.service.MoodCacheService;
@@ -91,6 +92,7 @@ public class ArtistEditMusicServlet extends HttpServlet {
 		int moodId = MultipartUtil.getInt(request.getPart("moodId"), -1);
 		String title = MultipartUtil.getString(request.getPart("title"));
 		String desc = MultipartUtil.getString(request.getPart("description"));
+		VisibilityType visibility = VisibilityType.fromString(MultipartUtil.getString(request.getPart("visibility")).toLowerCase());
 		boolean isPremium = MultipartUtil.getBoolean(request.getPart("premiumContent"));
 
 		MusicDTO musicDTO = musicService.getMusicDTOById(musicId);
@@ -116,6 +118,7 @@ public class ArtistEditMusicServlet extends HttpServlet {
 		music.setPremiumContent(isPremium);
 		music.setGenreId(genreId);
 		music.setMoodId(moodId);
+		music.setVisibility(visibility);
 
 		boolean success = musicService.updateMusic(music, audioPart, imagePart);
 		if (success) {

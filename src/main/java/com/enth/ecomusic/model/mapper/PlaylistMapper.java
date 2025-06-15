@@ -20,4 +20,10 @@ public interface PlaylistMapper {
 	@Mapping(source = "music.artist.username", target = "artistUsername")
     @Mapping(source = "music.artist.imageUrl", target = "artistImageUrl")
 	PlaylistMusicDTO toDTO(PlaylistMusic playlistMusic);
+
+	@Mapping(source = "musicList", target = "musicList")
+	Playlist toPlaylist(PlaylistDTO existingPlaylist);
+	
+	@Mapping(source = "music", target = "music")
+	PlaylistMusic toPlaylistMusic(PlaylistMusicDTO playlistMusic);
 }

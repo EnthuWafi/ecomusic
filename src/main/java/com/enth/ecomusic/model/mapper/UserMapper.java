@@ -11,6 +11,6 @@ import com.enth.ecomusic.model.entity.User;
 public interface UserMapper {
 	UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 	
-	@Mapping(target = "roleName", ignore=true)
+	@Mapping(source= "role.roleName", target = "roleName")
 	UserDTO toDTO(User user);
 }

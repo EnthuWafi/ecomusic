@@ -3,7 +3,7 @@ package com.enth.ecomusic.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.enth.ecomusic.model.dao.PlayHistoryDAO;
+import com.enth.ecomusic.dao.PlayHistoryDAO;
 import com.enth.ecomusic.model.dto.PlayHistoryDTO;
 import com.enth.ecomusic.model.entity.PlayHistory;
 import com.enth.ecomusic.model.mapper.PlayHistoryMapper;

@@ -28,6 +28,10 @@ public class AppConfigListener implements ServletContextListener {
         // Get the ServletContext to store global settings
         ServletContext context = sce.getServletContext();
 
+        for (String key : AppConfig.getProperties().stringPropertyNames()) {
+            context.setAttribute(key, AppConfig.get(key));
+        }
+        
         //App Context
         context.setAttribute("appContext", new AppContext());  
         

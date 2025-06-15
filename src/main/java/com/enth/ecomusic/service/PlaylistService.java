@@ -1,8 +1,10 @@
 package com.enth.ecomusic.service;
 
-import com.enth.ecomusic.model.dao.PlaylistDAO;
-import com.enth.ecomusic.model.dao.PlaylistMusicDAO;
+import com.enth.ecomusic.dao.PlaylistDAO;
+import com.enth.ecomusic.dao.PlaylistMusicDAO;
 import com.enth.ecomusic.model.dto.PlaylistDTO;
+import com.enth.ecomusic.model.dto.PlaylistMusicDTO;
+import com.enth.ecomusic.model.dto.UserDTO;
 import com.enth.ecomusic.model.entity.Music;
 import com.enth.ecomusic.model.entity.Playlist;
 import com.enth.ecomusic.model.entity.PlaylistMusic;
@@ -215,5 +217,34 @@ public class PlaylistService {
 		}
 
 	}
+
+	/**
+	 * Get playlist without loading playlist music
+	 * @param playlistId
+	 * @return
+	 */
+	public PlaylistDTO getPlaylistByPlaylistId(int playlistId) {
+		Playlist playlist = playlistDAO.getPlaylistById(playlistId);
+		
+		// TODO Auto-generated method stub
+		return PlaylistMapper.INSTANCE.toDTO(playlist);
+	}
+	
+	public PlaylistMusicDTO getPlaylistMusic(int playlistId, int musicId) {
+		PlaylistMusic playlistMusic = playlistMusicDAO.getPlaylistMusic(playlistId, musicId);
+		
+		return PlaylistMapper.INSTANCE.toDTO(playlistMusic);
+	}
+	
+	public boolean canAccessPublicPlaylist(PlaylistDTO playlist, UserDTO currentUser) {
+        return playlist != null &&
+               (playlist.isPublic() || (currentUser != null && playlist.getUserId() == currentUser.getUserId()));
+    }
+
+    public boolean canModifyPlaylist(PlaylistDTO playlist, UserDTO currentUser) {
+        return playlist != null &&
+               currentUser != null &&
+               playlist.getUserId() == currentUser.getUserId();
+    }
 
 }

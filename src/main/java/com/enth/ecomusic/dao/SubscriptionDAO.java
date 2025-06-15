@@ -1,4 +1,4 @@
-package com.enth.ecomusic.model.dao;
+package com.enth.ecomusic.dao;
 
 import com.enth.ecomusic.model.entity.UserSubscription;
 import com.enth.ecomusic.util.DBConnection;
@@ -16,6 +16,24 @@ public class SubscriptionDAO {
         String sql = "INSERT INTO Subscriptions (subscription_id, user_id, start_date, end_date, amount_paid, payment_status, payment_gateway_ref) "
                    + "VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, sub.getSubscriptionId());
+            stmt.setInt(2, sub.getUserId());
+            stmt.setDate(3, sub.getStartDate() != null ? Date.valueOf(sub.getStartDate()) : null);
+            stmt.setDate(4, sub.getEndDate() != null ? Date.valueOf(sub.getEndDate()) : null);
+            stmt.setDouble(5, sub.getAmountPaid());
+            stmt.setString(6, sub.getPaymentStatus());
+            stmt.setString(7, sub.getPaymentGatewayRef());
+
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    public boolean insertSubscription(UserSubscription sub, Connection conn) {
+        String sql = "INSERT INTO Subscriptions (subscription_id, user_id, start_date, end_date, amount_paid, payment_status, payment_gateway_ref) "
+                   + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, sub.getSubscriptionId());
             stmt.setInt(2, sub.getUserId());
             stmt.setDate(3, sub.getStartDate() != null ? Date.valueOf(sub.getStartDate()) : null);

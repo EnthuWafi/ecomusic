@@ -1,114 +1,122 @@
 package com.enth.ecomusic.service;
-import com.enth.ecomusic.model.dao.SubscriptionDAO;
-import com.enth.ecomusic.model.dao.SubscriptionPlanDAO;
+
+import com.enth.ecomusic.dao.SubscriptionDAO;
+import com.enth.ecomusic.dao.SubscriptionPlanDAO;
 import com.enth.ecomusic.model.dto.SubscriptionDTO;
 import com.enth.ecomusic.model.dto.SubscriptionPlanDTO;
 import com.enth.ecomusic.model.entity.SubscriptionPlan;
 import com.enth.ecomusic.model.entity.UserSubscription;
+import com.enth.ecomusic.model.enums.PlanType;
 import com.enth.ecomusic.model.enums.RoleType;
 import com.enth.ecomusic.model.mapper.SubscriptionMapper;
+import com.enth.ecomusic.model.transaction.TransactionTemplate;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class SubscriptionService {
 
-    private final SubscriptionDAO subscriptionDAO;
-    private final SubscriptionPlanDAO subscriptionPlanDAO;
-    private final UserService userService;
+	private final SubscriptionDAO subscriptionDAO;
+	private final SubscriptionPlanDAO subscriptionPlanDAO;
+	private final UserService userService;
 
-    public SubscriptionService(UserService userService) {
-        this.subscriptionDAO = new SubscriptionDAO();
-        this.subscriptionPlanDAO = new SubscriptionPlanDAO();
-        this.userService = userService;
-    }
+	public SubscriptionService(UserService userService) {
+		this.subscriptionDAO = new SubscriptionDAO();
+		this.subscriptionPlanDAO = new SubscriptionPlanDAO();
+		this.userService = userService;
+	}
 
-    // CREATE
-    public boolean createSubscriptionForArtist(UserSubscription sub) {
-    	//TODO: do operations with userService (update user -> artist)
-    	// RoleType.ARTIST
-    	boolean inserted = subscriptionDAO.insertSubscription(sub);
-        if (inserted) {
-            userService.updateUserWithRoleName(sub.getUserId(), RoleType.ARTIST);
-        }
-        return subscriptionDAO.insertSubscription(sub);
-    }
-    
-    public boolean createSubscriptionForPremiumUser(UserSubscription sub) {
-    	//TODO: do operations with userService (update user -> premium artist)
-    	// RoleType.PREMIUMUSER
-    	boolean inserted = subscriptionDAO.insertSubscription(sub);
-        if (inserted) {
-            userService.updateUserWithRoleName(sub.getUserId(), RoleType.PREMIUMUSER);
-        }
-        return subscriptionDAO.insertSubscription(sub);
-    }
+	// CREATE
+	public boolean createSubscription(UserSubscription sub, PlanType planType) {
+		// TODO: do operations with userService (update user -> artist)
+		// autoclosable transaction
+		try (TransactionTemplate transaction = new TransactionTemplate()) {
+			boolean userUpdated = false;
 
+			switch (planType) {
+			case CREATOR:
+				userUpdated = userService.updateUserWithRoleName(sub.getUserId(), RoleType.ARTIST,
+						transaction.getConnection());
+				break;
+			case LISTENER:
+				userUpdated = userService.updateUserWithRoleName(sub.getUserId(), RoleType.PREMIUMUSER,
+						transaction.getConnection());
+				break;
+			}
 
-    // GET by subscription ID (with plan loaded)
-    public SubscriptionDTO getSubscriptionById(int id) {
-        UserSubscription sub = subscriptionDAO.getSubscriptionById(id);
-        attachPlanIfAvailable(sub);
-        
-        return SubscriptionMapper.INSTANCE.toDTO(sub);
-    }
+			if (!userUpdated) {
+				throw new SQLException("Failed to update user role.");
+			}
 
-    // GET all user subscriptions (with plans)
-    public List<SubscriptionDTO> getSubscriptionsByUserId(int userId) {
-        List<UserSubscription> subs = subscriptionDAO.getSubscriptionsByUserId(userId);
-        List<SubscriptionDTO> subsDTO = new ArrayList<>();
-        for (UserSubscription sub : subs) {
-            attachPlanIfAvailable(sub);
-            subsDTO.add(SubscriptionMapper.INSTANCE.toDTO(sub));
-        }
-        return subsDTO;
-    }
+			return subscriptionDAO.insertSubscription(sub, transaction.getConnection());
+		} catch (SQLException e) {
+			e.printStackTrace(); // or use a logger
+			return false;
+		}
+	}
 
-    // UPDATE
-    public boolean updateSubscription(UserSubscription sub) {
-        return subscriptionDAO.updateSubscription(sub);
-    }
+	// GET by subscription ID (with plan loaded)
+	public SubscriptionDTO getSubscriptionById(int id) {
+		UserSubscription sub = subscriptionDAO.getSubscriptionById(id);
+		attachPlanIfAvailable(sub);
 
-    // DELETE
-    public boolean deleteSubscription(int subscriptionId) {
-        return subscriptionDAO.deleteSubscription(subscriptionId);
-    }
+		return SubscriptionMapper.INSTANCE.toDTO(sub);
+	}
 
-    // PRIVATE — reusability booster
-    private void attachPlanIfAvailable(UserSubscription sub) {
-        if (sub != null && sub.getSubscriptionPlanId() > 0) {
-            SubscriptionPlan plan = subscriptionPlanDAO.getSubscriptionPlanById(sub.getSubscriptionPlanId());
-            sub.setSubscriptionPlan(plan);
-        }
-    }
+	// GET all user subscriptions (with plans)
+	public List<SubscriptionDTO> getSubscriptionsByUserId(int userId) {
+		List<UserSubscription> subs = subscriptionDAO.getSubscriptionsByUserId(userId);
+		List<SubscriptionDTO> subsDTO = new ArrayList<>();
+		for (UserSubscription sub : subs) {
+			attachPlanIfAvailable(sub);
+			subsDTO.add(SubscriptionMapper.INSTANCE.toDTO(sub));
+		}
+		return subsDTO;
+	}
 
- // Optional — get all available plans
-    public List<SubscriptionPlanDTO> getAllSubscriptionPlans() {
-        return subscriptionPlanDAO.getAllSubscriptionPlans().stream()
-                .map(SubscriptionMapper.INSTANCE::toDTO)
-                .collect(Collectors.toList());
-    }
+	// UPDATE
+	public boolean updateSubscription(UserSubscription sub) {
+		return subscriptionDAO.updateSubscription(sub);
+	}
 
-    public List<SubscriptionPlanDTO> getAllSubscriptionPlansForListener() {
-        return subscriptionPlanDAO.getAllSubscriptionPlansByPlanType("listener").stream()
-                .map(SubscriptionMapper.INSTANCE::toDTO)
-                .collect(Collectors.toList());
-    }
+	// DELETE
+	public boolean deleteSubscription(int subscriptionId) {
+		return subscriptionDAO.deleteSubscription(subscriptionId);
+	}
 
-    public List<SubscriptionPlanDTO> getAllSubscriptionPlansForCreator() {
-        return subscriptionPlanDAO.getAllSubscriptionPlansByPlanType("creator").stream()
-                .map(SubscriptionMapper.INSTANCE::toDTO)
-                .collect(Collectors.toList());
-    }
+	// PRIVATE — reusability booster
+	private void attachPlanIfAvailable(UserSubscription sub) {
+		if (sub != null && sub.getSubscriptionPlanId() > 0) {
+			SubscriptionPlan plan = subscriptionPlanDAO.getSubscriptionPlanById(sub.getSubscriptionPlanId());
+			sub.setSubscriptionPlan(plan);
+		}
+	}
 
-    public SubscriptionPlanDTO getSubscriptionPlanById(int planId) {
-        SubscriptionPlan subscriptionPlan = subscriptionPlanDAO.getSubscriptionPlanById(planId);
-        return subscriptionPlan != null ? SubscriptionMapper.INSTANCE.toDTO(subscriptionPlan) : null;
-    }
+	// Optional — get all available plans
+	public List<SubscriptionPlanDTO> getAllSubscriptionPlans() {
+		return subscriptionPlanDAO.getAllSubscriptionPlans().stream().map(SubscriptionMapper.INSTANCE::toDTO)
+				.collect(Collectors.toList());
+	}
 
-    public SubscriptionPlanDTO getSubscriptionPlanByStripeId(String stripePriceId) {
-        SubscriptionPlan subscriptionPlan = subscriptionPlanDAO.getSubscriptionPlanByStripePriceId(stripePriceId);
-        return subscriptionPlan != null ? SubscriptionMapper.INSTANCE.toDTO(subscriptionPlan) : null;
-    }
+	public List<SubscriptionPlanDTO> getAllSubscriptionPlansForListener() {
+		return subscriptionPlanDAO.getAllSubscriptionPlansByPlanType("listener").stream()
+				.map(SubscriptionMapper.INSTANCE::toDTO).collect(Collectors.toList());
+	}
+
+	public List<SubscriptionPlanDTO> getAllSubscriptionPlansForCreator() {
+		return subscriptionPlanDAO.getAllSubscriptionPlansByPlanType("creator").stream()
+				.map(SubscriptionMapper.INSTANCE::toDTO).collect(Collectors.toList());
+	}
+
+	public SubscriptionPlanDTO getSubscriptionPlanById(int planId) {
+		SubscriptionPlan subscriptionPlan = subscriptionPlanDAO.getSubscriptionPlanById(planId);
+		return subscriptionPlan != null ? SubscriptionMapper.INSTANCE.toDTO(subscriptionPlan) : null;
+	}
+
+	public SubscriptionPlanDTO getSubscriptionPlanByStripeId(String stripePriceId) {
+		SubscriptionPlan subscriptionPlan = subscriptionPlanDAO.getSubscriptionPlanByStripePriceId(stripePriceId);
+		return subscriptionPlan != null ? SubscriptionMapper.INSTANCE.toDTO(subscriptionPlan) : null;
+	}
 }
