@@ -1,4 +1,10 @@
-package com.enth.ecomusic.controller.api.playlist;
+package com.enth.ecomusic.controller.api.playlist; 
+
+import com.enth.ecomusic.model.dto.PlaylistDTO;
+import com.enth.ecomusic.model.dto.UserDTO;
+import com.enth.ecomusic.service.PlaylistService;
+import com.enth.ecomusic.util.AppContext;
+import com.enth.ecomusic.util.ResponseUtil;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -9,12 +15,10 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.enth.ecomusic.model.dto.PlaylistDTO;
-import com.enth.ecomusic.model.dto.UserDTO;
-import com.enth.ecomusic.service.PlaylistService;
-import com.enth.ecomusic.util.AppContext;
+import org.apache.commons.io.IOUtils;
+
 import com.enth.ecomusic.util.JsonUtil;
-import com.enth.ecomusic.util.ResponseUtil;
+import com.google.gson.reflect.TypeToken;
 
 /**
  * Servlet implementation class PlaylistAPIServlet
@@ -22,185 +26,219 @@ import com.enth.ecomusic.util.ResponseUtil;
 @WebServlet("/api/playlist/*")
 public class PlaylistAPIServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-	private final PlaylistService playlistService;
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public PlaylistAPIServlet() {
-        super();
-        AppContext ctx = (AppContext) getServletContext().getAttribute("appContext");
-        this.playlistService = ctx.getPlaylistService();
-        // TODO Auto-generated constructor stub
-    }
+
+	private PlaylistService playlistService;
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#HttpServlet()
 	 */
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+	@Override
+	public void init() throws ServletException {
+		// TODO Auto-generated method stub
+		super.init();
+		AppContext ctx = (AppContext) getServletContext().getAttribute("appContext");
+		this.playlistService = ctx.getPlaylistService();
+	}
 
-        String pathInfo = request.getPathInfo();
-        if (pathInfo == null || pathInfo.equals("/")) {
-        	ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Playlist ID is required");
-            return;
-        }
-
-        String[] pathParts = pathInfo.split("/");
-
-        try {
-            if (pathParts.length == 2) {
-                handleFetchPlaylist(pathParts[1], request, response);
-
-            } else if (pathParts.length == 4 && "music".equals(pathParts[2])) {
-                handleFetchMusic(pathParts[1], pathParts[3], request, response);
-
-            } else {
-            	ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid API path");
-            }
-        } catch (NumberFormatException e) {
-        	ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "IDs must be numeric");
-        }
-    }
-    
-
-    private void handleFetchMusic(String playlistIdStr, String musicIdStr, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        int playlistId = Integer.parseInt(playlistIdStr);
-        int musicId = Integer.parseInt(musicIdStr);
-        
-        PlaylistDTO playlist = playlistService.getPlaylistByPlaylistId(playlistId);
-        UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
-        
-        if (!playlistService.canAccessPublicPlaylist(playlist, currentUser)) {
-            ResponseUtil.sendError(response, 403, "Access denied to this playlist");
-            return;
-        }
-        
-        Map<String, Object> data = new HashMap<>();
-        data.put("playlistId", playlistId);
-        data.put("musicId", musicId);
-        data.put("action", "fetch_music_in_playlist");
-        data.put("data", playlistService.getPlaylistMusic(playlistId, musicId));
-
-        response.getWriter().write(JsonUtil.toJson(data));
-    }
-
-
-	private void handleFetchPlaylist(String playlistIdStr, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	    int playlistId = Integer.parseInt(playlistIdStr);
-
-	    PlaylistDTO playlist = playlistService.getPlaylistByPlaylistId(playlistId);
-        UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
-        
-        if (!playlistService.canAccessPublicPlaylist(playlist, currentUser)) {
-            ResponseUtil.sendError(response, 403, "Access denied to this playlist");
-            return;
-        }
-        
-	    Map<String, Object> data = new HashMap<>();
-	    data.put("playlistId", playlistId);
-	    data.put("action", "fetch_playlist");
-	    data.put("data", playlist);
-
-	    response.getWriter().write(JsonUtil.toJson(data));
+	public PlaylistAPIServlet() {
+		super();
+		// TODO Auto-generated constructor stub
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		String pathInfo = request.getPathInfo();
+		if (pathInfo == null || pathInfo.equals("/")) {
+			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Playlist ID is required");
+			return;
+		}
+
+		String[] pathParts = pathInfo.split("/");
+
+		try {
+			if (pathParts.length == 2) {
+				handleFetchPlaylist(pathParts[1], request, response);
+
+			} else if (pathParts.length == 4 && "music".equals(pathParts[2])) {
+				handleFetchMusic(pathParts[1], pathParts[3], request, response);
+
+			} else {
+				ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid API path");
+			}
+		} catch (NumberFormatException e) {
+			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "IDs must be numeric");
+		}
+	}
+
+	private void handleFetchMusic(String playlistIdStr, String musicIdStr, HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
+		int playlistId = Integer.parseInt(playlistIdStr);
+		int musicId = Integer.parseInt(musicIdStr);
+
+		PlaylistDTO playlist = playlistService.getPlaylistByPlaylistId(playlistId);
+		UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
+
+		if (!playlistService.canAccessPublicPlaylist(playlist, currentUser)) {
+			ResponseUtil.sendError(response, 403, "Access denied to this playlist");
+			return;
+		}
+
+		Map<String, Object> data = new HashMap<>();
+		data.put("playlistId", playlistId);
+		data.put("musicId", musicId);
+		data.put("action", "fetch_music_in_playlist");
+		data.put("data", playlistService.getPlaylistMusic(playlistId, musicId));
+
+		response.getWriter().write(JsonUtil.toJson(data));
+	}
+
+	private void handleFetchPlaylist(String playlistIdStr, HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		int playlistId = Integer.parseInt(playlistIdStr);
+
+		PlaylistDTO playlist = playlistService.getPlaylistByPlaylistId(playlistId);
+		UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
+
+		if (!playlistService.canAccessPublicPlaylist(playlist, currentUser)) {
+			ResponseUtil.sendError(response, 403, "Access denied to this playlist");
+			return;
+		}
+
+		Map<String, Object> data = new HashMap<>();
+		data.put("playlistId", playlistId);
+		data.put("action", "fetch_playlist");
+		data.put("data", playlist);
+
+		response.getWriter().write(JsonUtil.toJson(data));
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		// TODO Auto-generated method stub
 
-        String pathInfo = request.getPathInfo();
-        if (pathInfo == null || pathInfo.equals("/")) {
-            //create playlist
-        	createPlaylistPost(request, response);
-        }
+		String pathInfo = request.getPathInfo();
+		if (pathInfo == null || pathInfo.equals("/")) {
+			// create playlist
+			createPlaylistPost(request, response);
+		}
 
-        String[] pathParts = pathInfo.split("/");
+		String[] pathParts = pathInfo.split("/");
 
-        try {
-            if (pathParts.length == 3 && "music".equals(pathParts[2])) {
-            	
-                addPlaylistMusic(pathParts[1], request, response);
+		try {
+			if (pathParts.length == 3 && "music".equals(pathParts[2])) {
 
-            } else {
-            	ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid API path");
-            }
-        } catch (NumberFormatException e) {
-        	ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "IDs must be numeric");
-        }
+				addPlaylistMusic(pathParts[1], request, response);
+
+			} else {
+				ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid API path");
+			}
+		} catch (NumberFormatException e) {
+			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "IDs must be numeric");
+		}
 	}
-	
-	private void createPlaylistPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+	private void createPlaylistPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
-	private void addPlaylistMusic(String playlistIdStr, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+	private void addPlaylistMusic(String playlistIdStr, HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		int playlistId = Integer.parseInt(playlistIdStr);
-		
+
 	}
 
 	@Override
-	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doPut(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 
-        String pathInfo = request.getPathInfo();
-        if (pathInfo == null || pathInfo.equals("/")) {
-        	ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Playlist ID is required");
-            return;
-        }
+		String pathInfo = request.getPathInfo();
+		if (pathInfo == null || pathInfo.equals("/")) {
+			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Playlist ID is required");
+			return;
+		}
 
-        String[] pathParts = pathInfo.split("/");
+		String[] pathParts = pathInfo.split("/");
 
+		try {
+			if (pathParts.length == 2) {
+				updatePlaylist(pathParts[1], request, response);
+
+			} else if (pathParts.length == 4 && "music".equals(pathParts[2])) {
+
+				updatePlaylistMusic(pathParts[1], pathParts[3], request, response);
+
+			} else {
+				ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid API path");
+			}
+		} catch (NumberFormatException e) {
+			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "IDs must be numeric");
+		}
+	}
+
+	private void updatePlaylistMusic(String playlistIdStr, String musicIdStr, HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
+		
+		int playlistId = Integer.parseInt(playlistIdStr);
+		int musicId = Integer.parseInt(musicIdStr);
+
+		String jsonBody;
         try {
-            if (pathParts.length == 2) {
-                updatePlaylist(pathParts[1], request, response);
-
-            } else if (pathParts.length == 4 && "music".equals(pathParts[2])) {
-            	
-                updatePlaylistMusic(pathParts[1], pathParts[3], request, response);
-
-            } else {
-            	ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid API path");
-            }
-        } catch (NumberFormatException e) {
-        	ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "IDs must be numeric");
-        }
-	}
-
-	private void updatePlaylistMusic(String playlistIdStr, String musicIdStr, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		int playlistId = Integer.parseInt(playlistIdStr);
-        int musicId = Integer.parseInt(musicIdStr);
-       
-        int newPosition = Integer.parseInt(request.getParameter("position"));
-        
-        PlaylistDTO playlist = playlistService.getPlaylistByPlaylistId(playlistId);
-        UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
-        
-        if (!playlistService.canModifyPlaylist(playlist, currentUser)) {
-            ResponseUtil.sendError(response, 403, "Access denied to this playlist");
+            // Read the entire request body as a String using UTF-8 encoding
+            jsonBody = IOUtils.toString(request.getReader()); 
+        } catch (IOException e) {
+            ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Failed to read request body: " + e.getMessage());
             return;
         }
-        
-        if (playlistService.updatePlaylistSongPosition(playlistId, musicId, newPosition)) {
-        	ResponseUtil.sendJson(response, null);
+
+        Map<String, Object> requestBody;
+        int newPosition;
+        try {
+            requestBody = JsonUtil.fromJson(jsonBody, new TypeToken<Map<String, Object>>() {});
+            Object posObj = requestBody.get("position");
+            if (posObj == null) {
+                ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Missing 'position' in request body.");
+                return;
+            }
+            newPosition = (posObj instanceof Number) ? ((Number) posObj).intValue() : Integer.parseInt(posObj.toString());
+
+        } catch (Exception e) {
+            ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid JSON body or 'position' format: " + e.getMessage());
+            return;
         }
-        else {
-        	ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Cannot update playlist music");
-        }
-		
+
+		PlaylistDTO playlist = playlistService.getPlaylistByPlaylistId(playlistId);
+		UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
+
+		if (!playlistService.canModifyPlaylist(playlist, currentUser)) {
+			ResponseUtil.sendError(response, 403, "Access denied to this playlist");
+			return;
+		}
+
+		if (playlistService.updatePlaylistSongPosition(playlistId, musicId, newPosition)) {
+			ResponseUtil.sendJson(response, null);
+		} else {
+			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Cannot update playlist music");
+		}
+
 	}
 
-	private void updatePlaylist(String playlistIdStr, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	private void updatePlaylist(String playlistIdStr, HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		int playlistId = Integer.parseInt(playlistIdStr);
-		
-		
+
 	}
-
-
 }

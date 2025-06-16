@@ -16,7 +16,6 @@ import com.enth.ecomusic.model.mapper.PlaylistMapper;
 import com.enth.ecomusic.service.PlaylistService;
 import com.enth.ecomusic.util.AppContext;
 import com.enth.ecomusic.util.CommonUtil;
-import com.enth.ecomusic.util.ResponseUtil;
 import com.enth.ecomusic.util.ToastrType;
 
 /**

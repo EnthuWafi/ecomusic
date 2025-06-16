@@ -1,6 +1,9 @@
 package com.enth.ecomusic.model.dto;
 
 import java.time.LocalDateTime;
+import java.util.Date;
+
+import com.enth.ecomusic.util.CommonUtil;
 
 public class PlaylistMusicDTO {
 
@@ -35,6 +38,10 @@ public class PlaylistMusicDTO {
 
 	public LocalDateTime getAddedAt() {
 		return addedAt;
+	}
+	
+	public Date getAddedAtDate() {
+		return CommonUtil.toDate(addedAt);
 	}
 
 	public int getPosition() {

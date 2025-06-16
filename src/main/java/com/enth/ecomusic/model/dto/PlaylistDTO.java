@@ -1,9 +1,11 @@
 package com.enth.ecomusic.model.dto;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 import com.enth.ecomusic.model.enums.VisibilityType;
+import com.enth.ecomusic.util.CommonUtil;
 
 public class PlaylistDTO {
 	private int playlistId;
@@ -39,6 +41,10 @@ public class PlaylistDTO {
 
 	public LocalDateTime getCreatedAt() {
 		return createdAt;
+	}
+	
+	public Date getCreatedAtDate() {
+		return CommonUtil.toDate(createdAt);
 	}
 
 	public VisibilityType getVisibility() {

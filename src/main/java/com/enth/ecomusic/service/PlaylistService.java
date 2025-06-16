@@ -138,7 +138,7 @@ public class PlaylistService {
 			if (!playlistMusicDAO.shiftPositions(playlistId, start, end, shift, transaction.getConnection())) {
 				throw new SQLException("Failed to playlist after song removal.");
 			}
-
+			transaction.commit();
 			return true;
 
 		} catch (SQLException e) {
@@ -146,6 +146,7 @@ public class PlaylistService {
 			e.printStackTrace();
 			return false;
 		}
+		
 
 	}
 
@@ -207,7 +208,8 @@ public class PlaylistService {
 			if (!moveSuccess) {
 				throw new SQLException("Failed to move the target song to its new position.");
 			}
-
+			
+			transaction.commit();
 			return true;
 
 		} catch (SQLException e) {
@@ -215,6 +217,7 @@ public class PlaylistService {
 			e.printStackTrace();
 			return false;
 		}
+		
 
 	}
 

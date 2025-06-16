@@ -34,7 +34,7 @@ public class PlaylistMusicDAO {
     
     public List<PlaylistMusic> getPlaylistMusicListByPlaylistId(int playlistId) {
         List<PlaylistMusic> list = new ArrayList<>();
-        String sql = "SELECT * FROM PlaylistMusic WHERE playlist_id = ? ORDER BY position";
+        String sql = "SELECT * FROM PlaylistMusic WHERE playlist_id = ? ORDER BY position ASC";
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, playlistId);
@@ -87,6 +87,7 @@ public class PlaylistMusicDAO {
      * @param shiftAmount   The amount to add to the position (e.g., +1 to move down, -1 to move up).
      */
     public boolean shiftPositions(int playlistId, int startPosition, int endPosition, int shiftAmount, Connection conn) {
+    	if (startPosition > endPosition) return true; // no-op
         String sql = "UPDATE PlaylistMusic SET position = position + ? " +
                      "WHERE playlist_id = ? AND position >= ? AND position <= ?";
 

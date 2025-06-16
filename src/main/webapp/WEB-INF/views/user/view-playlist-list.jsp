@@ -40,7 +40,7 @@
                                         <div class="playlist-image">
                                             <c:choose>
                                                 <c:when test="${not empty playlist.musicList and not empty playlist.musicList[0].music.imageUrl}">
-                                                    <img src="${pageContext.request.contextPath}/stream/image/music/${playlist.musicList[0].music.musicId}" alt="${playlist.name}" />
+                                                    <img src="${pageContext.request.contextPath}/stream/image/music/${playlist.musicList[0].music.musicId}?size=thumb" alt="${playlist.name}" />
                                                 </c:when>
                                                 <c:otherwise>
                                                     <div class="placeholder-image">

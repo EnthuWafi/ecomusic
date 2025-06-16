@@ -7,10 +7,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.commons.io.IOUtils;
 
 import com.enth.ecomusic.model.dto.SubscriptionPlanDTO;
 import com.enth.ecomusic.model.entity.User;
@@ -19,6 +20,7 @@ import com.enth.ecomusic.service.SubscriptionService;
 import com.enth.ecomusic.util.AppContext;
 import com.enth.ecomusic.util.CommonUtil;
 import com.enth.ecomusic.util.JsonUtil;
+import com.enth.ecomusic.util.ResponseUtil;
 import com.google.gson.reflect.TypeToken;
 import com.stripe.exception.StripeException;
 
@@ -56,15 +58,16 @@ public class SubscriptionSessionAPIServlet extends HttpServlet {
 		User user = (User) session.getAttribute("user");
 
 		// Read JSON from request body
-	    StringBuilder jsonBody = new StringBuilder();
-	    String line;
-	    BufferedReader reader = request.getReader();
-	    while ((line = reader.readLine()) != null) {
-	        jsonBody.append(line);
-	    }
+	    String jsonBody;
+        try {
+            jsonBody = IOUtils.toString(request.getReader());
+        } catch (IOException e) {
+            ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Failed to read request body: " + e.getMessage());
+            return;
+        }
 
 	    // Parse JSON into Map
-	    Map<String, Object> requestBody = JsonUtil.fromJson(jsonBody.toString(), new TypeToken<Map<String, Object>>() {});
+	    Map<String, Object> requestBody = JsonUtil.fromJson(jsonBody, new TypeToken<Map<String, Object>>() {});
 
 	    int subscriptionPlanId = Integer.parseInt(requestBody.get("planId").toString());
 	    String userId = String.valueOf(user.getUserId());

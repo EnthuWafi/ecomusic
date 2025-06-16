@@ -6,7 +6,11 @@ import java.io.StringWriter;
 import java.security.MessageDigest;
 import java.sql.Clob;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +23,15 @@ import jakarta.servlet.http.HttpSession;
 public class CommonUtil {
 
 	private CommonUtil() {}
-
+	
+	public static Date toDate(LocalDateTime dateTime) {
+		return Date.from(dateTime.atZone(ZoneId.systemDefault()).toInstant());
+	}
+	
+	public static Date toDate(LocalDate date) {
+		return Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
+	}
+	
 	public static String clobToString(Clob clobObject) throws SQLException, IOException {
 		if (clobObject == null) {
 			return null;
