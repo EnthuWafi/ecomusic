@@ -9,16 +9,6 @@
 		<welcome-file>index.jsp</welcome-file>
 	</welcome-file-list>
 
-
-	<filter>
-		<filter-name>APIAuthFilter</filter-name>
-		<filter-class>com.enth.ecomusic.filter.APIAuthFilter</filter-class>
-	</filter>
-	<filter-mapping>
-		<filter-name>APIAuthFilter</filter-name>
-		<url-pattern>/api/*</url-pattern>
-	</filter-mapping>
-
 	<filter>
 		<filter-name>AuthFilter</filter-name>
 		<filter-class>com.enth.ecomusic.filter.AuthFilter</filter-class>

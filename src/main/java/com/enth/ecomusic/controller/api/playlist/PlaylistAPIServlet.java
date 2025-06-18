@@ -228,7 +228,7 @@ public class PlaylistAPIServlet extends HttpServlet {
 		}
 
 		if (playlistService.updatePlaylistSongPosition(playlistId, musicId, newPosition)) {
-			ResponseUtil.sendJson(response, null);
+			ResponseUtil.sendJson(response, "Successfully updated playlist song position to " + newPosition);
 		} else {
 			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Cannot update playlist music");
 		}
@@ -241,4 +241,6 @@ public class PlaylistAPIServlet extends HttpServlet {
 		int playlistId = Integer.parseInt(playlistIdStr);
 
 	}
+	
+	
 }

@@ -61,22 +61,20 @@
 
 						<c:when test="${sessionScope.user.roleName == 'artist'}">
 							<a href="${pageContext.request.contextPath}/artist/music">Panel</a> |
+							
             			</c:when>
-
-						<c:otherwise>
-							<a href="${pageContext.request.contextPath}/user/library">Library</a> |
-                			<a
-								href="${pageContext.request.contextPath}/user/profile">Profile</a> |
-            		</c:otherwise>
 					</c:choose>
+					
+					<a href="${pageContext.request.contextPath}/user/library">Library</a> |
+                	<a href="${pageContext.request.contextPath}/user/profile">Profile</a> |
 
 					<a href="${pageContext.request.contextPath}/logout">Logout</a>
-							</c:when>
+				</c:when>
 	
-					<c:otherwise>
+				<c:otherwise>
 					<a href="${pageContext.request.contextPath}/login">Login</a> |
         			<a href="${pageContext.request.contextPath}/register">Register</a>
-					</c:otherwise>
+				</c:otherwise>
 			</c:choose>
 
 

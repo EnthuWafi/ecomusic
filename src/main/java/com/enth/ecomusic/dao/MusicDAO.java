@@ -2,6 +2,7 @@ package com.enth.ecomusic.dao;
 
 import com.enth.ecomusic.model.dto.MusicDTO;
 import com.enth.ecomusic.model.dto.MusicDetailDTO;
+import com.enth.ecomusic.model.dto.MusicSearchDTO;
 import com.enth.ecomusic.model.entity.Music;
 import com.enth.ecomusic.model.enums.VisibilityType;
 import com.enth.ecomusic.model.mapper.ResultSetMapper;
@@ -126,9 +127,9 @@ public class MusicDAO {
 				       m.like_count_cache, m.total_plays_cache, m.visibility,
 				       g.name AS genre_name, mo.name As mood_name,
 				       (
-				        m.like_count_cache * %.2f +
-				        m.total_plays_cache * %.2f +
-				        (SYSDATE - m.upload_date) * %.2f
+				        m.like_count_cache * ? +
+				        m.total_plays_cache * ? +
+				        (SYSDATE - m.upload_date) * ?
 				    ) AS relevance_score
 				   FROM Music m
 				   JOIN Users u ON m.artist_id = u.user_id
@@ -137,73 +138,75 @@ public class MusicDAO {
 				   WHERE m.visibility = 'public'
 
 				   )
-				SELECT
-				    r.*,
-				    ROW_NUMBER() OVER (ORDER BY r.relevance_score DESC) AS rnum
-				FROM
-				    RankedData r
+				SELECT r.*, ROW_NUMBER() OVER (ORDER BY r.relevance_score DESC) AS rnum
+				FROM RankedData r
 				""";
 
-		query = query.formatted(LIKE_COUNT_WEIGHT, TOTAL_PLAYS_WEIGHT, FRESHNESS_WEIGHT);
+		List<Object> params = new ArrayList<>();
+		params.add(LIKE_COUNT_WEIGHT);
+		params.add(TOTAL_PLAYS_WEIGHT);
+		params.add(FRESHNESS_WEIGHT);
 
-		return DAOUtil.executePaginatedQuery(query, ResultSetMapper::mapToMusicDetailDTO, page, pageSize);
+		return DAOUtil.executePaginatedQuery(query, ResultSetMapper::mapToMusicDetailDTO, page, pageSize,
+				params.toArray());
 	}
 
 	public List<MusicDetailDTO> getRelevantPaginatedMusicWithDetailByKeyword(String keyword, List<Integer> genreIds,
 			List<Integer> moodIds, int page, int pageSize) {
-		String genreInClause = genreIds.isEmpty() ? "null"
+		String genreInClause = genreIds.isEmpty() ? ""
 				: genreIds.stream().map(g -> "?").collect(Collectors.joining(", "));
-		String moodInClause = moodIds.isEmpty() ? "null"
-				: moodIds.stream().map(g -> "?").collect(Collectors.joining(", "));
+		String moodInClause = moodIds.isEmpty() ? "" : moodIds.stream().map(m -> "?").collect(Collectors.joining(", "));
 
-		String query = """
-				WITH RankedData AS (
+		StringBuilder queryBuilder = new StringBuilder("""
+				    WITH RankedData AS (
+				        SELECT
+				            m.music_id, m.artist_id, m.title, m.audio_file_url,
+				            m.image_url, m.premium_content, m.genre_id, m.mood_id, m.upload_date,
+				            u.username AS artist_username, u.image_url AS artist_image_url,
+				            m.like_count_cache, m.total_plays_cache, m.visibility,
+				            g.name AS genre_name, mo.name AS mood_name,
+				            (
+				                SCORE(1) * ? +
+				                m.like_count_cache * ? +
+				                m.total_plays_cache * ? +
+				                (SYSDATE - m.upload_date) * ?
+				            ) AS relevance_score
+				        FROM Music m
+				        JOIN Users u ON m.artist_id = u.user_id
+				        JOIN genres g ON m.genre_id = g.genre_id
+				        JOIN moods mo ON m.mood_id = mo.mood_id
+				        WHERE m.visibility = 'public'
+				          AND CONTAINS(m.title, ?, 1) > 0
+				""");
 
-				   SELECT
-				       m.music_id, m.artist_id, m.title, m.audio_file_url,
-				       m.image_url, m.premium_content, m.genre_id, m.mood_id, m.upload_date,
-				       u.username AS artist_username, u.image_url AS artist_image_url,
-				       m.like_count_cache, m.total_plays_cache, m.visibility,
-				       g.name AS genre_name, mo.name As mood_name,
-				       (
-				        SCORE(1) * %.2f +
-				        m.like_count_cache * %.2f +
-				        m.total_plays_cache * %.2f +
-				        (SYSDATE - m.upload_date) * %.2f
-				    	) AS relevance_score
-				   FROM Music m
-				   JOIN Users u ON m.artist_id = u.user_id
-				   JOIN genres g ON m.genre_id = g.genre_id
-				   JOIN moods mo ON m.mood_id = mo.mood_id
+		if (!genreIds.isEmpty()) {
+			queryBuilder.append(" AND m.genre_id IN (").append(genreInClause).append(")\n");
+		}
 
-				   WHERE m.visibility = 'public'
-				   AND (CONTAINS(m.title, ?, 1) > 0)
-				   AND (? IS NULL OR m.genre_id IN (%s))
-				   AND (? IS NULL OR m.mood_id IN (%s))
+		if (!moodIds.isEmpty()) {
+			queryBuilder.append(" AND m.mood_id IN (").append(moodInClause).append(")\n");
+		}
 
-				)
-				SELECT
-				    r.*,
-				    ROW_NUMBER() OVER (ORDER BY r.relevance_score DESC) AS rnum
-				FROM
-				    RankedData r
-				""";
+		queryBuilder.append(")\n");
+		queryBuilder.append("""
+				    SELECT r.*, ROW_NUMBER() OVER (ORDER BY r.relevance_score DESC) AS rnum
+				    FROM RankedData r
+				""");
 
-		query = query.formatted(TEXT_SCORE_WEIGHT, LIKE_COUNT_WEIGHT, TOTAL_PLAYS_WEIGHT, FRESHNESS_WEIGHT,
-				genreInClause, moodInClause);
-
+		// Build parameters in exact order
 		List<Object> params = new ArrayList<>();
+		params.add(TEXT_SCORE_WEIGHT);
+		params.add(LIKE_COUNT_WEIGHT);
+		params.add(TOTAL_PLAYS_WEIGHT);
+		params.add(FRESHNESS_WEIGHT);
 
 		params.add(DAOUtil.buildOracleTextQuery(keyword));
 
-		params.add(genreIds.isEmpty() ? null : 1);
 		params.addAll(genreIds);
-
-		params.add(moodIds.isEmpty() ? null : 1);
 		params.addAll(moodIds);
 
-		return DAOUtil.executePaginatedQuery(query, ResultSetMapper::mapToMusicDetailDTO, page, pageSize,
-				params.toArray());
+		return DAOUtil.executePaginatedQuery(queryBuilder.toString(), ResultSetMapper::mapToMusicDetailDTO, page,
+				pageSize, params.toArray());
 	}
 
 	public List<MusicDTO> getPaginatedMusicByArtistId(int artistId, int page, int pageSize) {
@@ -338,6 +341,39 @@ public class MusicDAO {
 
 		return new Music(musicId, artistId, title, description, uploadDate, audioFileUrl, imageUrl, premiumContent,
 				genreId, moodId, likeCount, totalPlayCount, visibility);
+	}
+
+	
+	public List<MusicSearchDTO> getRelevantMusicSearchDTO(String keyword, int limit) {
+		String query = """
+				WITH RankedData AS (
+				   SELECT
+				       m.title, (
+				                SCORE(1) * ? +
+				                m.like_count_cache * ? +
+				                m.total_plays_cache * ? +
+				                (SYSDATE - m.upload_date) * ?
+				            ) AS relevance_score
+				   FROM Music m
+				   WHERE  m.visibility = 'public'
+				   AND CONTAINS(m.title, ?, 1) > 0
+				)
+				SELECT * FROM (
+					SELECT r.*, ROW_NUMBER() OVER (ORDER BY r.relevance_score DESC) AS rnum FROM RankedData r
+				) WHERE rnum BETWEEN 1 AND ?
+				
+				""";
+		
+		List<Object> params = new ArrayList<>();
+	    params.add(TEXT_SCORE_WEIGHT);
+	    params.add(LIKE_COUNT_WEIGHT);
+	    params.add(TOTAL_PLAYS_WEIGHT);
+	    params.add(FRESHNESS_WEIGHT);
+		params.add(DAOUtil.buildOracleTextQuery(keyword));
+		params.add(limit);
+		
+		return DAOUtil.executeQuery(query, ResultSetMapper::mapToMusicSearchDTO, params.toArray());
+
 	}
 
 }

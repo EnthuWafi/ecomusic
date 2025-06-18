@@ -19,6 +19,6 @@ public class HomeServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		request.setAttribute("pageTitle", "Home Page");
 		request.setAttribute("contentPage", "/WEB-INF/views/common/home-page.jsp");
-		request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
+		request.getRequestDispatcher("/WEB-INF/views/layout-main.jsp").forward(request, response);
 	}
 }

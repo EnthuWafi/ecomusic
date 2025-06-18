@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import com.enth.ecomusic.dao.MusicDAO;
 import com.enth.ecomusic.model.dto.MusicDTO;
 import com.enth.ecomusic.model.dto.MusicDetailDTO;
+import com.enth.ecomusic.model.dto.MusicSearchDTO;
 import com.enth.ecomusic.model.entity.Music;
 import com.enth.ecomusic.model.entity.User;
 import com.enth.ecomusic.model.mapper.MusicMapper;
@@ -239,6 +240,11 @@ public class MusicService {
 			setGenreMood(music);
 		}
 		return musicList;
+	}
+
+	public List<MusicSearchDTO> getRelevantMusicSearchDTO(String keyword, int limit) {
+		List<MusicSearchDTO> musicSearchDTO = musicDAO.getRelevantMusicSearchDTO(keyword, limit);
+		return musicSearchDTO;
 	}
 
 

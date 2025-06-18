@@ -1,0 +1,17 @@
+{
+  "scripts": {
+    "build": "babel src --out-dir ../src/main/webapp/assets/js --presets=@babel/preset-react",
+    "watch": "babel src --watch --out-dir ../src/main/webapp/assets/js --presets=@babel/preset-react"
+  },
+  "dependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-bootstrap": "^2.0.0",
+    "bootstrap": "^5.0.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.0.0",
+    "@babel/core": "^7.0.0",
+    "@babel/preset-react": "^7.0.0"
+  }
+}

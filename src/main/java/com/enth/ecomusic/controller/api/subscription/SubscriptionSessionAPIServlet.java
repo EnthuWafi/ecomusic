@@ -1,4 +1,4 @@
-package com.enth.ecomusic.controller.api;
+package com.enth.ecomusic.controller.api.subscription;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -25,6 +25,7 @@ import com.google.gson.reflect.TypeToken;
 import com.stripe.exception.StripeException;
 
 /**
+ * i dont need this anymore
  * Servlet implementation class SubscriptionAPIServlet
  */
 @WebServlet("/api/subscription/create")

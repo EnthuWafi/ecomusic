@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 import com.enth.ecomusic.model.dto.MusicDTO;
 import com.enth.ecomusic.model.dto.MusicDetailDTO;
+import com.enth.ecomusic.model.dto.MusicSearchDTO;
 import com.enth.ecomusic.model.entity.Genre;
 import com.enth.ecomusic.model.entity.Mood;
 import com.enth.ecomusic.model.entity.Music;
@@ -48,5 +49,10 @@ public class ResultSetMapper {
 	
 	public static Integer mapToInt(ResultSet rs) throws SQLException {
 		return rs.getInt(1);
+	}
+	
+	public static MusicSearchDTO mapToMusicSearchDTO(ResultSet rs) throws SQLException {
+		MusicSearchDTO dto = new MusicSearchDTO(rs.getString("title"));
+		return dto;
 	}
 }

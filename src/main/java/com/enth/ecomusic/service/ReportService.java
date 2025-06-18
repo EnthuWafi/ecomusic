@@ -7,4 +7,6 @@ public class ReportService {
 	public ReportService(SubscriptionService subscriptionService) {
 		this.subscriptionService = subscriptionService;
 	}
+	
+	//I dont know
 }
