@@ -27,8 +27,9 @@ const SearchBar = ({
     return () => clearTimeout(timeoutId);
   }, [searchTerm, baseUrl]);
   return /*#__PURE__*/React.createElement("div", {
-    className: "mb-3 position-relative"
+    className: "position-relative"
   }, /*#__PURE__*/React.createElement("input", {
+    name: "",
     type: "text",
     className: "form-control rounded-pill bg-secondary border-0 text-white",
     placeholder: "Search here...",

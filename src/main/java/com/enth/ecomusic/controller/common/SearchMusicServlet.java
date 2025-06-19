@@ -95,8 +95,8 @@ public class SearchMusicServlet extends HttpServlet {
             musicList = musicService.getPaginatedMusicDetailDTOLikeKeyword(cleanQuery, genreIdList, moodIdList, page, pageSize);
             totalRecords = musicService.getMusicCountLikeKeyword(cleanQuery, genreIdList, moodIdList); 
         } else {
-            musicList = musicService.getPaginatedMusicDetailDTO(page, pageSize); 
-            totalRecords = musicService.getMusicCount(); 
+            response.sendRedirect(request.getContextPath() + "/music");
+            return;
         }
         
         int totalPages = (int) Math.ceil(totalRecords / (double) pageSize);

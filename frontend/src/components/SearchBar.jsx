@@ -29,8 +29,9 @@ const SearchBar = ({ baseUrl }) => {
   }, [searchTerm, baseUrl]);
 
   return (
-    <div className="mb-3 position-relative">
+    <div className="position-relative">
       <input
+	  	name=""
         type="text"
         className="form-control rounded-pill bg-secondary border-0 text-white"
         placeholder="Search here..."

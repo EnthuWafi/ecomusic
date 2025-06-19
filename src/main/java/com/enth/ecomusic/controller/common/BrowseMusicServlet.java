@@ -12,7 +12,7 @@ import com.enth.ecomusic.model.dto.MusicDetailDTO;
 import com.enth.ecomusic.service.MusicService;
 import com.enth.ecomusic.util.AppContext;
 
-@WebServlet("/music")
+@WebServlet({"/music/browse", "/music"})
 public class BrowseMusicServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 

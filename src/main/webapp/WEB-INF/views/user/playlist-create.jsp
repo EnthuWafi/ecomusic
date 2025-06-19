@@ -1,88 +1,78 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <div class="create-playlist-container">
-    <div class="create-playlist-header">
-        <h1>Create New Playlist</h1>
-        <p>Build your perfect music collection</p>
-    </div>
+	<div class="create-playlist-header">
+		<h1>Create New Playlist</h1>
+		<p>Build your perfect music collection</p>
+	</div>
 
-    <div class="create-playlist-content">
-        <form id="createPlaylistForm" action="${pageContext.request.contextPath}/user/playlist/create" method="post" class="playlist-form">
-            
-            <!-- Playlist Name -->
-            <div class="form-group">
-                <label for="playlistName" class="form-label">
-                    <i class="fas fa-music"></i> Playlist Name *
-                </label>
-                <input type="text" 
-                       id="playlistName" 
-                       name="name" 
-                       class="form-control" 
-                       placeholder="Enter playlist name..." 
-                       required 
-                       maxlength="100">
-                <small class="form-text">Give your playlist a memorable name</small>
-            </div>
+	<div class="create-playlist-content">
+		<form id="createPlaylistForm"
+			action="${pageContext.request.contextPath}/user/playlist/create"
+			method="post" class="playlist-form">
 
-            <!-- Visibility -->
-            <div class="form-group">
-                <label class="form-label">
-                    <i class="fas fa-eye"></i> Privacy Settings
-                </label>
-                <div class="visibility-options">
-                    <div class="radio-option">
-                        <input type="radio" 
-                               id="visibilityPublic" 
-                               name="visibility" 
-                               value="public" 
-                               checked>
-                        <label for="visibilityPublic" class="radio-label">
-                            <div class="radio-content">
-                                <i class="fas fa-globe"></i>
-                                <div>
-                                    <strong>Public</strong>
-                                    <p>Anyone can find and listen to this playlist</p>
-                                </div>
-                            </div>
-                        </label>
-                    </div>
-                    
-                    <div class="radio-option">
-                        <input type="radio" 
-                               id="visibilityPrivate" 
-                               name="visibility" 
-                               value="private">
-                        <label for="visibilityPrivate" class="radio-label">
-                            <div class="radio-content">
-                                <i class="fas fa-lock"></i>
-                                <div>
-                                    <strong>Private</strong>
-                                    <p>Only you can access this playlist</p>
-                                </div>
-                            </div>
-                        </label>
-                    </div>
-                </div>
-            </div>
+			<!-- Playlist Name -->
+			<div class="form-group">
+				<label for="playlistName" class="form-label"> <i
+					class="fas fa-music"></i> Playlist Name *
+				</label> <input type="text" id="playlistName" name="name"
+					class="form-control" placeholder="Enter playlist name..." required
+					maxlength="100"> <small class="form-text">Give your
+					playlist a memorable name</small>
+			</div>
 
-            <!-- Form Actions -->
-            <div class="form-actions">
-                <button type="button" 
-                        class="btn btn-secondary" 
-                        onclick="window.history.back()">
-                    <i class="fas fa-arrow-left"></i> Cancel
-                </button>
-                
-                <button type="submit" 
-                        class="btn btn-primary" 
-                        id="createBtn">
-                    <i class="fas fa-plus"></i> Create Playlist
-                </button>
-            </div>
-        </form>
+			<!-- Visibility -->
+			<div class="form-group">
+				<label class="form-label"> <i class="fas fa-eye"></i>
+					Privacy Settings
+				</label>
+				<div class="visibility-options">
+					<div class="radio-option">
+						<input type="radio" id="visibilityPublic" name="visibility"
+							value="public" checked> <label for="visibilityPublic"
+							class="radio-label">
+							<div class="radio-content">
+								<i class="fas fa-globe"></i>
+								<div>
+									<strong>Public</strong>
+									<p>Anyone can find and listen to this playlist</p>
+								</div>
+							</div>
+						</label>
+					</div>
 
-    </div>
+					<div class="radio-option">
+						<input type="radio" id="visibilityPrivate" name="visibility"
+							value="private"> <label for="visibilityPrivate"
+							class="radio-label">
+							<div class="radio-content">
+								<i class="fas fa-lock"></i>
+								<div>
+									<strong>Private</strong>
+									<p>Only you can access this playlist</p>
+								</div>
+							</div>
+						</label>
+					</div>
+				</div>
+			</div>
+
+			<!-- Form Actions -->
+			<div class="form-actions">
+				<button type="button" class="btn btn-secondary"
+					onclick="window.history.back()">
+					<i class="fas fa-arrow-left"></i> Cancel
+				</button>
+
+				<button type="submit" class="btn btn-primary" id="createBtn">
+					<i class="fas fa-plus"></i> Create Playlist
+				</button>
+			</div>
+		</form>
+
+	</div>
 </div>
 
 
