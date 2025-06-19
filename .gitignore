@@ -26,8 +26,7 @@ replay_pid*
 
 src/main/webapp/WEB-INF/classes/config.properties
 
-# Generated UML output
-output.puml
+
 plantuml.jar
 
 /frontend/node_modules/

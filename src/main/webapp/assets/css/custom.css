@@ -1,0 +1,31 @@
+@charset "UTF-8";
+
+.cute-search-input {
+	border-color: #fbcfe8; /* Light pink border */
+	transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+/* Custom focus style to override Bootstrap's default */
+.cute-search-input:focus {
+	border-color: #f9a8d4;
+	box-shadow: 0 0 0 0.25rem rgba(244, 114, 182, 0.25);
+	outline: 0;
+}
+
+/* Custom placeholder color */
+.cute-search-input::placeholder {
+	color: #d1d5db;
+}
+
+.cute-search-btn {
+	background-color: #f9a8d4; /* Medium pink */
+	border-color: #f9a8d4;
+	color: white;
+	transition: background-color 0.2s ease-in-out;
+}
+
+.cute-search-btn:hover {
+	background-color: #f472b6; /* A slightly darker pink for hover */
+	border-color: #f472b6;
+	color: white;
+}

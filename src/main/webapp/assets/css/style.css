@@ -1,0 +1,119 @@
+/* Custom Styles */
+body {
+    background-color: #0f1015 !important;
+    color: #ffffff;
+    /* margin-bottom: 70px; */ 
+}
+.navbar-brand svg {
+    margin-right: 8px;
+}
+.navbar-brand span {
+    color: #9B59B6; /* Purple brand color */
+}
+.sidebar {
+    background-color: #1c1e26;
+    min-height: 100vh;
+}
+.sidebar .nav-link:hover {
+    color: #9B59B6;
+}
+.sidebar .nav-link {
+    font-size: 0.95rem;
+}
+.sidebar h6 {
+    letter-spacing: 1px;
+    font-size: 0.75rem;
+}
+.card {
+    background-color: #1d1e26;
+    border: none;
+    border-radius: 8px;
+}
+.card-body {
+    padding: 10px;
+}
+.card-title {
+    font-size: 1rem;
+    margin-bottom: 0.3rem;
+}
+.card-text {
+    font-size: 0.85rem;
+}
+.navbar.fixed-bottom {
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.5);
+}
+.progress {
+    border-radius: 0;
+}
+
+/* Player card */
+.player-card {
+    background-color: #1d1e26;
+    padding: 2rem;
+    border-radius: 1rem;
+    width: 100%;
+    max-width: 380px;
+}
+.player-art {
+    width: 100%;
+    max-height: 200px;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    background-color: #2a2c35;
+    aspect-ratio: 1;
+}
+.player-title {
+    font-size: 1.4rem;
+    margin-bottom: 0.25rem;
+}
+.player-artist {
+    font-size: 1rem;
+    color: #bbb;
+    margin-bottom: 1.5rem;
+}
+
+.waveform {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 3px;
+    height: 80px;
+    margin-bottom: 1.5rem;
+}
+.waveform .bar {
+    width: 5px;
+    background-color: #9B59B6;
+    border-radius: 2px;
+}
+
+.controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+.controls .btn {
+    color: #ccc;
+    font-size: 1.2rem;
+}
+.controls .btn-play {
+    font-size: 1.8rem;
+    color: #9B59B6;
+}
+
+.progress-container {
+    font-size: 0.85rem;
+    color: #888;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.progress-container .progress {
+    flex-grow: 1;
+    height: 4px;
+    background-color: #2a2c35;
+}
+.progress-container .progress .progress-bar {
+    background-color: #9B59B6;
+}
