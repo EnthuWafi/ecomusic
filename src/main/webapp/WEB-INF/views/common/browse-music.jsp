@@ -6,42 +6,32 @@
 <h2>All Music</h2>
 
 <div class="container mt-4">
-	<div class="row row-cols-1 row-cols-md-3 g-4">
+	<div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4">
 		<c:forEach var="musicDTO" items="${musicList}">
 			<div class="col">
-				<div class="card h-100 shadow-sm">
+				<div class="card h-100 bg-dark text-light border-0 shadow-sm">
+
+
 					<img
 						src="${pageContext.request.contextPath}/stream/image/music/${musicDTO.music.musicId}?size=thumb"
-						class="card-img-top" alt="${musicDTO.music.title}"
-						style="height: 200px; object-fit: cover;">
-					<div class="card-body">
-						<h5 class="card-title">${musicDTO.music.title}</h5>
-						<h6 class="card-subtitle mb-2 text-muted"><a>${musicDTO.artistUsername}</a></h6>
-						<h6 class="card-subtitle mb-2 text-muted">${musicDTO.music.genreName} - ${musicDTO.music.moodName}</h6>
-						<p class="card-text">
-			
-							<small class="text-muted">Uploaded on:
-								<fmt:parseDate value="${musicDTO.music.uploadDate}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedDateTime" type="both" />
-								<fmt:formatDate pattern="dd.MM.yyyy HH:mm" value="${parsedDateTime}" />	 
-							</small>
+						class="card-img-top object-fit-cover"
+						style="height: 180px; width: 100%;" alt="${musicDTO.music.title}">
 
-						</p>
-						<div class="text-muted">
-							<i class="bi bi-hand-thumbs-up me-1"></i> ${musicDTO.music.likeCount} <span
-								class="mx-2">|</span> <i class="bi bi-eye me-1"></i>
-							${musicDTO.music.totalPlayCount}
-						</div>
-						<p class="card-text">
-							<span
-								class="badge ${musicDTO.music.premiumContent ? 'bg-warning text-dark' : 'bg-secondary'}">
-								${musicDTO.music.premiumContent ? 'Premium' : 'Free'} </span>
-						</p>
+
+					<div class="card-body">
+						<h5 class="card-title mb-1 text-truncate"
+							title="${musicDTO.music.title}">
+							<a
+								href="${pageContext.request.contextPath}/music/play/${musicDTO.music.musicId}">${musicDTO.music.title}</a>
+						</h5>
+						<p class="card-text mb-2 small text-secondary">by
+							${musicDTO.artistUsername}</p>
+						<span
+							class="badge rounded-pill 
+							${musicDTO.music.premiumContent ? 'bg-warning text-dark' : 'bg-primary'}">
+							${musicDTO.music.premiumContent ? 'Premium' : 'Free'} </span>
 					</div>
-					<div class="card-footer text-center">
-						<a
-							href="${pageContext.request.contextPath}/music/play/${musicDTO.music.musicId}"
-							class="btn btn-primary">Play</a>
-					</div>
+
 				</div>
 			</div>
 		</c:forEach>
@@ -50,16 +40,22 @@
 
 
 <!-- Pagination controls -->
-<div>
-	<c:if test="${currentPage > 1}">
-		<a href="?page=${currentPage - 1}">Previous</a>
-	</c:if>
+<nav aria-label="Page navigation example">
+	<ul class="pagination justify-content-center">
 
-	<c:forEach var="i" begin="1" end="${totalPages}">
-		<a href="?page=${i}">${i}</a>
-	</c:forEach>
+		<c:if test="${currentPage > 1}">
+			<li class="page-item"><a class="page-link"
+				href="?page=${currentPage - 1}">Previous</a></li>
+		</c:if>
 
-	<c:if test="${currentPage < totalPages}">
-		<a href="?page=${currentPage + 1}">Next</a>
-	</c:if>
-</div>
+		<c:forEach var="i" begin="1" end="${totalPages}">
+			<li class="page-item"><a class="page-link" href="?page=${i}">${i}</a></li>
+		</c:forEach>
+
+		<c:if test="${currentPage < totalPages}">
+			<li class="page-item"><a class="page-link"
+				href="?page=${currentPage + 1}">Next</a></li>
+		</c:if>
+
+	</ul>
+</nav>

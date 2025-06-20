@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import com.enth.ecomusic.model.dto.MusicDetailDTO;
+import com.enth.ecomusic.model.dto.UserDTO;
 import com.enth.ecomusic.service.MusicService;
 import com.enth.ecomusic.util.AppContext;
 import com.enth.ecomusic.util.CommonUtil;
@@ -43,28 +44,21 @@ public class PlayMusicServlet extends HttpServlet {
 		// TODO Auto-generated method stub
 		String pathInfo = request.getPathInfo();
 		int id = CommonUtil.extractIdFromPath(pathInfo);
+		UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
 		
 		if (pathInfo.matches("/\\d+")) {
-			MusicDetailDTO music = musicService.getMusicDetailDTOById(id);	
+			MusicDetailDTO music = musicService.getMusicDetailDTOById(id, currentUser);	
 			
 			request.setAttribute("pageTitle", "Listen to Music");
 			request.setAttribute("musicDTO", music);			
-			//request.setAttribute("relatedTracks", recommendedList);
 			request.setAttribute("contentPage", "/WEB-INF/views/common/play-music.jsp");
 		} else {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;
 		}
-		request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
+		request.getRequestDispatcher("/WEB-INF/views/layout-main.jsp").forward(request, response);
 		
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
-	}
 
 }

@@ -13,6 +13,7 @@ import java.io.OutputStream;
 import com.enth.ecomusic.service.MusicService;
 import com.enth.ecomusic.model.dto.MusicDTO;
 import com.enth.ecomusic.model.dto.StreamRangeDTO;
+import com.enth.ecomusic.model.dto.UserDTO;
 import com.enth.ecomusic.service.FileStreamingService;
 import com.enth.ecomusic.util.AppConfig;
 import com.enth.ecomusic.util.AppContext;
@@ -54,7 +55,8 @@ public class MusicImageStreamServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		String pathInfo = request.getPathInfo(); // e.g., "/42"
+		UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
+		String pathInfo = request.getPathInfo(); 
 		int musicId = CommonUtil.extractIdFromPath(pathInfo);
 		
 		String requestedSize = request.getParameter("size"); 
@@ -66,7 +68,7 @@ public class MusicImageStreamServlet extends HttpServlet {
 		
 		boolean isThumbnailRequest = "thumb".equalsIgnoreCase(requestedSize);
 		
-		MusicDTO music = musicService.getMusicDTOById(musicId);
+		MusicDTO music = musicService.getMusicDTOWithoutAudioById(musicId, currentUser);
 
 		String basePath = AppConfig.get("musicImageFilePath");
 		

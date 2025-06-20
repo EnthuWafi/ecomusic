@@ -42,8 +42,8 @@ public class LibraryServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		UserDTO user = (UserDTO) request.getSession().getAttribute("user");
-		List<PlaylistDTO> playlists = playlistService.getUserPlaylistWithMusicByUserId(user.getUserId());
+		UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
+		List<PlaylistDTO> playlists = playlistService.getUserPlaylistWithMusicByUserId(currentUser.getUserId(), currentUser);
 		
         request.setAttribute("pageTitle", "Library");
         request.setAttribute("playlists", playlists);

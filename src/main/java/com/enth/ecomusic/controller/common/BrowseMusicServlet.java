@@ -60,6 +60,6 @@ public class BrowseMusicServlet extends HttpServlet {
 		request.setAttribute("pageTitle", "Browse Music");
 		request.setAttribute("contentPage", "/WEB-INF/views/common/browse-music.jsp");
 
-		request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
+		request.getRequestDispatcher("/WEB-INF/views/layout-main.jsp").forward(request, response);
 	}
 }

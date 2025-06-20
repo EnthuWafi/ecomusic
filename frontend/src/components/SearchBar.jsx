@@ -31,7 +31,8 @@ const SearchBar = ({ baseUrl }) => {
   return (
     <div className="position-relative">
       <input
-	  	name=""
+	  	name="q"
+		autoComplete="off"
         type="text"
         className="form-control rounded-pill bg-secondary border-0 text-white"
         placeholder="Search here..."

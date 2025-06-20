@@ -12,6 +12,7 @@ import java.io.OutputStream;
 
 import com.enth.ecomusic.model.dto.MusicDTO;
 import com.enth.ecomusic.model.dto.StreamRangeDTO;
+import com.enth.ecomusic.model.dto.UserDTO;
 import com.enth.ecomusic.service.FileStreamingService;
 import com.enth.ecomusic.service.MusicService;
 import com.enth.ecomusic.util.AppContext;
@@ -60,9 +61,16 @@ public class AudioStreamServlet extends HttpServlet {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid music ID.");
 			return;
 		}
+		
+		UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
 
-		MusicDTO music = musicService.getMusicDTOById(musicId);
+		MusicDTO music = musicService.getMusicDTOById(musicId, currentUser);
 
+		if (music == null) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			return;
+		}
+		
 		String basePath = getServletContext().getAttribute("audioFilePath").toString();
 		String filePath = basePath + music.getAudioFileUrl();
 

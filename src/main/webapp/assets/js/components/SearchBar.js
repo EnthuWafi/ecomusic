@@ -29,7 +29,8 @@ const SearchBar = ({
   return /*#__PURE__*/React.createElement("div", {
     className: "position-relative"
   }, /*#__PURE__*/React.createElement("input", {
-    name: "",
+    name: "q",
+    autoComplete: "off",
     type: "text",
     className: "form-control rounded-pill bg-secondary border-0 text-white",
     placeholder: "Search here...",

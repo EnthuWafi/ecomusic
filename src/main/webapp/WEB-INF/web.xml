@@ -46,6 +46,11 @@
 		<filter-name>RoleFilter</filter-name>
 		<url-pattern>/artist/*</url-pattern>
 	</filter-mapping>
+	
+	<filter-mapping>
+		<filter-name>RoleFilter</filter-name>
+		<url-pattern>/music/*</url-pattern>
+	</filter-mapping>
 
 	<!-- <error-page> <error-code>404</error-code> <location>/WEB-INF/error-pages/not-found.jsp</location> 
 		</error-page> <error-page> <error-code>500</error-code> <location>/WEB-INF/error-pages/general-error.jsp</location> 

@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.List;
 
 import com.enth.ecomusic.model.dto.MusicDTO;
+import com.enth.ecomusic.model.dto.UserDTO;
 import com.enth.ecomusic.model.entity.Genre;
 import com.enth.ecomusic.model.entity.Mood;
 import com.enth.ecomusic.model.entity.Music;
@@ -69,7 +70,9 @@ public class ArtistEditMusicServlet extends HttpServlet {
 		List<Genre> genreList = genreCacheService.getAll();
 		List<Mood> moodList = moodCacheService.getAll();
 		
-		MusicDTO music = musicService.getMusicDTOById(musicId);
+		UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
+		
+		MusicDTO music = musicService.getMusicDTOById(musicId, currentUser);
 
 		request.setAttribute("pageTitle", "Edit Music");
 		request.setAttribute("genreList", genreList);
@@ -85,6 +88,8 @@ public class ArtistEditMusicServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session = request.getSession();
+		UserDTO currentUser = (UserDTO) session.getAttribute("user");
+		
 		String pathInfo = request.getPathInfo(); 
 		Integer musicId = CommonUtil.extractIdFromPath(pathInfo);
 
@@ -95,7 +100,7 @@ public class ArtistEditMusicServlet extends HttpServlet {
 		VisibilityType visibility = VisibilityType.fromString(MultipartUtil.getString(request.getPart("visibility")).toLowerCase());
 		boolean isPremium = MultipartUtil.getBoolean(request.getPart("premiumContent"));
 
-		MusicDTO musicDTO = musicService.getMusicDTOById(musicId);
+		MusicDTO musicDTO = musicService.getMusicDTOById(musicId, currentUser);
 		
 		if (musicDTO == null) {
 			CommonUtil.addMessage(session, ToastrType.ERROR, "Invalid music!");
@@ -120,7 +125,7 @@ public class ArtistEditMusicServlet extends HttpServlet {
 		music.setMoodId(moodId);
 		music.setVisibility(visibility);
 
-		boolean success = musicService.updateMusic(music, audioPart, imagePart);
+		boolean success = musicService.updateMusic(music, audioPart, imagePart, currentUser);
 		if (success) {
 			CommonUtil.addMessage(session, ToastrType.SUCCESS, "Music successfully updated");
 			response.sendRedirect(request.getContextPath() + "/artist/music");

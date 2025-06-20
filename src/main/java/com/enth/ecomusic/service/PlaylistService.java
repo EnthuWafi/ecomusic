@@ -9,6 +9,8 @@ import com.enth.ecomusic.model.entity.Music;
 import com.enth.ecomusic.model.entity.Playlist;
 import com.enth.ecomusic.model.entity.PlaylistMusic;
 import com.enth.ecomusic.model.entity.User;
+import com.enth.ecomusic.model.enums.RoleType;
+import com.enth.ecomusic.model.enums.VisibilityType;
 import com.enth.ecomusic.model.mapper.PlaylistMapper;
 import com.enth.ecomusic.model.transaction.TransactionTemplate;
 
@@ -35,9 +37,9 @@ public class PlaylistService {
 				.getPlaylistMusicListByPlaylistId(playlist.getPlaylistId());
 
 		for (PlaylistMusic pm : playlistMusicList) {
-			Music music = musicService.getMusicById(pm.getMusicId());
-			User user = userService.getUserById(music.getArtistId());
+			Music music = musicService.getMusicById(pm.getMusicId());		
 			if (music != null) {
+				User user = userService.getUserById(music.getArtistId());
 				music.setArtist(user);
 				pm.setMusic(music);
 			}
@@ -47,22 +49,27 @@ public class PlaylistService {
 	}
 
 	// Method to get a playlist with music by playlistId
-	public PlaylistDTO getPlaylistWithMusicByPlaylistId(int playlistId) {
+	public PlaylistDTO getPlaylistWithMusicByPlaylistId(int playlistId, UserDTO currentUser) {
 		Playlist playlist = playlistDAO.getPlaylistById(playlistId);
-		if (playlist != null) {
-			loadMusicForPlaylist(playlist);
+
+		if (!canAccessPublicPlaylist(playlist, currentUser)) {
+			return null;
 		}
+		
+		loadMusicForPlaylist(playlist);
 		PlaylistDTO playlistDTO = PlaylistMapper.INSTANCE.toDTO(playlist);
 		return playlistDTO;
 	}
 
 	// Method to get all playlists for a user with associated music
-	public List<PlaylistDTO> getUserPlaylistWithMusicByUserId(int userId) {
+	public List<PlaylistDTO> getUserPlaylistWithMusicByUserId(int userId, UserDTO currentUser) {
 		List<Playlist> playlists = playlistDAO.getPlaylistsByUserId(userId);
 		List<PlaylistDTO> playlistDTOList = new ArrayList<>();
 		for (Playlist playlist : playlists) {
-			loadMusicForPlaylist(playlist);
-			playlistDTOList.add(PlaylistMapper.INSTANCE.toDTO(playlist));
+			if (canAccessPublicPlaylist(playlist, currentUser)) {
+				loadMusicForPlaylist(playlist);
+				playlistDTOList.add(PlaylistMapper.INSTANCE.toDTO(playlist));
+			}	
 		}
 		return playlistDTOList;
 	}
@@ -85,7 +92,14 @@ public class PlaylistService {
 	 * 
 	 * @param playlistId The ID of the playlist to remove.
 	 */
-	public boolean removePlaylist(int playlistId) {
+	public boolean removePlaylist(int playlistId, UserDTO currentUser) {
+		Playlist playlist = playlistDAO.getPlaylistById(playlistId);
+		
+		if (!canDeletePlaylist(playlist, currentUser)) {
+			return false;
+		}
+		
+		
 		return playlistDAO.deletePlaylist(playlistId);
 	}
 
@@ -94,7 +108,11 @@ public class PlaylistService {
 	 * 
 	 * @param playlist The playlist object with updated information.
 	 */
-	public boolean updatePlaylist(Playlist playlist) {
+	public boolean updatePlaylist(Playlist playlist, UserDTO currentUser) {
+		if (!canModifyPlaylist(playlist, currentUser)) {
+			return false;
+		}
+		
 		return playlistDAO.updatePlaylist(playlist);
 	}
 
@@ -102,7 +120,14 @@ public class PlaylistService {
 	 * Adds a song to a specific playlist. The song will be added to the last
 	 * position.
 	 */
-	public boolean addSongToPlaylist(PlaylistMusic playlistMusic) {
+	public boolean addSongToPlaylist(PlaylistMusic playlistMusic, UserDTO currentUser) {
+		Playlist playlist = playlistDAO.getPlaylistById(playlistMusic.getPlaylistId());
+		
+		if (!canModifyPlaylist(playlist, currentUser)) {
+			return false;
+		}
+		
+		
 		Integer highestPosition = playlistMusicDAO.getHighestPositionForPlaylist(playlistMusic.getPlaylistId());
 
         // Set the new song's position to one more than the highest position
@@ -117,7 +142,13 @@ public class PlaylistService {
 	 * @param playlistId The ID of the playlist.
 	 * @param musicId    The ID of the song to remove.
 	 */
-	public boolean removeSongFromPlaylist(int playlistId, int musicId) {
+	public boolean removeSongFromPlaylist(int playlistId, int musicId, UserDTO currentUser) {
+		Playlist playlist = playlistDAO.getPlaylistById(playlistId);
+		
+		if (!canModifyPlaylist(playlist, currentUser)) {
+			return false;
+		}
+		
 		try (TransactionTemplate transaction = new TransactionTemplate()) {
 
 			PlaylistMusic playlistMusic = playlistMusicDAO.getPlaylistMusic(playlistId, musicId);
@@ -155,7 +186,12 @@ public class PlaylistService {
 	 * 
 	 * @param playlistId The ID of the playlist to clear.
 	 */
-	public boolean clearPlaylist(int playlistId) {
+	public boolean clearPlaylist(int playlistId, UserDTO currentUser) {		
+		Playlist playlist = playlistDAO.getPlaylistById(playlistId);
+		
+		if (!canModifyPlaylist(playlist, currentUser)) {
+			return false;
+		}
 		return playlistMusicDAO.clearPlaylist(playlistId);
 	}
 
@@ -166,7 +202,12 @@ public class PlaylistService {
 	 * @param musicId     The ID of the song to move.
 	 * @param newPosition The new position for the song.
 	 */
-	public boolean updatePlaylistSongPosition(int playlistId, int musicId, int newPosition) {
+	public boolean updatePlaylistSongPosition(int playlistId, int musicId, int newPosition, UserDTO currentUser) {
+		Playlist playlist = playlistDAO.getPlaylistById(playlistId);
+		
+		if (!canModifyPlaylist(playlist, currentUser)) {
+			return false;
+		}
 
 		try (TransactionTemplate transaction = new TransactionTemplate()) {
 
@@ -226,9 +267,12 @@ public class PlaylistService {
 	 * @param playlistId
 	 * @return
 	 */
-	public PlaylistDTO getPlaylistByPlaylistId(int playlistId) {
+	public PlaylistDTO getPlaylistByPlaylistId(int playlistId, UserDTO currentUser) {
 		Playlist playlist = playlistDAO.getPlaylistById(playlistId);
 		
+		if (!canAccessPublicPlaylist(playlist, currentUser)) {
+			return null;
+		}
 		// TODO Auto-generated method stub
 		return PlaylistMapper.INSTANCE.toDTO(playlist);
 	}
@@ -239,15 +283,21 @@ public class PlaylistService {
 		return PlaylistMapper.INSTANCE.toDTO(playlistMusic);
 	}
 	
-	public boolean canAccessPublicPlaylist(PlaylistDTO playlist, UserDTO currentUser) {
+	public boolean canAccessPublicPlaylist(Playlist playlist, UserDTO user) {
         return playlist != null &&
-               (playlist.isPublic() || (currentUser != null && playlist.getUserId() == currentUser.getUserId()));
+               (playlist.getVisibility() == VisibilityType.PUBLIC || (user != null && playlist.getUserId() == user.getUserId()));
     }
 
-    public boolean canModifyPlaylist(PlaylistDTO playlist, UserDTO currentUser) {
+    public boolean canModifyPlaylist(Playlist playlist, UserDTO user) {
         return playlist != null &&
-               currentUser != null &&
-               playlist.getUserId() == currentUser.getUserId();
+               user != null &&
+               playlist.getUserId() == user.getUserId();
+    }
+    
+    public boolean canDeletePlaylist(Playlist playlist, UserDTO user) {
+        return playlist != null &&
+               user != null &&
+               (playlist.getUserId() == user.getUserId() || user.hasRole(RoleType.ADMIN));
     }
 
 }

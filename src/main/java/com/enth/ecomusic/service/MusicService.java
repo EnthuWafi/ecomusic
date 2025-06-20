@@ -12,8 +12,11 @@ import com.enth.ecomusic.dao.MusicDAO;
 import com.enth.ecomusic.model.dto.MusicDTO;
 import com.enth.ecomusic.model.dto.MusicDetailDTO;
 import com.enth.ecomusic.model.dto.MusicSearchDTO;
+import com.enth.ecomusic.model.dto.UserDTO;
 import com.enth.ecomusic.model.entity.Music;
 import com.enth.ecomusic.model.entity.User;
+import com.enth.ecomusic.model.enums.RoleType;
+import com.enth.ecomusic.model.enums.VisibilityType;
 import com.enth.ecomusic.model.mapper.MusicMapper;
 import com.enth.ecomusic.util.AppConfig;
 import com.enth.ecomusic.util.FileTypeUtil;
@@ -85,7 +88,11 @@ public class MusicService {
 		}
 	}
 
-	public boolean updateMusic(Music music, Part audioPart, Part imagePart) {
+	public boolean updateMusic(Music music, Part audioPart, Part imagePart, UserDTO currentUser) {
+		if (!canModifyMusic(music, currentUser)) {
+			return false;
+		}
+		
 		try {
 
 			String oldAudioFileName = music.getAudioFileUrl();
@@ -162,16 +169,26 @@ public class MusicService {
 		}
 	}
 
-
-	public MusicDTO getMusicDTOById(int musicId) {
+	public MusicDTO getMusicDTOWithoutAudioById(int musicId, UserDTO currentUser) {
 		Music music = this.getMusicById(musicId);
+		music.setAudioFileUrl(null);
+		if (!canSeeMusic(music, currentUser)) return null;
 		MusicDTO dto = MusicMapper.INSTANCE.toDTO(music);
 
 		return dto;
 	}
 
-	public MusicDetailDTO getMusicDetailDTOById(int musicId) {
+	public MusicDTO getMusicDTOById(int musicId, UserDTO currentUser) {
 		Music music = this.getMusicById(musicId);
+		if (!canAccessMusic(music, currentUser)) return null;
+		MusicDTO dto = MusicMapper.INSTANCE.toDTO(music);
+
+		return dto;
+	}
+
+	public MusicDetailDTO getMusicDetailDTOById(int musicId, UserDTO currentUser) {
+		Music music = this.getMusicById(musicId);
+		if (!canAccessMusic(music, currentUser)) return null;
 		User user = userService.getUserById(music.getArtistId());
 		music.setArtist(user);
 
@@ -179,16 +196,17 @@ public class MusicService {
 		return dto;
 	}
 
-	public List<MusicDTO> getAllMusicDTOsByArtistId(int artistId) {
+	public List<MusicDTO> getAllMusicDTOsByArtistId(int artistId, UserDTO currentUser) {
 		List<Music> musicList = this.getAllMusicByArtistId(artistId);
 
-		return musicList.stream().map(music -> {
+		return musicList.stream().filter(music -> canSeeMusic(music, currentUser))
+				.map(music -> {
 			MusicDTO dto = MusicMapper.INSTANCE.toDTO(music);
 			return dto;
 		}).collect(Collectors.toList());
 	}
 
-	//special case
+	//special case (i dont think these will need currentUser since its for search result
 	public List<MusicDetailDTO> getPaginatedMusicDetailDTO(int page, int pageSize) {
 		List<MusicDetailDTO> musicList = musicDAO.getRelevantPaginatedMusicWithDetail(page, pageSize);
 
@@ -246,6 +264,50 @@ public class MusicService {
 		List<MusicSearchDTO> musicSearchDTO = musicDAO.getRelevantMusicSearchDTO(keyword, limit);
 		return musicSearchDTO;
 	}
+	
+	//check if user can access music,
+	//an owner should be able to see regardless even if music is private
+	public boolean canAccessMusic(Music music, UserDTO user) {
+		if (music == null) return false;
 
+		boolean isOwner = user != null && music.getArtistId() == user.getUserId();
+		boolean isAdmin = user != null && user.hasRole(RoleType.ADMIN);
+		boolean isPremiumUser = user != null && user.hasRole(RoleType.PREMIUMUSER);
+		boolean isPublic = music.getVisibility() == VisibilityType.PUBLIC;
 
+		if (isOwner) return true; // Artist always has access
+
+		if (isAdmin && isPublic) return true; // Admins can access public tracks
+
+		if (isPublic) {
+			if (music.isPremiumContent()) {
+				return isPremiumUser;
+			} else {
+				return true;
+			}
+		}
+
+		return false; // All other cases (e.g., private & not owner or admin)
+	}
+	
+	public boolean canSeeMusic(Music music, UserDTO user) {
+		if (music == null) return false;
+
+		boolean isOwner = user != null && music.getArtistId() == user.getUserId();
+		boolean isPublic = music.getVisibility() == VisibilityType.PUBLIC;
+
+		return isOwner || isPublic;
+	}
+	
+	public boolean canModifyMusic(Music music, UserDTO user) {
+		return music != null &&
+	               user != null &&
+	               music.getArtistId() == user.getUserId();
+	}
+
+	public boolean canDeleteMusic(Music music, UserDTO user) {
+		return music != null &&
+	               user != null &&
+	               (music.getArtistId() == user.getUserId() || user.hasRole(RoleType.ADMIN));
+	}
 }

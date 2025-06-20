@@ -270,20 +270,22 @@ public class MusicDAO {
 	public Integer countMusicByArtist(int artistId) {
 		String sql = "SELECT COUNT(*) FROM Music WHERE artist_id = ?";
 
-		try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-			stmt.setInt(1, artistId);
+		Integer result = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt, artistId);
 
-			try (ResultSet rs = stmt.executeQuery()) {
-				if (rs.next()) {
-					return rs.getInt(1);
-				}
-			}
+		return (result != null) ? result : 0;
+	}
+	
+	public int countVisibleMusicByArtist(int artistId, int currentUserId) {
+		String sql = """
+		    SELECT COUNT(*) FROM Music
+		    WHERE artist_id = ?
+		    AND (
+		        visibility = 'public'
+		        OR artist_id = ?
+		    )
+		""";
 
-		} catch (SQLException e) {
-			System.err.println("Error counting music: " + e.getMessage());
-		}
-
-		return 0;
+		return DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt, artistId, currentUserId);
 	}
 
 	// UPDATE

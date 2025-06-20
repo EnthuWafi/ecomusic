@@ -88,8 +88,9 @@ public class PlaylistServlet extends HttpServlet {
 
 	private void editPlaylist(HttpServletRequest request, HttpServletResponse response, int playlistId)
 			throws ServletException, IOException {
-	
-		PlaylistDTO playlist = playlistService.getPlaylistByPlaylistId(playlistId);
+		
+		UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
+		PlaylistDTO playlist = playlistService.getPlaylistByPlaylistId(playlistId, currentUser);
 
 		request.setAttribute("playlist", playlist);
 		request.setAttribute("pageTitle", "Edit Playlist");
@@ -100,8 +101,8 @@ public class PlaylistServlet extends HttpServlet {
 
 	private void viewPlaylist(HttpServletRequest request, HttpServletResponse response, int playlistId)
 			throws ServletException, IOException {
-	
-		PlaylistDTO playlist = playlistService.getPlaylistWithMusicByPlaylistId(playlistId);
+		UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
+		PlaylistDTO playlist = playlistService.getPlaylistWithMusicByPlaylistId(playlistId, currentUser);
 
 		request.setAttribute("playlist", playlist);
 		request.setAttribute("pageTitle", "Edit Playlist");
@@ -112,8 +113,8 @@ public class PlaylistServlet extends HttpServlet {
 
 	private void viewPlaylistList(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		UserDTO user = (UserDTO) request.getSession().getAttribute("user");
-		List<PlaylistDTO> playlistList = playlistService.getUserPlaylistWithMusicByUserId(user.getUserId());
+		UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
+		List<PlaylistDTO> playlistList = playlistService.getUserPlaylistWithMusicByUserId(currentUser.getUserId(), currentUser);
 
 		request.setAttribute("playlists", playlistList);
 		request.setAttribute("pageTitle", "All Playlist");
@@ -194,12 +195,7 @@ public class PlaylistServlet extends HttpServlet {
 	private void editPlaylistPost(HttpServletRequest request, HttpServletResponse response, int playlistId)
 			throws ServletException, IOException {
 		UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
-		PlaylistDTO existingPlaylist = playlistService.getPlaylistByPlaylistId(playlistId);
-
-		if (!playlistService.canModifyPlaylist(existingPlaylist, currentUser)) {
-			response.sendError(HttpServletResponse.SC_FORBIDDEN, "You do not have permission to edit this playlist.");
-			return;
-		}
+		PlaylistDTO existingPlaylist = playlistService.getPlaylistByPlaylistId(playlistId, currentUser);
 
 		String name = request.getParameter("name");
 		VisibilityType visibility = VisibilityType.fromString(request.getParameter("visibility"));
@@ -219,7 +215,7 @@ public class PlaylistServlet extends HttpServlet {
 		newPlaylist.setName(name.trim());
 		newPlaylist.setVisibility(visibility);
 
-		if (playlistService.updatePlaylist(newPlaylist)) {
+		if (playlistService.updatePlaylist(newPlaylist, currentUser)) {
 			CommonUtil.addMessage(request.getSession(), ToastrType.SUCCESS, "Playlist modified successfully");
 			response.sendRedirect(request.getContextPath() + "/user/playlist/" + playlistId);
 		} else {
@@ -231,14 +227,8 @@ public class PlaylistServlet extends HttpServlet {
 	private void deletePlaylistPost(HttpServletRequest request, HttpServletResponse response, int playlistId)
 			throws ServletException, IOException {
 		UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
-		PlaylistDTO existingPlaylist = playlistService.getPlaylistByPlaylistId(playlistId);
-
-		if (!playlistService.canModifyPlaylist(existingPlaylist, currentUser)) {
-			response.sendError(HttpServletResponse.SC_FORBIDDEN, "You do not have permission to delete this playlist.");
-			return;
-		}
 		
-		if (playlistService.removePlaylist(playlistId)) {
+		if (playlistService.removePlaylist(playlistId, currentUser)) {
 			CommonUtil.addMessage(request.getSession(), ToastrType.SUCCESS, "Playlist removed successfully");
 			response.sendRedirect(request.getContextPath() + "/user/playlist");
 		} else {

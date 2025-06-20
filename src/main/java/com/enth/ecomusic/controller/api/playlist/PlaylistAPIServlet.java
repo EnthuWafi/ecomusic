@@ -13,9 +13,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.enth.ecomusic.util.JsonUtil;
 import com.google.gson.reflect.TypeToken;
@@ -55,7 +57,7 @@ public class PlaylistAPIServlet extends HttpServlet {
 
 		String pathInfo = request.getPathInfo();
 		if (pathInfo == null || pathInfo.equals("/")) {
-			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Playlist ID is required");
+			handleFetchPlaylists(request, response);
 			return;
 		}
 
@@ -75,47 +77,66 @@ public class PlaylistAPIServlet extends HttpServlet {
 			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "IDs must be numeric");
 		}
 	}
+	
+	private void handleFetchPlaylists(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String userIdStr = StringUtils.defaultString(request.getParameter("userId")).trim();
+		
+		if (!StringUtils.isNumeric(userIdStr)) {
+			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "No user ID specified!");
+			return;
+		}
+		
+		int userId = Integer.parseInt(userIdStr);
+		
+		UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
+		List<PlaylistDTO> playlists = playlistService.getUserPlaylistWithMusicByUserId(userId, currentUser);
+	
+		Map<String, Object> data = new HashMap<>();
+		data.put("userId", userId);
+		data.put("results", playlists);
+
+		ResponseUtil.sendJson(response, data);
+	}
+
 
 	private void handleFetchMusic(String playlistIdStr, String musicIdStr, HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 		int playlistId = Integer.parseInt(playlistIdStr);
 		int musicId = Integer.parseInt(musicIdStr);
-
-		PlaylistDTO playlist = playlistService.getPlaylistByPlaylistId(playlistId);
+		
 		UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
-
-		if (!playlistService.canAccessPublicPlaylist(playlist, currentUser)) {
-			ResponseUtil.sendError(response, 403, "Access denied to this playlist");
+		PlaylistDTO playlist = playlistService.getPlaylistByPlaylistId(playlistId, currentUser);
+		
+		if (playlist == null) {
+			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Access denied or does not exist");
 			return;
 		}
-
 		Map<String, Object> data = new HashMap<>();
 		data.put("playlistId", playlistId);
 		data.put("musicId", musicId);
-		data.put("action", "fetch_music_in_playlist");
 		data.put("data", playlistService.getPlaylistMusic(playlistId, musicId));
 
-		response.getWriter().write(JsonUtil.toJson(data));
+		ResponseUtil.sendJson(response, data);
 	}
 
 	private void handleFetchPlaylist(String playlistIdStr, HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		int playlistId = Integer.parseInt(playlistIdStr);
-
-		PlaylistDTO playlist = playlistService.getPlaylistByPlaylistId(playlistId);
+		
 		UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
+		PlaylistDTO playlist = playlistService.getPlaylistByPlaylistId(playlistId, currentUser);
+		
 
-		if (!playlistService.canAccessPublicPlaylist(playlist, currentUser)) {
-			ResponseUtil.sendError(response, 403, "Access denied to this playlist");
+		if (playlist == null) {
+			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Access denied or does not exist");
 			return;
 		}
 
 		Map<String, Object> data = new HashMap<>();
 		data.put("playlistId", playlistId);
-		data.put("action", "fetch_playlist");
 		data.put("data", playlist);
 
-		response.getWriter().write(JsonUtil.toJson(data));
+		ResponseUtil.sendJson(response, data);
 	}
 
 	/**
@@ -218,16 +239,10 @@ public class PlaylistAPIServlet extends HttpServlet {
             ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid JSON body or 'position' format: " + e.getMessage());
             return;
         }
+        
+        UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
 
-		PlaylistDTO playlist = playlistService.getPlaylistByPlaylistId(playlistId);
-		UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
-
-		if (!playlistService.canModifyPlaylist(playlist, currentUser)) {
-			ResponseUtil.sendError(response, 403, "Access denied to this playlist");
-			return;
-		}
-
-		if (playlistService.updatePlaylistSongPosition(playlistId, musicId, newPosition)) {
+		if (playlistService.updatePlaylistSongPosition(playlistId, musicId, newPosition, currentUser)) {
 			ResponseUtil.sendJson(response, "Successfully updated playlist song position to " + newPosition);
 		} else {
 			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Cannot update playlist music");

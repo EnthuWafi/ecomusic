@@ -21,7 +21,7 @@ import com.enth.ecomusic.util.ToastrType;
 /**
  * Servlet Filter implementation class RoleFilter
  */
-@WebFilter({ "/admin/*", "/artist/*", "/user/*"})
+@WebFilter({ "/admin/*", "/artist/*", "/user/*", "/music/*"})
 public class RoleFilter extends HttpFilter implements Filter {
 
 	/**
@@ -53,39 +53,54 @@ public class RoleFilter extends HttpFilter implements Filter {
 		HttpServletResponse httpResponse = (HttpServletResponse) response;
 
 		HttpSession session = httpRequest.getSession(false);
-		UserDTO user = (UserDTO) session.getAttribute("user");
-		String uri = httpRequest.getRequestURI();
+		
+		if (session != null && (session.getAttribute("user") != null)) {
+			UserDTO user = (UserDTO) session.getAttribute("user");
+			
+			String contextPath = httpRequest.getContextPath();
+			String uri = httpRequest.getRequestURI();
+			String path = uri.substring(contextPath.length());  // <- key fix
 
-		// role flags
-		boolean isSuperadmin = user.isSuperAdmin();
-		boolean isAdmin = user.isAdmin();
-		boolean isArtist = user.isArtist();
-		boolean isUser = user.isUser();
+			// role flags
+			boolean isSuperadmin = user.isSuperAdmin();
+			boolean isAdmin = user.isAdmin();
+			boolean isArtist = user.isArtist();
+			boolean isUser = user.isUser();
 
-		if (uri.startsWith("/admin")) {
-	        if (!(isSuperadmin || isAdmin)) {
-	        	CommonUtil.addMessage(session, ToastrType.ERROR, "Access denied: Admins only");
-				httpResponse.sendRedirect(httpRequest.getContextPath());
-				return;
-	        }
-	    }
+			if (path.startsWith("/admin")) {
+			    if (!(isSuperadmin || isAdmin)) {
+			        CommonUtil.addMessage(session, ToastrType.ERROR, "Access denied: Admins only");
+			        httpResponse.sendRedirect(contextPath);
+			        return;
+			    }
+			}
 
-		if (uri.startsWith("/artist")) {
-	        if (!isArtist) {
-	        	CommonUtil.addMessage(session, ToastrType.ERROR, "Access denied: Artists only");
-				httpResponse.sendRedirect(httpRequest.getContextPath());
-				return;
-	        }
-	    }
-	
-		if (uri.startsWith("/user")) {
-	        if (!(isUser || isArtist)) {
-	        	CommonUtil.addMessage(session, ToastrType.ERROR, "Access denied: Users only");
-				httpResponse.sendRedirect(httpRequest.getContextPath());
-				return;
-	        }
-	    }
-	
+			if (path.startsWith("/artist")) {
+			    if (!isArtist) {
+			        CommonUtil.addMessage(session, ToastrType.ERROR, "Access denied: Artists only");
+			        httpResponse.sendRedirect(contextPath);
+			        return;
+			    }
+			}
+
+			if (path.startsWith("/user")) {
+			    if (!(isUser || isArtist)) {
+			        CommonUtil.addMessage(session, ToastrType.ERROR, "Access denied: Users only");
+			        httpResponse.sendRedirect(contextPath);
+			        return;
+			    }
+			}
+
+			if (path.startsWith("/music")) {
+			    if (isSuperadmin || isAdmin) {
+			        CommonUtil.addMessage(session, ToastrType.ERROR, "Access denied: This is an admin free zone!");
+			        httpResponse.sendRedirect(contextPath);
+			        return;
+			    }
+			}
+
+		}
+		
 
 		chain.doFilter(request, response);
 	}
