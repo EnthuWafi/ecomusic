@@ -16,27 +16,28 @@ import java.util.List;
 import java.util.Map;
 
 import com.enth.ecomusic.util.CommonUtil;
+import com.enth.ecomusic.util.FlashStorage;
 
 /**
- * Servlet Filter implementation class FlashFilter
- * Purpose of this filter is simply to destroy the flash message in session
- * and extract all messages if it exists
+ * Servlet Filter implementation class FlashFilter Purpose of this filter is
+ * simply to destroy the flash message in session and extract all messages if it
+ * exists
  */
 @WebFilter("/*")
 public class FlashFilter extends HttpFilter implements Filter {
-       
-    /**
+
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
 	/**
-     * @see HttpFilter#HttpFilter()
-     */
-    public FlashFilter() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
+	 * @see HttpFilter#HttpFilter()
+	 */
+	public FlashFilter() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
 
 	/**
 	 * @see Filter#destroy()
@@ -48,23 +49,32 @@ public class FlashFilter extends HttpFilter implements Filter {
 	/**
 	 * @see Filter#doFilter(ServletRequest, ServletResponse, FilterChain)
 	 */
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-		// TODO Auto-generated method stub
-		// place your code here
-		if (request instanceof HttpServletRequest) {
-            HttpServletRequest httpReq = (HttpServletRequest) request;
-            HttpSession session = httpReq.getSession(false);
-            
-            String acceptHeader = httpReq.getHeader("Accept");
-            boolean isHtmlRequest = acceptHeader != null && acceptHeader.contains("text/html");
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+			throws IOException, ServletException {
 
-            if (isHtmlRequest && session != null) {
-                List<Map<String, String>> flashMessages = CommonUtil.extractMessages(session);
-                request.setAttribute("flashMessages", flashMessages);
-            }
-        }
-		// pass the request along the filter chain
-		chain.doFilter(request, response);
+		if (request instanceof HttpServletRequest) {
+			HttpServletRequest httpReq = (HttpServletRequest) request;
+			HttpSession session = httpReq.getSession(false);
+
+			// Only for GET requests serving HTML (not API calls, not static)
+			String method = httpReq.getMethod();
+			String acceptHeader = httpReq.getHeader("Accept");
+			boolean isHtml = acceptHeader != null && acceptHeader.contains("text/html");
+
+			if ("GET".equalsIgnoreCase(method) && isHtml && session != null) {
+				@SuppressWarnings("unchecked")
+				List<Map<String, String>> flashMessages =
+					(List<Map<String, String>>) session.getAttribute("flash_messages");
+
+				if (flashMessages != null) {
+					System.out.println("✅ FlashFilter: Injecting flash messages");
+					request.setAttribute("flashMessages", flashMessages);
+					session.removeAttribute("flash_messages"); // Flash = one-time
+				}
+			}
+		}
+
+		chain.doFilter(request, response); 
 	}
 
 	/**

@@ -23,9 +23,10 @@
 <script
 	src="${pageContext.request.contextPath}/assets/js/react-bootstrap.min.js"></script>
 <script src="${pageContext.request.contextPath}/assets/js/babel.min.js"></script>
+
+<script src="${pageContext.request.contextPath}/assets/js/bootstrap.bundle.min.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/jquery.min.js"></script>
 <script src="${pageContext.request.contextPath}/assets/js/toastr.min.js"></script>
-<script
-	src="${pageContext.request.contextPath}/assets/js/bootstrap.bundle.min.js"></script>
 
 <meta charset="UTF-8">
 <!-- Custom CSS -->
@@ -200,6 +201,16 @@
 				userId : userId
 			}));
 			
+		</script>
+	</c:if>
+	
+	<c:if test="${not empty flashMessages}">
+		<script>
+		<c:forEach var="msg" items="${flashMessages}">
+
+			toastr["${msg.type}"]("${msg.message}");
+
+		</c:forEach>
 		</script>
 	</c:if>
 

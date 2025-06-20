@@ -51,6 +51,16 @@
 		<filter-name>RoleFilter</filter-name>
 		<url-pattern>/music/*</url-pattern>
 	</filter-mapping>
+	
+	<filter>
+		<filter-name>FlashFilter</filter-name>
+		<filter-class>com.enth.ecomusic.filter.FlashFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>FlashFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	
 
 	<!-- <error-page> <error-code>404</error-code> <location>/WEB-INF/error-pages/not-found.jsp</location> 
 		</error-page> <error-page> <error-code>500</error-code> <location>/WEB-INF/error-pages/general-error.jsp</location> 
