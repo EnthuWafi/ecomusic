@@ -1,4 +1,22 @@
 /* Custom Styles */
+body, h1, h2, h3, h4, h5, h6, p, span, small, a, li, label, td, th {
+    color: #f8f9fa !important;
+}
+.text-muted {
+    color: #cccccc !important;
+}
+
+.card-body {
+    padding: 10px;
+    color: #f8f9fa; /* ensures readable text inside cards */
+}
+
+.card-title,
+.card-subtitle,
+.card-text {
+    color: #ffffff !important;
+}
+
 body {
     background-color: #0f1015 !important;
     color: #ffffff;

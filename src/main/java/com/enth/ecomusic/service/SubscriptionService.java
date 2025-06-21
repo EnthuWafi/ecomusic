@@ -50,7 +50,10 @@ public class SubscriptionService {
 				throw new SQLException("Failed to update user role.");
 			}
 
-			return subscriptionDAO.insertSubscription(sub, transaction.getConnection());
+			boolean insert = subscriptionDAO.insertSubscription(sub, transaction.getConnection());
+			
+			transaction.commit();
+			return insert;
 		} catch (SQLException e) {
 			e.printStackTrace(); // or use a logger
 			return false;
@@ -93,8 +96,9 @@ public class SubscriptionService {
 			sub.setSubscriptionPlan(plan);
 		}
 	}
-
-	// Optional — get all available plans
+	
+	
+	
 	public List<SubscriptionPlanDTO> getAllSubscriptionPlans() {
 		return subscriptionPlanDAO.getAllSubscriptionPlans().stream().map(SubscriptionMapper.INSTANCE::toDTO)
 				.collect(Collectors.toList());
@@ -119,4 +123,5 @@ public class SubscriptionService {
 		SubscriptionPlan subscriptionPlan = subscriptionPlanDAO.getSubscriptionPlanByStripePriceId(stripePriceId);
 		return subscriptionPlan != null ? SubscriptionMapper.INSTANCE.toDTO(subscriptionPlan) : null;
 	}
+
 }

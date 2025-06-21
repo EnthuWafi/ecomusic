@@ -29,7 +29,7 @@ public class StripeService {
 				.setMode(SessionCreateParams.Mode.SUBSCRIPTION)
 				.setReturnUrl(returnUrl + "?session_id={CHECKOUT_SESSION_ID}").setClientReferenceId(userId)
 				.putMetadata("subscription_plan_id", String.valueOf(plan.getSubscriptionPlanId()))
-				.putMetadata("subscription_plan_type", plan.getPlanType()).setCustomerEmail(email)
+				.putMetadata("subscription_plan_type", plan.getPlanType().getValue()).setCustomerEmail(email)
 				.addLineItem(SessionCreateParams.LineItem.builder().setQuantity(1L).setPrice(plan.getStripePriceId())
 						.build())
 				.build();
@@ -45,7 +45,7 @@ public class StripeService {
 				.setSuccessUrl(returnUrl + "?session_id={CHECKOUT_SESSION_ID}").setCancelUrl(returnUrl)
 				.setClientReferenceId(userId)
 				.putMetadata("subscription_plan_id", String.valueOf(plan.getSubscriptionPlanId()))
-				.putMetadata("subscription_plan_type", plan.getPlanType()).setCustomerEmail(email)
+				.putMetadata("subscription_plan_type", plan.getPlanType().getValue()).setCustomerEmail(email)
 				.addLineItem(SessionCreateParams.LineItem.builder().setQuantity(1L).setPrice(plan.getStripePriceId())
 						.build())
 				.build();
@@ -61,7 +61,7 @@ public class StripeService {
 		String userId = session.getClientReferenceId();
 		String stripeSubId = session.getSubscription();
 		String planIdStr = session.getMetadata().get("subscription_plan_id");
-		PlanType planType = PlanType.fromString(session.getMetadata().get("subscription_plan_type"));
+		PlanType planType = PlanType.fromString(session.getMetadata().get("subscription_plan_type").toLowerCase());
 
 		// Get payment details from Stripe
 		LocalDate today = LocalDate.now();

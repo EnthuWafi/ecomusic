@@ -1,6 +1,7 @@
 package com.enth.ecomusic.dao;
 
 import com.enth.ecomusic.model.entity.UserSubscription;
+import com.enth.ecomusic.util.DAOUtil;
 import com.enth.ecomusic.util.DBConnection;
 
 import java.sql.*;
@@ -30,6 +31,8 @@ public class SubscriptionDAO {
             return false;
         }
     }
+    
+    // Create (Transactional)
     public boolean insertSubscription(UserSubscription sub, Connection conn) {
         String sql = "INSERT INTO Subscriptions (subscription_id, user_id, start_date, end_date, amount_paid, payment_status, payment_gateway_ref) "
                    + "VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -112,6 +115,18 @@ public class SubscriptionDAO {
         }
     }
 
+    
+    //get latest subscription for a user
+    public UserSubscription getLatestSubscriptionByUserId(int userId) {
+    	String sql = """
+    			SELECT * FROM (
+			        SELECT * FROM Subscriptions WHERE user_id = ? ORDER BY created_at DESC
+			    ) WHERE ROWNUM = 1
+    			""";
+    	
+    	return DAOUtil.executeSingleQuery(sql, this::mapResultSetToSubscription, userId);
+    }
+    
     // Helper method
     private UserSubscription mapResultSetToSubscription(ResultSet rs) throws SQLException {
     	LocalDate startDate = rs.getDate("start_date") != null ? rs.getDate("start_date").toLocalDate() : null;

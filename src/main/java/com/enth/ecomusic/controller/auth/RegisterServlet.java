@@ -38,7 +38,7 @@ public class RegisterServlet extends HttpServlet {
 			throws ServletException, IOException {
 		request.setAttribute("pageTitle", "Registration Page");
 		request.setAttribute("contentPage", "/WEB-INF/views/auth/register.jsp");
-		request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
+		request.getRequestDispatcher("/WEB-INF/views/layout-main.jsp").forward(request, response);
 	}
 
 	@Override

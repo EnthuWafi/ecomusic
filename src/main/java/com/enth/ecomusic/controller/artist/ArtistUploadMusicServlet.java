@@ -69,7 +69,7 @@ public class ArtistUploadMusicServlet extends HttpServlet {
 		request.setAttribute("genreList", genreList);
 		request.setAttribute("moodList", moodList);
 		request.setAttribute("contentPage", "/WEB-INF/views/artist/upload-music.jsp");
-		request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
+		request.getRequestDispatcher("/WEB-INF/views/layout-main.jsp").forward(request, response);
 	}
 
 	/**

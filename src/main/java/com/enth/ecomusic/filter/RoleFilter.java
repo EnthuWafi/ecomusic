@@ -21,7 +21,7 @@ import com.enth.ecomusic.util.ToastrType;
 /**
  * Servlet Filter implementation class RoleFilter
  */
-@WebFilter({ "/admin/*", "/artist/*", "/user/*", "/music/*"})
+@WebFilter({ "/admin/*", "/artist/*", "/user/*", "/become-artist", "/choose-plan"})
 public class RoleFilter extends HttpFilter implements Filter {
 
 	/**
@@ -66,38 +66,48 @@ public class RoleFilter extends HttpFilter implements Filter {
 			boolean isAdmin = user.isAdmin();
 			boolean isArtist = user.isArtist();
 			boolean isUser = user.isUser();
+			boolean isPremiumUser = user.isPremiumUser();
 
 			if (path.startsWith("/admin")) {
 			    if (!(isSuperadmin || isAdmin)) {
 			        CommonUtil.addMessage(session, ToastrType.ERROR, "Access denied: Admins only");
-			        httpResponse.sendRedirect(contextPath);
+			        httpResponse.sendRedirect(contextPath + "/home");
 			        return;
 			    }
 			}
 
-			if (path.startsWith("/artist")) {
+			else if (path.startsWith("/artist")) {
 			    if (!isArtist) {
 			        CommonUtil.addMessage(session, ToastrType.ERROR, "Access denied: Artists only");
-			        httpResponse.sendRedirect(contextPath);
+			        httpResponse.sendRedirect(contextPath + "/home");
 			        return;
 			    }
 			}
 
-			if (path.startsWith("/user")) {
-			    if (!(isUser || isArtist)) {
+			else if (path.startsWith("/user")) {
+			    if (!(isUser || isPremiumUser || isArtist)) {
 			        CommonUtil.addMessage(session, ToastrType.ERROR, "Access denied: Users only");
-			        httpResponse.sendRedirect(contextPath);
+			        httpResponse.sendRedirect(contextPath + "/home");
 			        return;
 			    }
 			}
-
-			if (path.startsWith("/music")) {
-			    if (isSuperadmin || isAdmin) {
-			        CommonUtil.addMessage(session, ToastrType.ERROR, "Access denied: This is an admin free zone!");
-			        httpResponse.sendRedirect(contextPath);
+			
+			else if (path.startsWith("/become-artist")) {
+			    if (isSuperadmin || isAdmin || isArtist) {
+			        CommonUtil.addMessage(session, ToastrType.ERROR, "Access denied: Admin and artist denied!");
+			        httpResponse.sendRedirect(contextPath + "/home");
 			        return;
 			    }
 			}
+			
+			else if (path.startsWith("/choose-plan")) {
+			    if (isSuperadmin || isAdmin || isPremiumUser) {
+			        CommonUtil.addMessage(session, ToastrType.ERROR, "Access denied: Admin and premium user denied!");
+			        httpResponse.sendRedirect(contextPath + "/home");
+			        return;
+			    }
+			}
+			
 
 		}
 		

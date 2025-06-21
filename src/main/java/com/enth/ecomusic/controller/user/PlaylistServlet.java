@@ -82,7 +82,7 @@ public class PlaylistServlet extends HttpServlet {
 		
 		request.setAttribute("pageTitle", "Create Playlist");
 		request.setAttribute("contentPage", "/WEB-INF/views/user/playlist-create.jsp");
-		request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
+		request.getRequestDispatcher("/WEB-INF/views/layout-main.jsp").forward(request, response);
 
 	}
 
@@ -95,7 +95,7 @@ public class PlaylistServlet extends HttpServlet {
 		request.setAttribute("playlist", playlist);
 		request.setAttribute("pageTitle", "Edit Playlist");
 		request.setAttribute("contentPage", "/WEB-INF/views/user/playlist-edit.jsp");
-		request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
+		request.getRequestDispatcher("/WEB-INF/views/layout-main.jsp").forward(request, response);
 
 	}
 
@@ -107,7 +107,7 @@ public class PlaylistServlet extends HttpServlet {
 		request.setAttribute("playlist", playlist);
 		request.setAttribute("pageTitle", "Edit Playlist");
 		request.setAttribute("contentPage", "/WEB-INF/views/user/playlist-view.jsp");
-		request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
+		request.getRequestDispatcher("/WEB-INF/views/layout-main.jsp").forward(request, response);
 
 	}
 
@@ -119,7 +119,7 @@ public class PlaylistServlet extends HttpServlet {
 		request.setAttribute("playlists", playlistList);
 		request.setAttribute("pageTitle", "All Playlist");
 		request.setAttribute("contentPage", "/WEB-INF/views/user/view-playlist-list.jsp");
-		request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
+		request.getRequestDispatcher("/WEB-INF/views/layout-main.jsp").forward(request, response);
 	}
 
 	/**

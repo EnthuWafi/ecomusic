@@ -15,9 +15,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import com.enth.ecomusic.util.CommonUtil;
-import com.enth.ecomusic.util.FlashStorage;
-
 /**
  * Servlet Filter implementation class FlashFilter Purpose of this filter is
  * simply to destroy the flash message in session and extract all messages if it
@@ -67,9 +64,9 @@ public class FlashFilter extends HttpFilter implements Filter {
 					(List<Map<String, String>>) session.getAttribute("flash_messages");
 
 				if (flashMessages != null) {
-					System.out.println("✅ FlashFilter: Injecting flash messages");
 					request.setAttribute("flashMessages", flashMessages);
-					session.removeAttribute("flash_messages"); // Flash = one-time
+					session.removeAttribute("flash_messages");
+					System.out.println(flashMessages);
 				}
 			}
 		}

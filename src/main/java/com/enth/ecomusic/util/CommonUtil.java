@@ -119,9 +119,10 @@ public class CommonUtil {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static List<Map<String, String>> getMessages(HttpSession session) {
+	public static List<Map<String, String>> extractMessages(HttpSession session) {
 		List<Map<String, String>> messages = (List<Map<String, String>>) session.getAttribute("flash_messages");
 		if (messages != null) {
+			session.removeAttribute("flash_messages");
 	        return messages;
 	    }
 		return new ArrayList<>();

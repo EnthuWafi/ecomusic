@@ -110,7 +110,7 @@ public class SearchMusicServlet extends HttpServlet {
         request.setAttribute("pageTitle", "Search Results");
         request.setAttribute("contentPage", "/WEB-INF/views/common/search-music.jsp");
 
-        request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/layout-main.jsp").forward(request, response);
 	}
 
 }

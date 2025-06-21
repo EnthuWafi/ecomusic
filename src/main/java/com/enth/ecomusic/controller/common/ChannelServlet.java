@@ -1,4 +1,4 @@
-package com.enth.ecomusic.controller.artist;
+package com.enth.ecomusic.controller.common;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -8,16 +8,16 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * Servlet implementation class ArtistDashboardServlet
+ * Servlet implementation class ChannelServlet
  */
-@WebServlet({"/artist/", "/artist/dashboard"})
-public class ArtistDashboardServlet extends HttpServlet {
+@WebServlet("/channel/*")
+public class ChannelServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public ArtistDashboardServlet() {
+    public ChannelServlet() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -27,10 +27,17 @@ public class ArtistDashboardServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		request.setAttribute("pageTitle", "Artist Dashboard");
-		request.setAttribute("contentPage", "/WEB-INF/views/artist/dashboard.jsp");
-		request.getRequestDispatcher("/WEB-INF/views/layout-main.jsp").forward(request, response);
+		// This is going to display info about this user channel
+		
+		response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
 
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
 
 }

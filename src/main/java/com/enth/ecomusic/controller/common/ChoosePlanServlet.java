@@ -13,11 +13,12 @@ import com.enth.ecomusic.service.SubscriptionService;
 import com.enth.ecomusic.util.AppContext;
 
 /**
- * Servlet implementation class PurchasePremiumServlet
+ * Servlet implementation class ChoosePlanServlet
  */
-@WebServlet("/purchase-premium")
-public class PurchasePremiumServlet extends HttpServlet {
+@WebServlet("/choose-plan")
+public class ChoosePlanServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+
 	private SubscriptionService subscriptionService;
 
 	@Override
@@ -31,7 +32,7 @@ public class PurchasePremiumServlet extends HttpServlet {
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public PurchasePremiumServlet() {
+	public ChoosePlanServlet() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
@@ -46,9 +47,9 @@ public class PurchasePremiumServlet extends HttpServlet {
 		List<SubscriptionPlanDTO> plans = subscriptionService.getAllSubscriptionPlansForListener();
 
 		request.setAttribute("subscriptionPlanList", plans);
-		request.setAttribute("pageTitle", "Become a Premium User");
+		request.setAttribute("pageTitle", "Become an Artist");
 		request.setAttribute("contentPage", "/WEB-INF/views/common/choose-plan.jsp");
-		request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
+		request.getRequestDispatcher("/WEB-INF/views/layout-main.jsp").forward(request, response);
 	}
 
 }

@@ -10,11 +10,13 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
 import com.enth.ecomusic.model.dto.SubscriptionPlanDTO;
+import com.enth.ecomusic.model.dto.UserDTO;
 import com.enth.ecomusic.model.entity.User;
 import com.enth.ecomusic.service.StripeService;
 import com.enth.ecomusic.service.SubscriptionService;
 import com.enth.ecomusic.util.AppContext;
 import com.enth.ecomusic.util.CommonUtil;
+import com.enth.ecomusic.util.ToastrType;
 import com.stripe.exception.StripeException;
 
 /**
@@ -50,37 +52,60 @@ public class SubscriptionCheckoutServlet extends HttpServlet {
 		response.sendRedirect(request.getContextPath() + "/become-artist");
 	}
 
+	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	        throws ServletException, IOException {
 
-		String subscriptionPlanId = request.getParameter("planId");
+	    HttpSession session = request.getSession(false);
 
-		SubscriptionPlanDTO plan = subscriptionService.getSubscriptionPlanById(Integer.parseInt(subscriptionPlanId));
+	    UserDTO user = (UserDTO) session.getAttribute("user");
 
-		// Originally intended to make this a checkout embed, but lets just do redirect
-//		request.setAttribute("subscriptionPlan", plan);
-//		
-//		request.setAttribute("stripePublicKey", getServletContext().getAttribute("stripePublicKey"));
-//		request.setAttribute("pageTitle", "Complete Your Subscription");
-//		request.setAttribute("contentPage", "/WEB-INF/views/user/checkout.jsp");
-//		request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
-		
-		HttpSession session = request.getSession(false);
-		User user = (User) session.getAttribute("user");
-		
-		String userId = String.valueOf(user.getUserId());
+	    // Validate user object
+	    if (user.getUserId() == 0 || user.getEmail() == null || user.getEmail().isBlank()) {
+	        CommonUtil.addMessage(session, ToastrType.ERROR, "User session is invalid. Please log in again.");
+	        response.sendRedirect(request.getContextPath() + "/login");
+	        return;
+	    }
+
+	    String subscriptionPlanId = request.getParameter("planId");
+
+	    // Validate planId
+	    if (subscriptionPlanId == null || !subscriptionPlanId.matches("\\d+")) {
+	        CommonUtil.addMessage(session, ToastrType.ERROR, "Invalid subscription plan selected.");
+	        response.sendRedirect(request.getContextPath() + "/choose-plan");
+	        return;
+	    }
+
+	    SubscriptionPlanDTO plan = subscriptionService.getSubscriptionPlanById(Integer.parseInt(subscriptionPlanId));
+
+	    if (plan == null) {
+	        CommonUtil.addMessage(session, ToastrType.ERROR, "That subscription plan doesn't exist.");
+	        response.sendRedirect(request.getContextPath() + "/choose-plan");
+	        return;
+	    }
+
+	    String userId = String.valueOf(user.getUserId());
 	    String email = user.getEmail();
 	    String returnUrl = CommonUtil.getBaseUrl(request) + "/user/subscription/return";
 
-		try {
-			String sessionURL = stripeService.createRedirectCheckoutSessionForPlan(plan, returnUrl, userId, email);
+	    try {
+	        String sessionURL = stripeService.createRedirectCheckoutSessionForPlan(plan, returnUrl, userId, email);
 
-			response.sendRedirect(sessionURL);
-		} catch (StripeException e) {
-			e.printStackTrace();
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Stripe error: " + e.getMessage());
-		}
-
+	        if (sessionURL == null || sessionURL.isBlank()) {
+	            CommonUtil.addMessage(session, ToastrType.ERROR, "Failed to initiate checkout. Please try again.");
+	            response.sendRedirect(request.getContextPath() + "/choose-plan");
+	            return;
+	        }
+	        
+	        session.setAttribute("subscriptionIntent", plan.getPlanType());
+	        response.sendRedirect(sessionURL);
+	    } catch (StripeException e) {
+	        e.printStackTrace(); // Optional: use a logger
+	        CommonUtil.addMessage(session, ToastrType.ERROR, "Something went wrong with Stripe. Try again later.");
+	        response.sendRedirect(request.getContextPath() + "/choose-plan");
+	    }
 	}
+
+
 
 }

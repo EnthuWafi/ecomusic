@@ -5,11 +5,13 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.util.List;
 
 import com.enth.ecomusic.model.dto.SubscriptionPlanDTO;
+import com.enth.ecomusic.model.dto.UserDTO;
 import com.enth.ecomusic.service.SubscriptionService;
 import com.enth.ecomusic.util.AppContext;
 
@@ -39,14 +41,14 @@ public class BecomeArtistServlet extends HttpServlet {
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {   	
     	
     	List<SubscriptionPlanDTO> plans = subscriptionService.getAllSubscriptionPlansForCreator();
     	
     	request.setAttribute("subscriptionPlanList", plans);
         request.setAttribute("pageTitle", "Become an Artist");
         request.setAttribute("contentPage", "/WEB-INF/views/common/choose-plan.jsp");
-        request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/layout-main.jsp").forward(request, response);
     }
 
 }

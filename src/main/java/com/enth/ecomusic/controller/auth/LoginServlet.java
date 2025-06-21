@@ -36,7 +36,7 @@ public class LoginServlet extends HttpServlet {
 			throws ServletException, IOException {
 		request.setAttribute("pageTitle", "Login Page");
 		request.setAttribute("contentPage", "/WEB-INF/views/auth/login.jsp");
-		request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
+		request.getRequestDispatcher("/WEB-INF/views/layout-main.jsp").forward(request, response);
 	}
 
 	@Override

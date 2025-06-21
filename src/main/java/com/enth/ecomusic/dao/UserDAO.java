@@ -98,6 +98,7 @@ public class UserDAO {
 		}
 	}
 	
+	//Transactional
 	public boolean updateUserRole(int userId, int roleId, Connection conn) {
 		String sql = "UPDATE Users SET role_id = ? WHERE user_id = ?";
 		try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -123,6 +124,7 @@ public class UserDAO {
 		}
 	}
 
+	
 	// HELPER
 	private User mapUserFromResultSet(ResultSet rs) throws SQLException {
 		User user = new User(

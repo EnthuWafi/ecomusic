@@ -33,22 +33,22 @@
         <div class="flex-fill">
           <!-- Title + Premium badge -->
           <div class="d-flex justify-content-between align-items-start">
-            <h5 class="mb-1">${music.title}</h5>
+            <h5 class="mb-1 text-dark">${music.title}</h5>
             <c:if test="${music.premiumContent}">
               <span class="badge bg-warning text-dark">Premium</span>
             </c:if>
           </div>
           
           <!-- Genre • Mood -->
-          <small class="text-muted d-block mb-1">
+          <small class="text-muted d-block mb-1 text-dark">
             ${music.genreName} • ${music.moodName}
           </small>
           
           <!-- Likes & Views -->
           <div class="text-muted">
-            <i class="bi bi-hand-thumbs-up me-1"></i> ${music.likeCount}
+            <i class="bi bi-hand-thumbs-up me-1 text-dark"></i> ${music.likeCount}
             <span class="mx-2">|</span>
-            <i class="bi bi-eye me-1"></i> ${music.totalPlayCount}
+            <i class="bi bi-eye me-1 text-dark"></i> ${music.totalPlayCount}
           </div>
         </div>
 
@@ -56,7 +56,7 @@
         <div>
           <a
             href="${pageContext.request.contextPath}/artist/music/edit/${music.musicId}"
-            class="btn btn-outline-secondary btn-sm"
+            class="btn btn-outline-secondary btn-sm text-dark"
           >
             <i class="bi bi-pencil-square me-1"></i> Edit
           </a>

@@ -48,7 +48,7 @@ public class LibraryServlet extends HttpServlet {
         request.setAttribute("pageTitle", "Library");
         request.setAttribute("playlists", playlists);
         request.setAttribute("contentPage", "/WEB-INF/views/user/library.jsp");
-        request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/layout-main.jsp").forward(request, response);
 	}
 
 

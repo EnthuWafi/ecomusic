@@ -1,7 +1,11 @@
 package com.enth.ecomusic.model.dto;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
+
+import com.enth.ecomusic.model.enums.PlanType;
+import com.enth.ecomusic.util.CommonUtil;
 
 public class SubscriptionPlanDTO {
 	private int subscriptionPlanId;
@@ -11,12 +15,12 @@ public class SubscriptionPlanDTO {
     private double price;
     private String description;
     private LocalDateTime createdAt;
-    private String planType;
+    private PlanType planType;
 
     private List<String> features;
 
 	public SubscriptionPlanDTO(int subscriptionPlanId, String name, String stripePriceId, String billingCycle,
-			double price, String description, LocalDateTime createdAt, String planType, List<String> features) {
+			double price, String description, LocalDateTime createdAt, PlanType planType, List<String> features) {
 		super();
 		this.subscriptionPlanId = subscriptionPlanId;
 		this.name = name;
@@ -56,8 +60,12 @@ public class SubscriptionPlanDTO {
 	public LocalDateTime getCreatedAt() {
 		return createdAt;
 	}
+	
+	public Date getCreatedAtDate() {
+		return CommonUtil.toDate(createdAt);
+	}
 
-	public String getPlanType() {
+	public PlanType getPlanType() {
 		return planType;
 	}
 

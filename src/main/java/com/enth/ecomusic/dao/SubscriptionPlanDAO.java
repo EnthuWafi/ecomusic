@@ -1,6 +1,7 @@
 package com.enth.ecomusic.dao;
 
 import com.enth.ecomusic.model.entity.SubscriptionPlan;
+import com.enth.ecomusic.model.enums.PlanType;
 import com.enth.ecomusic.util.DBConnection;
 import com.enth.ecomusic.util.JsonUtil;
 import com.google.gson.reflect.TypeToken;
@@ -24,7 +25,7 @@ public class SubscriptionPlanDAO {
             stmt.setDouble(4, plan.getPrice());
             stmt.setString(5, plan.getDescription());
             stmt.setString(6, plan.getFeaturesJson());
-            stmt.setString(7, plan.getPlanType());
+            stmt.setString(7, plan.getPlanType().getValue());
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -113,7 +114,7 @@ public class SubscriptionPlanDAO {
         double price = rs.getDouble("price");
         String desc = rs.getString("description");
         String rawJson = rs.getString("features");
-        String type = rs.getString("plan_type");
+        PlanType type = PlanType.fromString(rs.getString("plan_type"));
         LocalDateTime createdAt = rs.getTimestamp("created_at").toLocalDateTime();
 
         List<String> features;

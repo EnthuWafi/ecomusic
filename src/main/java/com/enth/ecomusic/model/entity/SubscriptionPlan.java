@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
+import com.enth.ecomusic.model.enums.PlanType;
 import com.enth.ecomusic.util.JsonUtil;
 import com.google.gson.reflect.TypeToken;
 
@@ -19,12 +20,12 @@ public class SubscriptionPlan{
     private double price;
     private String description;
     private LocalDateTime createdAt;
-    private String planType;
+    private PlanType planType;
 
     private List<String> features; 
     
     public SubscriptionPlan(int subscriptionPlanId, String name, String stripePriceId, String billingCycle,
-                            double price, String description, List<String> features, LocalDateTime createdAt, String planType) {
+                            double price, String description, List<String> features, LocalDateTime createdAt, PlanType planType) {
         this.subscriptionPlanId = subscriptionPlanId;
         this.name = name;
         this.stripePriceId = stripePriceId;
@@ -39,7 +40,7 @@ public class SubscriptionPlan{
     
 
 	public SubscriptionPlan(String name, String stripePriceId, String billingCycle, double price, String description,
-			List<String> features, String planType) {
+			List<String> features, PlanType planType) {
 		super();
 		this.name = name;
 		this.stripePriceId = stripePriceId;
@@ -145,12 +146,12 @@ public class SubscriptionPlan{
 	}
 
 
-	public String getPlanType() {
+	public PlanType getPlanType() {
 		return planType;
 	}
 
 
-	public void setPlanType(String planType) {
+	public void setPlanType(PlanType planType) {
 		this.planType = planType;
 	}
 

@@ -62,7 +62,7 @@ public class ArtistMusicServlet extends HttpServlet {
 		request.setAttribute("musicList", musicList);
 		request.setAttribute("pageTitle", "Music Page");
 		request.setAttribute("contentPage", "/WEB-INF/views/artist/view-music-list.jsp");
-		request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
+		request.getRequestDispatcher("/WEB-INF/views/layout-main.jsp").forward(request, response);
 	}
 
 

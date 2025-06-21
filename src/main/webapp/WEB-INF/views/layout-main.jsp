@@ -35,6 +35,7 @@
 </head>
 <body class="text-light">
 
+	<c:set var="user" value="${sessionScope.user}" />
 	<!-- Top Navbar -->
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
 		<a class="navbar-brand d-flex align-items-center" href="#"> <img
@@ -48,114 +49,116 @@
 		</button>
 		<div class="collapse navbar-collapse justify-content-between"
 			id="navbarNav">
-
-
-			<c:set var="user" value="${sessionScope.user}" />
-			<c:choose>
-				<c:when test="${empty user}">
-					<form action="${pageContext.request.contextPath}/music/search">
-					<ul class="navbar-nav">
-						<li class="nav-item px-2"><a class="nav-link"
-							href="${pageContext.request.contextPath}/home">Home</a></li>
-						<li class="nav-item px-2"><a class="nav-link"
-							href="${pageContext.request.contextPath}/music/search">Browse</a>
-						</li>
+			<ul class="navbar-nav me-auto">
+	            <li class="nav-item px-2">
+	                <a class="nav-link" href="${pageContext.request.contextPath}/home">Home</a>
+	            </li>
+	            <li class="nav-item px-2">
+	                <a class="nav-link" href="${pageContext.request.contextPath}/music/search">Browse</a>
+	            </li>
 	
-						<li class="nav-item px-2 w-100" id="search-bar-root"></li>
-					</ul>
-					</form>
-				</c:when>
-
-				<c:otherwise>
-					<c:choose>
-						<c:when
-							test="${user.admin or user.superAdmin}">
-							<ul class="navbar-nav">
-								<li class="nav-item px-2"><a class="nav-link"
-									href="${pageContext.request.contextPath}/home">Home</a></li>
-								<li class="nav-item px-2"><a class="nav-link"
-									href="${pageContext.request.contextPath}/admin/music">Music</a>
-								</li>
-								<li class="nav-item px-2"><a class="nav-link"
-									href="${pageContext.request.contextPath}/admin/user">Users</a>
-								</li>
-							</ul>
-						</c:when>
-
-						<c:when test="${user.artist}">
-							<form action="${pageContext.request.contextPath}/music/search">
-							<ul class="navbar-nav">
-								<li class="nav-item px-2"><a class="nav-link"
-									href="${pageContext.request.contextPath}/home">Home</a></li>
-								<li class="nav-item px-2"><a class="nav-link"
-									href="${pageContext.request.contextPath}/music/search">Browse</a>
-								</li>
-								<li class="nav-item px-2"><a class="nav-link"
-									href="${pageContext.request.contextPath}/user/library">Library</a>
-								</li>
-								<li class="nav-item px-2"><a class="nav-link"
-									href="${pageContext.request.contextPath}/artist/music">Music</a></li>
-								<li class="nav-item px-2 w-100" id="search-bar-root"></li>
-							</ul>
-							</form>
-						</c:when>
-
-						<c:otherwise>
-							<form action="${pageContext.request.contextPath}/music/search">
-							<ul class="navbar-nav">
-								<li class="nav-item px-2"><a class="nav-link"
-									href="${pageContext.request.contextPath}/home">Home</a></li>
-								<li class="nav-item px-2"><a class="nav-link"
-									href="${pageContext.request.contextPath}/music/search">Browse</a>
-								</li>
-								<li class="nav-item px-2"><a class="nav-link"
-									href="${pageContext.request.contextPath}/user/library">Library</a>
-								</li>
-								<li class="nav-item px-2 w-100" id="search-bar-root"></li>
-							</ul>
-							</form>
-						</c:otherwise>
-					</c:choose>
-				</c:otherwise>
-			</c:choose>
-
-
-
-			<ul class="navbar-nav">
-				<c:choose>
-					<c:when test="${not empty user}">
-						<li class="nav-item px-2 dropdown"><a
-							class="nav-link dropdown-toggle" href="#" id="userDropdown"
-							role="button" data-bs-toggle="dropdown" aria-expanded="false">
-								<img
-								src="${pageContext.request.contextPath}/stream/image/user/${user.userId}"
-								alt="Profile" width="24" height="24" class="rounded-circle me-1">
-								${user.username}
-						</a>
-							<ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end"
-								aria-labelledby="userDropdown">
-								<li><a class="dropdown-item"
-									href="${pageContext.request.contextPath}/user/profile">Profile</a></li>
-								<li><hr class="dropdown-divider"></li>
-								<li><a class="dropdown-item"
-									href="${pageContext.request.contextPath}/logout">Logout</a></li>
-							</ul></li>
+				<c:if test="${not empty user && (user.user or user.premiumUser)}">
+	                <li class="nav-item px-2">
+	                    <a class="nav-link" href="${pageContext.request.contextPath}/user/library">Library</a>
+	                </li>
+	            </c:if>
+	
+	            <c:if test="${not empty user && user.artist}">
+	                <li class="nav-item px-2">
+	                    <a class="nav-link" href="${pageContext.request.contextPath}/user/library">Library</a>
+	                </li>
+	                <li class="nav-item px-2">
+	                    <a class="nav-link" href="${pageContext.request.contextPath}/artist/music">Music</a>
+	                </li>
+	            </c:if>
+	
+	            <c:if test="${not empty user && (user.admin || user.superAdmin)}">
+	            	<li class="nav-item px-2">
+	                    <a class="nav-link" href="${pageContext.request.contextPath}/admin/dashboard">Dashboard</a>
+	                </li>
+	            
+	                <li class="nav-item px-2 dropdown">
+					  <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Admin Tools</a>
+					  <ul class="dropdown-menu dropdown-menu-dark">
+					    <li><a class="dropdown-item" href="${pageContext.request.contextPath}/admin/user">Users</a></li>
+					    <li><a class="dropdown-item" href="${pageContext.request.contextPath}/admin/music">Music</a></li>
+					    <li><a class="dropdown-item" href="${pageContext.request.contextPath}/admin/subscription">Subscriptions</a></li>
+					    <li><a class="dropdown-item" href="${pageContext.request.contextPath}/admin/reports">Reports</a></li>
+					  </ul>
+					</li>
+	                
+	            </c:if>
+	        </ul>
+	
+	        <!-- CENTER SEARCH BAR -->
+	        <div class="d-none d-lg-block w-25" id="search-bar-root"></div>
+	
+	        <!-- RIGHT CTA / USER -->
+	        <ul class="navbar-nav ms-auto">
+	            <c:choose>
+	                <c:when test="${not empty user}">
+					    <!-- User Dropdown -->
+					    <li class="nav-item px-2 dropdown">
+					        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown"
+					            role="button" data-bs-toggle="dropdown" aria-expanded="false">
+					            <img src="${pageContext.request.contextPath}/stream/image/user/${user.userId}" alt="Profile"
+					                width="24" height="24" class="rounded-circle me-1">
+					            ${user.username}
+					        </a>
+					        <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" aria-labelledby="userDropdown">
+					        	<c:if test="${!user.admin}">
+					            <li>
+					                <a class="dropdown-item" href="${pageContext.request.contextPath}/user/profile">Profile</a>
+					            </li>
+					            </c:if>
+					
+					            <c:if test="${!(user.artist or user.admin)}">
+					                <li>
+					                    <a class="dropdown-item" href="${pageContext.request.contextPath}/become-artist">Become an Artist</a>
+					                </li>
+					            </c:if>
+					
+					            <c:if test="${!(user.premiumUser or user.admin)}">
+					                <li>
+					                    <a class="dropdown-item" href="${pageContext.request.contextPath}/choose-plan">Go Premium</a>
+					                </li>
+					            </c:if>
+					
+					            <li><hr class="dropdown-divider" /></li>
+					            <li>
+					                <a class="dropdown-item" href="${pageContext.request.contextPath}/logout">Logout</a>
+					            </li>
+					        </ul>
+					    </li>
 					</c:when>
-					<c:otherwise>
-						<li class="nav-item px-2"><a class="nav-link"
-							href="${pageContext.request.contextPath}/login">Login</a></li>
-						<li class="nav-item px-2"><a class="nav-link"
-							href="${pageContext.request.contextPath}/register">Register</a></li>
-					</c:otherwise>
-				</c:choose>
-			</ul>
+	
+	                <c:otherwise>
+	                    <li class="nav-item px-2">
+	                        <a class="btn btn-outline-light" href="${pageContext.request.contextPath}/become-artist">
+	                            Become an Artist
+	                        </a>
+	                    </li>
+	                    <li class="nav-item px-2">
+	                        <a class="btn btn-warning text-dark" href="${pageContext.request.contextPath}/choose-plan">
+	                            Go Premium
+	                        </a>
+	                    </li>
+	                    <li class="nav-item px-2">
+	                        <a class="nav-link" href="${pageContext.request.contextPath}/login">Login</a>
+	                    </li>
+	                    <li class="nav-item px-2">
+	                        <a class="nav-link" href="${pageContext.request.contextPath}/register">Register</a>
+	                    </li>
+	                </c:otherwise>
+	            </c:choose>
+	        </ul>
 		</div>
 	</nav>
 
 	<div class="container-fluid">
 		<div class="row">
 			<!-- Sidebar -->
-			<c:if test="${empty user or (not empty user and not user.admin)}">
+			<c:if test="${not empty user and not user.admin}">
 				<nav class="col-md-2 d-none d-lg-block bg-dark sidebar px-3 pt-4">
 					<h6 class="text-uppercase">Your Library</h6>
 					<ul class="nav flex-column mb-3">
@@ -168,9 +171,39 @@
 					</div>
 				</nav>
 			</c:if>
+			<c:if test="${empty user}">
+				<nav class="col-md-2 d-none d-lg-block bg-dark sidebar px-3 pt-4">
+
+				</nav>
+			</c:if>
+			<c:if test="${not empty user and user.admin}">
+				<nav class="col-md-2 d-none d-lg-block bg-dark sidebar px-3 pt-4">
+				<h6 class="text-uppercase">Manage</h6>
+				  <ul class="nav flex-column mb-3">
+				    <li class="nav-item">
+				      <a class="nav-link text-white" href="${pageContext.request.contextPath}/admin/dashboard"><i class="bi bi-speedometer"></i> Dashboard</a>
+				    </li>
+				    <li class="nav-item">
+				      <a class="nav-link text-white" href="${pageContext.request.contextPath}/admin/user"><i class="bi bi-people"></i> Users</a>
+				    </li>
+				    <li class="nav-item">
+				      <a class="nav-link text-white" href="${pageContext.request.contextPath}/admin/music"><i class="bi bi-apple-music"></i> Music</a>
+				    </li>
+				    <li class="nav-item">
+				      <a class="nav-link text-white" href="${pageContext.request.contextPath}/admin/subscription"><i class="bi bi-calendar-check"></i> Subscriptions</a>
+				    </li>
+				    <li class="nav-item">
+				      <a class="nav-link text-white" href="${pageContext.request.contextPath}/admin/reports"><i class="bi bi-graph-up-arrow"></i> Reports</a>
+				    </li>
+				    <li class="nav-item">
+				      <a class="nav-link text-white" href="${pageContext.request.contextPath}/admin/logs"><i class="bi bi-clipboard-data"></i> Logs</a>
+				    </li>
+				  </ul>
+				</nav>
+			</c:if>
 
 			<!-- Main Content -->
-			<main class="col-md-10 px-4 pt-4" id="main-content">
+			<main class="col-md-10 px-4 pt-4 text-white" id="main-content">
 				<c:import url="${contentPage}" />
 			</main>
 		</div>
@@ -206,6 +239,8 @@
 	
 	<c:if test="${not empty flashMessages}">
 		<script>
+		toastr.options.positionClass = 'toast-bottom-right';
+		
 		<c:forEach var="msg" items="${flashMessages}">
 
 			toastr["${msg.type}"]("${msg.message}");

@@ -80,7 +80,7 @@ public class ArtistEditMusicServlet extends HttpServlet {
 		request.setAttribute("musicId", musicId);
 		request.setAttribute("musicDTOJson", JsonUtil.toJson(music));
 		request.setAttribute("contentPage", "/WEB-INF/views/artist/edit-music.jsp");
-		request.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(request, response);
+		request.getRequestDispatcher("/WEB-INF/views/layout-main.jsp").forward(request, response);
 	}
 
 	/**
