@@ -67,7 +67,7 @@ public class UserService {
 
 	}
 
-	public boolean createUserWithRoleName(User user, RoleType roleType) {
+	private boolean createUserWithRoleName(User user, RoleType roleType) {
 		Role role = roleCacheService.getByType(roleType);
 		if (role != null) {
 			user.setRoleId(role.getRoleId());
@@ -123,6 +123,15 @@ public class UserService {
 			return userDAO.updateUserRole(userId, role.getRoleId(), conn);
 		}
 		return false;
+	}
+	
+	public boolean updateUserSetPremium(int userId, boolean premium, Connection conn) {
+		return userDAO.updateUserSetPremium(userId, premium, conn);
+	}
+	
+	
+	public boolean updateUserSetArtist(int userId, boolean artist, Connection conn) {
+		return userDAO.updateUserSetArtist(userId, artist, conn);
 	}
 
 	public boolean deleteUser(int userId) {

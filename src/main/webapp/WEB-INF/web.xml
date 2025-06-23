@@ -7,6 +7,15 @@
 	<!-- Put configuration here -->
 
 	<filter>
+		<filter-name>UpdateUserSessionFilter</filter-name>
+		<filter-class>com.enth.ecomusic.filter.UpdateUserSessionFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>UpdateUserSessionFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter>
 		<filter-name>AuthFilter</filter-name>
 		<filter-class>com.enth.ecomusic.filter.AuthFilter</filter-class>
 	</filter>

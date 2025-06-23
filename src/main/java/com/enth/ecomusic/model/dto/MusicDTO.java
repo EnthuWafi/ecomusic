@@ -24,12 +24,12 @@ public class MusicDTO{
     private int totalPlayCount;
     private VisibilityType visibility;
     private LocalDateTime uploadDate;
+    private LocalDateTime updatedAt;
     
 	
-
 	public MusicDTO(int musicId, int artistId, String title, String description, String audioFileUrl, String imageUrl,
 			boolean premiumContent, int genreId, int moodId, String genreName, String moodName, int likeCount,
-			int totalPlayCount, VisibilityType visibility, LocalDateTime uploadDate) {
+			int totalPlayCount, VisibilityType visibility, LocalDateTime uploadDate, LocalDateTime updatedAt) {
 		super();
 		this.musicId = musicId;
 		this.artistId = artistId;
@@ -46,8 +46,8 @@ public class MusicDTO{
 		this.totalPlayCount = totalPlayCount;
 		this.visibility = visibility;
 		this.uploadDate = uploadDate;
+		this.updatedAt = updatedAt;
 	}
-
 
 
 	public int getMusicId() {
@@ -129,6 +129,12 @@ public class MusicDTO{
 		return uploadDate;
 	}
 
+
+	public LocalDateTime getUpdatedAt() {
+		return updatedAt;
+	}
+
+	
 	
     
 }

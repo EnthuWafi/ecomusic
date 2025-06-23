@@ -23,6 +23,7 @@ public class ResultSetMapper {
 		music.setPremiumContent(rs.getBoolean("premium_content"));
 		music.setGenreId(rs.getInt("genre_id"));
 		music.setMoodId(rs.getInt("mood_id"));
+		music.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
 		music.setUploadDate(rs.getTimestamp("upload_date").toLocalDateTime());
 		
 		music.setLikeCount(rs.getInt("like_count_cache"));

@@ -30,28 +30,30 @@ const SearchBar = ({ baseUrl }) => {
 
   return (
     <div className="position-relative">
-      <input
-	  	name="q"
-		autoComplete="off"
-        type="text"
-        className="form-control rounded-pill bg-secondary border-0 text-white"
-        placeholder="Search here..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
-      
-      {showDropdown && suggestions.length > 0 && (
-        <div className="dropdown-menu  dropdown-menu-dark show position-absolute w-100">
-          {suggestions.map((song, index) => (
-            <div key={index} 			
-			  className="dropdown-item small" 
-			  style={{cursor: 'pointer'}}
-			  onClick={() => window.location.href = `${baseUrl}/music/search?q=${song.title}`}>
-              {song.title}
-            </div>
-          ))}
-        </div>
-      )}
+		<form action={`${baseUrl}/music/search`}>
+	      <input
+		  	name="q"
+			autoComplete="off"
+	        type="text"
+	        className="form-control rounded-pill bg-secondary border-0 text-white"
+	        placeholder="Search here..."
+	        value={searchTerm}
+	        onChange={(e) => setSearchTerm(e.target.value)}
+	      />
+	      
+	      {showDropdown && suggestions.length > 0 && (
+	        <div className="dropdown-menu  dropdown-menu-dark show position-absolute w-100">
+	          {suggestions.map((song, index) => (
+	            <div key={index} 			
+				  className="dropdown-item small" 
+				  style={{cursor: 'pointer'}}
+				  onClick={() => window.location.href = `${baseUrl}/music/search?q=${song.title}`}>
+	              {song.title}
+	            </div>
+	          ))}
+	        </div>
+	      )}
+	  </form>
     </div>
   );
 };

@@ -11,6 +11,7 @@ import com.enth.ecomusic.model.enums.RoleType;
 import com.enth.ecomusic.model.mapper.SubscriptionMapper;
 import com.enth.ecomusic.model.transaction.TransactionTemplate;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,12 +38,10 @@ public class SubscriptionService {
 
 			switch (planType) {
 			case CREATOR:
-				userUpdated = userService.updateUserWithRoleName(sub.getUserId(), RoleType.ARTIST,
-						transaction.getConnection());
+				userUpdated = userService.updateUserSetArtist(sub.getUserId(), true, transaction.getConnection());
 				break;
 			case LISTENER:
-				userUpdated = userService.updateUserWithRoleName(sub.getUserId(), RoleType.PREMIUMUSER,
-						transaction.getConnection());
+				userUpdated = userService.updateUserSetPremium(sub.getUserId(), true, transaction.getConnection());
 				break;
 			}
 
@@ -55,7 +54,7 @@ public class SubscriptionService {
 			transaction.commit();
 			return insert;
 		} catch (SQLException e) {
-			e.printStackTrace(); // or use a logger
+			e.printStackTrace(); 
 			return false;
 		}
 	}
@@ -89,7 +88,6 @@ public class SubscriptionService {
 		return subscriptionDAO.deleteSubscription(subscriptionId);
 	}
 
-	// PRIVATE — reusability booster
 	private void attachPlanIfAvailable(UserSubscription sub) {
 		if (sub != null && sub.getSubscriptionPlanId() > 0) {
 			SubscriptionPlan plan = subscriptionPlanDAO.getSubscriptionPlanById(sub.getSubscriptionPlanId());
@@ -97,7 +95,19 @@ public class SubscriptionService {
 		}
 	}
 	
+	public UserSubscription getLatestSubscriptionByUserAndPlan(int userId, PlanType planType) {
+        return subscriptionDAO.getLatestSubscriptionByUserIdAndPlanType(userId, planType);
+    }
 	
+	public boolean hasActiveListenerSubscription(int userId) {
+        UserSubscription sub = getLatestSubscriptionByUserAndPlan(userId, PlanType.LISTENER);
+        return sub != null && sub.getEndDate() == null;
+    }
+	
+	 public boolean hasActiveCreatorSubscription(int userId) {
+        UserSubscription sub = getLatestSubscriptionByUserAndPlan(userId, PlanType.CREATOR);
+        return sub != null && sub.getEndDate() == null;
+    }
 	
 	public List<SubscriptionPlanDTO> getAllSubscriptionPlans() {
 		return subscriptionPlanDAO.getAllSubscriptionPlans().stream().map(SubscriptionMapper.INSTANCE::toDTO)

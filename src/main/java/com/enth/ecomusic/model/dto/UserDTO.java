@@ -19,12 +19,15 @@ public class UserDTO implements Serializable{
 	private int roleId;
 	private String roleName;
 	private String imageUrl;
+	
+	private boolean isPremium;
+	private boolean isArtist;
+	
 	private LocalDateTime createdAt;
 	
-	
-	
+
 	public UserDTO(int userId, String firstName, String lastName, String username, String bio, String email, int roleId,
-			String roleName, String imageUrl, LocalDateTime createdAt) {
+			String roleName, String imageUrl, boolean isPremium, boolean isArtist, LocalDateTime createdAt) {
 		super();
 		this.userId = userId;
 		this.firstName = firstName;
@@ -35,8 +38,11 @@ public class UserDTO implements Serializable{
 		this.roleId = roleId;
 		this.roleName = roleName;
 		this.imageUrl = imageUrl;
+		this.isPremium = isPremium;
+		this.isArtist = isArtist;
 		this.createdAt = createdAt;
 	}
+
 
 
 	public static long getSerialversionuid() {
@@ -103,8 +109,6 @@ public class UserDTO implements Serializable{
 		return createdAt;
 	}
 
-
-
 	//role checking
 	public boolean hasRole(RoleType roleType) {
 	    return roleType.getValue().equalsIgnoreCase(this.roleName);
@@ -119,15 +123,15 @@ public class UserDTO implements Serializable{
 	}
 
 	public boolean isArtist() {
-	    return hasRole(RoleType.ARTIST);
+	    return isArtist;
 	}
 	
 	public boolean isUser() {
 	    return hasRole(RoleType.USER);
 	}
 	
-	public boolean isPremiumUser() {
-	    return hasRole(RoleType.PREMIUMUSER);
+	public boolean isPremium() {
+	    return isPremium;
 	}
 	
 }

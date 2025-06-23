@@ -13,6 +13,7 @@ public class Music{
     private int artistId;
     private String title;
     private String description;
+    private LocalDateTime updatedAt;
     private LocalDateTime uploadDate;
     private String audioFileUrl;
     private String imageUrl;
@@ -27,7 +28,7 @@ public class Music{
 	private Mood mood;
 	private User artist;
 	
-	public Music(int musicId, int artistId, String title, String description, LocalDateTime uploadDate,
+	public Music(int musicId, int artistId, String title, String description, LocalDateTime updatedAt, LocalDateTime uploadDate,
 			String audioFileUrl, String imageUrl, boolean premiumContent, int genreId, int moodId, int likeCount,
 			int totalPlayCount, VisibilityType visibility) {
 		super();
@@ -35,6 +36,7 @@ public class Music{
 		this.artistId = artistId;
 		this.title = title;
 		this.description = description;
+		this.updatedAt = updatedAt;
 		this.uploadDate = uploadDate;
 		this.audioFileUrl = audioFileUrl;
 		this.imageUrl = imageUrl;
@@ -219,6 +221,16 @@ public class Music{
 
 	public void setArtist(User artist) {
 		this.artist = artist;
+	}
+
+
+	public LocalDateTime getUpdatedAt() {
+		return updatedAt;
+	}
+
+
+	public void setUpdatedAt(LocalDateTime updatedAt) {
+		this.updatedAt = updatedAt;
 	}
 	
 	

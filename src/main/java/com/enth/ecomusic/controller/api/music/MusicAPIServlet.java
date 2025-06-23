@@ -76,14 +76,23 @@ public class MusicAPIServlet extends HttpServlet {
 			throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		String query = request.getParameter("q");
-
+		String limitStr = StringUtils.defaultString(request.getParameter("limit")).trim();
+		
 		String cleanQuery = query != null ? query.trim().replaceAll("\\s+", " ").replaceAll("[&|*!~{}]", "") : null;
 		if (StringUtils.isBlank(cleanQuery)) {
 			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "q cannot be empty");
 			return;
 		}
+		
+		int limit = 8;
+		if (StringUtils.isNumeric(limitStr)) {
+			limit = Integer.parseInt(limitStr);
+			if (limit > 20) {
+				limit = 20;
+			}
+		}
 
-		List<MusicSearchDTO> musicSearchList = musicService.getRelevantMusicSearchDTO(cleanQuery, 8);
+		List<MusicSearchDTO> musicSearchList = musicService.getRelevantMusicSearchDTO(cleanQuery, limit);
 		Map<String, Object> data = new HashMap<>();
 		data.put("q", cleanQuery);
 		data.put("results", musicSearchList);

@@ -122,7 +122,7 @@ public class MusicDAO {
 
 				   SELECT
 				       m.music_id, m.artist_id, m.title, m.audio_file_url,
-				       m.image_url, m.premium_content, m.genre_id, m.mood_id, m.upload_date,
+				       m.image_url, m.premium_content, m.genre_id, m.mood_id, m.updated_at, m.upload_date,
 				       u.username AS artist_username, u.image_url AS artist_image_url,
 				       m.like_count_cache, m.total_plays_cache, m.visibility,
 				       g.name AS genre_name, mo.name As mood_name,
@@ -161,7 +161,7 @@ public class MusicDAO {
 				    WITH RankedData AS (
 				        SELECT
 				            m.music_id, m.artist_id, m.title, m.audio_file_url,
-				            m.image_url, m.premium_content, m.genre_id, m.mood_id, m.upload_date,
+				            m.image_url, m.premium_content, m.genre_id, m.mood_id, m.updated_at, m.upload_date,
 				            u.username AS artist_username, u.image_url AS artist_image_url,
 				            m.like_count_cache, m.total_plays_cache, m.visibility,
 				            g.name AS genre_name, mo.name AS mood_name,
@@ -213,7 +213,7 @@ public class MusicDAO {
 		String query = """
 				   SELECT
 				       m.music_id, m.artist_id, m.title, m.audio_file_url,
-				       m.image_url, m.premium_content, m.genre_id, m.mood_id, m.upload_date,
+				       m.image_url, m.premium_content, m.genre_id, m.mood_id, m.updated_at, m.upload_date,
 				       m.like_count_cache, m.total_plays_cache, m.visibility,
 				       g.name AS genre_name, mo.name As mood_name,
 				       ROW_NUMBER() OVER (ORDER BY m.upload_date DESC) AS rnum
@@ -330,6 +330,7 @@ public class MusicDAO {
 		int artistId = rs.getInt("artist_id");
 		String title = rs.getString("title");
 		String description = rs.getString("description");
+		LocalDateTime updatedAt = rs.getTimestamp("updated_at").toLocalDateTime();
 		LocalDateTime uploadDate = rs.getTimestamp("upload_date").toLocalDateTime();
 		String audioFileUrl = rs.getString("audio_file_url");
 		String imageUrl = rs.getString("image_url");
@@ -341,7 +342,7 @@ public class MusicDAO {
 
 		VisibilityType visibility = VisibilityType.fromString(rs.getString("visibility"));
 
-		return new Music(musicId, artistId, title, description, uploadDate, audioFileUrl, imageUrl, premiumContent,
+		return new Music(musicId, artistId, title, description, updatedAt, uploadDate, audioFileUrl, imageUrl, premiumContent,
 				genreId, moodId, likeCount, totalPlayCount, visibility);
 	}
 

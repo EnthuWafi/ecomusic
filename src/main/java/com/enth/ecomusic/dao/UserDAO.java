@@ -98,6 +98,30 @@ public class UserDAO {
 		}
 	}
 	
+	public boolean updateUserSetPremium(int userId, boolean premium, Connection conn) {
+		String sql = "UPDATE Users SET is_premium = ? WHERE user_id = ?";
+		try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+			stmt.setInt(1, (premium ? 1 : 0));
+			stmt.setInt(2, userId);
+			return stmt.executeUpdate() > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	public boolean updateUserSetArtist(int userId, boolean artist, Connection conn) {
+		String sql = "UPDATE Users SET is_artist = ? WHERE user_id = ?";
+		try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+			stmt.setInt(1, (artist ? 1 : 0));
+			stmt.setInt(2, userId);
+			return stmt.executeUpdate() > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
 	//Transactional
 	public boolean updateUserRole(int userId, int roleId, Connection conn) {
 		String sql = "UPDATE Users SET role_id = ? WHERE user_id = ?";
@@ -137,9 +161,11 @@ public class UserDAO {
 			rs.getString("password"),
 			rs.getInt("role_id"),
 			rs.getString("image_url"),
+			rs.getInt("is_premium") == 1,
+			rs.getInt("is_artist") == 1,
+			rs.getTimestamp("updated_at").toLocalDateTime(),
 			rs.getTimestamp("created_at").toLocalDateTime()
 		);
-		// Lazy load: user.setRole(null) by default
 		return user;
 	}
 }

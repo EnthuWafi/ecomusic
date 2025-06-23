@@ -66,7 +66,7 @@ public class RoleFilter extends HttpFilter implements Filter {
 			boolean isAdmin = user.isAdmin();
 			boolean isArtist = user.isArtist();
 			boolean isUser = user.isUser();
-			boolean isPremiumUser = user.isPremiumUser();
+			boolean isPremiumUser = user.isPremium();
 
 			if (path.startsWith("/admin")) {
 			    if (!(isSuperadmin || isAdmin)) {

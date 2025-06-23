@@ -151,11 +151,8 @@
 						</goals>
 						<configuration>
 							<scanPackages>
-								<scanPackage>com.enth.ecomusic.model.entity</scanPackage>
-								<scanPackage>com.enth.ecomusic.model.dto</scanPackage>
 								<scanPackage>com.enth.ecomusic.dao</scanPackage>
 								<scanPackage>com.enth.ecomusic.service</scanPackage>
-								<scanPackage>com.enth.ecomusic.model.enums</scanPackage>
 							</scanPackages>
 							<outputDirectory>${project.build.directory}/uml</outputDirectory>
 							<outputFilename>class-diagram.puml</outputFilename>

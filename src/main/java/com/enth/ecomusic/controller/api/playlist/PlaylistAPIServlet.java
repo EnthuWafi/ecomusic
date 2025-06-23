@@ -80,13 +80,24 @@ public class PlaylistAPIServlet extends HttpServlet {
 	
 	private void handleFetchPlaylists(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String userIdStr = StringUtils.defaultString(request.getParameter("userId")).trim();
+		String limitStr = StringUtils.defaultString(request.getParameter("limit")).trim();
 		
 		if (!StringUtils.isNumeric(userIdStr)) {
 			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "No user ID specified!");
 			return;
 		}
 		
+		//TODO: 
+		int limit = 8;
+		if (StringUtils.isNumeric(limitStr)) {
+			limit = Integer.parseInt(limitStr);
+			if (limit > 20) {
+				limit = 20;
+			}
+		}
+		
 		int userId = Integer.parseInt(userIdStr);
+		
 		
 		UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
 		List<PlaylistDTO> playlists = playlistService.getUserPlaylistWithMusicByUserId(userId, currentUser);

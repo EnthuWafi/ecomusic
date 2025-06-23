@@ -2,7 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="app-base-url" content="${pageContext.request.contextPath}">
@@ -22,7 +22,7 @@
 	src="${pageContext.request.contextPath}/assets/js/react-dom.development.js"></script>
 <script
 	src="${pageContext.request.contextPath}/assets/js/react-bootstrap.min.js"></script>
-<script src="${pageContext.request.contextPath}/assets/js/babel.min.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/chart.js"></script>
 
 <script src="${pageContext.request.contextPath}/assets/js/bootstrap.bundle.min.js"></script>
 <script src="${pageContext.request.contextPath}/assets/js/jquery.min.js"></script>
@@ -38,7 +38,7 @@
 	<c:set var="user" value="${sessionScope.user}" />
 	<!-- Top Navbar -->
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
-		<a class="navbar-brand d-flex align-items-center" href="#"> <img
+		<a class="navbar-brand d-flex align-items-center" href="${pageContext.request.contextPath}/home"> <img
 			src="${pageContext.request.contextPath}/assets/images/logo.svg"
 			alt="Logo" width="24" height="24" /> <span class="fs-4 fw-bold">${applicationScope.websiteName}</span>
 		</a>
@@ -54,10 +54,10 @@
 	                <a class="nav-link" href="${pageContext.request.contextPath}/home">Home</a>
 	            </li>
 	            <li class="nav-item px-2">
-	                <a class="nav-link" href="${pageContext.request.contextPath}/music/search">Browse</a>
+	                <a class="nav-link" href="${pageContext.request.contextPath}/music/browse">Browse</a>
 	            </li>
 	
-				<c:if test="${not empty user && (user.user or user.premiumUser)}">
+				<c:if test="${not empty user && (user.user or user.premium)}">
 	                <li class="nav-item px-2">
 	                    <a class="nav-link" href="${pageContext.request.contextPath}/user/library">Library</a>
 	                </li>
@@ -91,7 +91,7 @@
 	        </ul>
 	
 	        <!-- CENTER SEARCH BAR -->
-	        <div class="d-none d-lg-block w-25" id="search-bar-root"></div>
+	        <div class="d-lg-block" id="search-bar-root"></div>
 	
 	        <!-- RIGHT CTA / USER -->
 	        <ul class="navbar-nav ms-auto">
@@ -112,13 +112,13 @@
 					            </li>
 					            </c:if>
 					
-					            <c:if test="${!(user.artist or user.admin)}">
+					            <c:if test="${!(user.artist or (user.admin or user.superAdmin))}">
 					                <li>
 					                    <a class="dropdown-item" href="${pageContext.request.contextPath}/become-artist">Become an Artist</a>
 					                </li>
 					            </c:if>
 					
-					            <c:if test="${!(user.premiumUser or user.admin)}">
+					            <c:if test="${!(user.premium or (user.admin or user.superAdmin))}">
 					                <li>
 					                    <a class="dropdown-item" href="${pageContext.request.contextPath}/choose-plan">Go Premium</a>
 					                </li>
@@ -158,7 +158,7 @@
 	<div class="container-fluid">
 		<div class="row">
 			<!-- Sidebar -->
-			<c:if test="${not empty user and not user.admin}">
+			<c:if test="${not empty user and not (user.admin or user.superAdmin)}">
 				<nav class="col-md-2 d-none d-lg-block bg-dark sidebar px-3 pt-4">
 					<h6 class="text-uppercase">Your Library</h6>
 					<ul class="nav flex-column mb-3">
@@ -176,7 +176,7 @@
 
 				</nav>
 			</c:if>
-			<c:if test="${not empty user and user.admin}">
+			<c:if test="${not empty user and (user.admin or user.superAdmin)}">
 				<nav class="col-md-2 d-none d-lg-block bg-dark sidebar px-3 pt-4">
 				<h6 class="text-uppercase">Manage</h6>
 				  <ul class="nav flex-column mb-3">
@@ -209,15 +209,11 @@
 		</div>
 	</div>
 
-	<c:if test="${empty user or (not empty user and not user.admin)}">
+	<c:if test="${empty user or (not empty user and not (user.admin or user.superAdmin))}">
 		<script
 			src="${pageContext.request.contextPath}/assets/js/components/SearchBar.js"></script>
-			
-		<script
-			src="${pageContext.request.contextPath}/assets/js/components/PlaylistSidebar.js"></script>
-			
+		
 		<script>
-			const userId = ${(not empty user) ? user.userId : 'null'};
 			const baseUrl = document.querySelector('meta[name="app-base-url"]')
 					.getAttribute('content');
 	
@@ -226,15 +222,25 @@
 			root.render(React.createElement(SearchBar, {
 				baseUrl : baseUrl
 			}));
-			
-			const containerPlaylist = document.getElementById('playlist-sidebar-root');
-			const rootPlaylist = ReactDOM.createRoot(containerPlaylist);
-			rootPlaylist.render(React.createElement(PlaylistSidebar, {
-				baseUrl : baseUrl,
-				userId : userId
-			}));
-			
 		</script>
+	</c:if>
+	
+	<c:if test="${not empty user and not (user.admin or user.superAdmin)}">
+	
+	<script
+	src="${pageContext.request.contextPath}/assets/js/components/PlaylistSidebar.js"></script>
+			
+	<script>
+		const userId = ${(not empty user) ? user.userId : 'null'};
+	
+		const containerPlaylist = document.getElementById('playlist-sidebar-root');
+		const rootPlaylist = ReactDOM.createRoot(containerPlaylist);
+		rootPlaylist.render(React.createElement(PlaylistSidebar, {
+			baseUrl : baseUrl,
+			userId : userId
+		}));
+	
+	</script>
 	</c:if>
 	
 	<c:if test="${not empty flashMessages}">
@@ -248,6 +254,20 @@
 		</c:forEach>
 		</script>
 	</c:if>
+	
+	<script>
+	$(document).ready(function () {
+	    const path = window.location.pathname;
+
+	    $('.nav-link').each(function () {
+	        const href = $(this).attr('href');
+
+	        if (path === href || path.startsWith(href)) {
+	            $(this).addClass('active');
+	        }
+	    });
+	});
+	</script>
 
 </body>
 </html>

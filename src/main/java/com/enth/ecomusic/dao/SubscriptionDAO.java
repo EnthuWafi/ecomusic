@@ -1,6 +1,7 @@
 package com.enth.ecomusic.dao;
 
 import com.enth.ecomusic.model.entity.UserSubscription;
+import com.enth.ecomusic.model.enums.PlanType;
 import com.enth.ecomusic.util.DAOUtil;
 import com.enth.ecomusic.util.DBConnection;
 
@@ -14,9 +15,9 @@ public class SubscriptionDAO {
 
     // CREATE
     public boolean insertSubscription(UserSubscription sub) {
-        String sql = "INSERT INTO Subscriptions (subscription_id, user_id, start_date, end_date, amount_paid, payment_status, payment_gateway_ref) "
-                   + "VALUES (?, ?, ?, ?, ?, ?, ?)";
-        try (Connection conn = DBConnection.getConnection();PreparedStatement stmt = conn.prepareStatement(sql)) {
+        String sql = "INSERT INTO Subscriptions (subscription_id, user_id, start_date, end_date, amount_paid, payment_status, payment_gateway_ref, subscription_plan_id) "
+                   + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, sub.getSubscriptionId());
             stmt.setInt(2, sub.getUserId());
             stmt.setDate(3, sub.getStartDate() != null ? Date.valueOf(sub.getStartDate()) : null);
@@ -24,6 +25,7 @@ public class SubscriptionDAO {
             stmt.setDouble(5, sub.getAmountPaid());
             stmt.setString(6, sub.getPaymentStatus());
             stmt.setString(7, sub.getPaymentGatewayRef());
+            stmt.setInt(8, sub.getSubscriptionPlanId());
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -34,8 +36,8 @@ public class SubscriptionDAO {
     
     // Create (Transactional)
     public boolean insertSubscription(UserSubscription sub, Connection conn) {
-        String sql = "INSERT INTO Subscriptions (subscription_id, user_id, start_date, end_date, amount_paid, payment_status, payment_gateway_ref) "
-                   + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Subscriptions (subscription_id, user_id, start_date, end_date, amount_paid, payment_status, payment_gateway_ref, subscription_plan_id) "
+                   + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, sub.getSubscriptionId());
             stmt.setInt(2, sub.getUserId());
@@ -44,6 +46,7 @@ public class SubscriptionDAO {
             stmt.setDouble(5, sub.getAmountPaid());
             stmt.setString(6, sub.getPaymentStatus());
             stmt.setString(7, sub.getPaymentGatewayRef());
+            stmt.setInt(8, sub.getSubscriptionPlanId());
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -106,7 +109,7 @@ public class SubscriptionDAO {
     // DELETE
     public boolean deleteSubscription(int id) {
         String sql = "DELETE FROM Subscriptions WHERE subscription_id = ?";
-        try (Connection conn = DBConnection.getConnection();PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -116,15 +119,17 @@ public class SubscriptionDAO {
     }
 
     
-    //get latest subscription for a user
-    public UserSubscription getLatestSubscriptionByUserId(int userId) {
+    public UserSubscription getLatestSubscriptionByUserIdAndPlanType(int userId, PlanType plan) {
     	String sql = """
     			SELECT * FROM (
-			        SELECT * FROM Subscriptions WHERE user_id = ? ORDER BY created_at DESC
+			        SELECT s.* FROM Subscriptions 
+			        JOIN SubscriptionPlans sp ON s.subscription_plan_id = sp.subscription_plan_id
+			        WHERE user_id = ? AND sp.plan_type = ?
+			        ORDER BY created_at DESC
 			    ) WHERE ROWNUM = 1
     			""";
     	
-    	return DAOUtil.executeSingleQuery(sql, this::mapResultSetToSubscription, userId);
+    	return DAOUtil.executeSingleQuery(sql, this::mapResultSetToSubscription, userId, plan.getValue());
     }
     
     // Helper method

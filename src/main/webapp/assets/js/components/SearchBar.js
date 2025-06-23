@@ -28,6 +28,8 @@ const SearchBar = ({
   }, [searchTerm, baseUrl]);
   return /*#__PURE__*/React.createElement("div", {
     className: "position-relative"
+  }, /*#__PURE__*/React.createElement("form", {
+    action: `${baseUrl}/music/search`
   }, /*#__PURE__*/React.createElement("input", {
     name: "q",
     autoComplete: "off",
@@ -45,5 +47,5 @@ const SearchBar = ({
       cursor: 'pointer'
     },
     onClick: () => window.location.href = `${baseUrl}/music/search?q=${song.title}`
-  }, song.title))));
+  }, song.title)))));
 };

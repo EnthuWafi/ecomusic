@@ -272,7 +272,7 @@ public class MusicService {
 
 		boolean isOwner = user != null && music.getArtistId() == user.getUserId();
 		boolean isAdmin = user != null && user.hasRole(RoleType.ADMIN);
-		boolean isPremiumUser = user != null && user.hasRole(RoleType.PREMIUMUSER);
+		boolean isPremiumUser = user != null && user.isPremium();
 		boolean isPublic = music.getVisibility() == VisibilityType.PUBLIC;
 
 		if (isOwner) return true; // Artist always has access
@@ -302,7 +302,7 @@ public class MusicService {
 	public boolean canModifyMusic(Music music, UserDTO user) {
 		return music != null &&
 	               user != null &&
-	               music.getArtistId() == user.getUserId();
+	               music.getArtistId() == user.getUserId() && user.isAdmin();
 	}
 
 	public boolean canDeleteMusic(Music music, UserDTO user) {

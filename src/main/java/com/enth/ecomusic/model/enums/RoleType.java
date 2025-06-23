@@ -6,9 +6,7 @@ import java.util.Map;
 public enum RoleType {
 	SUPERADMIN("superadmin"),
 	ADMIN("admin"),
-	ARTIST("artist"),
-	USER("user"),
-	PREMIUMUSER("premiumuser");
+	USER("user");
 	
     private final String value;
 

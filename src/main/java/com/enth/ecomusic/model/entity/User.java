@@ -13,6 +13,10 @@ public class User{
 	private String password;
 	private int roleId; 
 	private String imageUrl;
+	
+	private boolean isPremium;
+	private boolean isArtist;
+	private LocalDateTime updatedAt;
 	private LocalDateTime createdAt;
 	
 	private Role role;
@@ -22,7 +26,8 @@ public class User{
 	}
 
 	public User(int userId, String firstName, String lastName, String username, String bio, String email,
-			String password, int roleId, String imageUrl, LocalDateTime createdAt) {
+			String password, int roleId, String imageUrl, boolean isPremium, boolean isArtist, LocalDateTime updatedAt,
+			LocalDateTime createdAt) {
 		super();
 		this.userId = userId;
 		this.firstName = firstName;
@@ -33,8 +38,13 @@ public class User{
 		this.password = password;
 		this.roleId = roleId;
 		this.imageUrl = imageUrl;
+		this.isPremium = isPremium;
+		this.isArtist = isArtist;
+		this.updatedAt = updatedAt;
 		this.createdAt = createdAt;
 	}
+
+
 
 	public User(String firstName, String lastName, String username, String bio, String email, String password,
 			int roleId, String imageUrl) {
@@ -159,6 +169,31 @@ public class User{
 	public void setRole(Role role) {
 		this.role = role;
 	}
+
+	public boolean isPremium() {
+		return isPremium;
+	}
+
+	public void setPremium(boolean isPremium) {
+		this.isPremium = isPremium;
+	}
+
+	public boolean isArtist() {
+		return isArtist;
+	}
+
+	public void setArtist(boolean isArtist) {
+		this.isArtist = isArtist;
+	}
+
+	public LocalDateTime getUpdatedAt() {
+		return updatedAt;
+	}
+
+	public void setUpdatedAt(LocalDateTime updatedAt) {
+		this.updatedAt = updatedAt;
+	}
+	
 	
 	
 
