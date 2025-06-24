@@ -6,15 +6,7 @@
 
 	<!-- Put configuration here -->
 
-	<filter>
-		<filter-name>UpdateUserSessionFilter</filter-name>
-		<filter-class>com.enth.ecomusic.filter.UpdateUserSessionFilter</filter-class>
-	</filter>
-	<filter-mapping>
-		<filter-name>UpdateUserSessionFilter</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
-
+	
 	<filter>
 		<filter-name>AuthFilter</filter-name>
 		<filter-class>com.enth.ecomusic.filter.AuthFilter</filter-class>
@@ -35,6 +27,26 @@
 	</filter-mapping>
 
 	<filter>
+		<filter-name>RefreshUserSessionFilter</filter-name>
+		<filter-class>com.enth.ecomusic.filter.RefreshUserSessionFilter</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>RefreshUserSessionFilter</filter-name>
+		<url-pattern>/user/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>RefreshUserSessionFilter</filter-name>
+		<url-pattern>/admin/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>RefreshUserSessionFilter</filter-name>
+		<url-pattern>/artist/*</url-pattern>
+	</filter-mapping>
+
+	<filter>
 		<filter-name>RoleFilter</filter-name>
 		<filter-class>com.enth.ecomusic.filter.RoleFilter</filter-class>
 	</filter>
@@ -51,21 +63,6 @@
 	<filter-mapping>
 		<filter-name>RoleFilter</filter-name>
 		<url-pattern>/artist/*</url-pattern>
-	</filter-mapping>
-	
-	<filter-mapping>
-		<filter-name>RoleFilter</filter-name>
-		<url-pattern>/music/*</url-pattern>
-	</filter-mapping>
-	
-	<filter-mapping>
-		<filter-name>RoleFilter</filter-name>
-		<url-pattern>/become-artist</url-pattern>
-	</filter-mapping>
-	
-	<filter-mapping>
-		<filter-name>RoleFilter</filter-name>
-		<url-pattern>/choose-plan</url-pattern>
 	</filter-mapping>
 	
 	<filter>

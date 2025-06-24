@@ -69,7 +69,6 @@ public class SubscriptionCheckoutServlet extends HttpServlet {
 
 	    String subscriptionPlanId = request.getParameter("planId");
 
-	    // Validate planId
 	    if (subscriptionPlanId == null || !subscriptionPlanId.matches("\\d+")) {
 	        CommonUtil.addMessage(session, ToastrType.ERROR, "Invalid subscription plan selected.");
 	        response.sendRedirect(request.getContextPath() + "/choose-plan");

@@ -101,7 +101,7 @@ public class ArtistUploadMusicServlet extends HttpServlet {
 		Music music = new Music(artist.getUserId(), title, genreId, moodId, desc, null, null, isPremium);
 		music.setVisibility(visibility);
 
-		boolean success = musicService.uploadMusic(music, audioPart, imagePart);
+		boolean success = musicService.uploadMusic(music, audioPart, imagePart, artist);
 		if (success) {
 			CommonUtil.addMessage(session, ToastrType.SUCCESS, "Music successfully uploaded");
 			response.sendRedirect(request.getContextPath() + "/artist/music");

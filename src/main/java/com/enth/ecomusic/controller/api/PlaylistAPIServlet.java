@@ -1,4 +1,4 @@
-package com.enth.ecomusic.controller.api.playlist; 
+package com.enth.ecomusic.controller.api; 
 
 import com.enth.ecomusic.model.dto.PlaylistDTO;
 import com.enth.ecomusic.model.dto.UserDTO;
@@ -11,6 +11,8 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -61,15 +63,16 @@ public class PlaylistAPIServlet extends HttpServlet {
 			return;
 		}
 
-		String[] pathParts = pathInfo.split("/");
+		String[] pathParts = pathInfo.substring(1).split("/");
 
 		try {
-			if (pathParts.length == 2) {
-				handleFetchPlaylist(pathParts[1], request, response);
+			if (pathParts.length == 1) {
+				// /{id}
+				handleFetchPlaylist(pathParts[0], request, response);
 
-			} else if (pathParts.length == 4 && "music".equals(pathParts[2])) {
-				handleFetchMusic(pathParts[1], pathParts[3], request, response);
-
+			} else if (pathParts.length == 3 && "music".equals(pathParts[1])) {
+				// /{id}/music/{id}
+				handleFetchMusic(pathParts[0], pathParts[2], request, response);
 			} else {
 				ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid API path");
 			}
@@ -111,7 +114,7 @@ public class PlaylistAPIServlet extends HttpServlet {
 
 
 	private void handleFetchMusic(String playlistIdStr, String musicIdStr, HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
+			HttpServletResponse response) throws ServletException, IOException, NumberFormatException {
 		int playlistId = Integer.parseInt(playlistIdStr);
 		int musicId = Integer.parseInt(musicIdStr);
 		
@@ -131,12 +134,20 @@ public class PlaylistAPIServlet extends HttpServlet {
 	}
 
 	private void handleFetchPlaylist(String playlistIdStr, HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+			throws ServletException, IOException, NumberFormatException {
 		int playlistId = Integer.parseInt(playlistIdStr);
 		
 		UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
-		PlaylistDTO playlist = playlistService.getPlaylistByPlaylistId(playlistId, currentUser);
+	
+		String fetchMusic = request.getParameter("fetch");
 		
+		PlaylistDTO playlist;
+		if (StringUtils.isBlank(fetchMusic)) {
+			playlist = playlistService.getPlaylistByPlaylistId(playlistId, currentUser);
+		}
+		else {
+			playlist = playlistService.getPlaylistWithMusicByPlaylistId(playlistId, currentUser);
+		}
 
 		if (playlist == null) {
 			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Access denied or does not exist");
@@ -162,14 +173,15 @@ public class PlaylistAPIServlet extends HttpServlet {
 		if (pathInfo == null || pathInfo.equals("/")) {
 			// create playlist
 			createPlaylistPost(request, response);
+			return;
 		}
 
-		String[] pathParts = pathInfo.split("/");
+		String[] pathParts = pathInfo.substring(1).split("/");
 
 		try {
-			if (pathParts.length == 3 && "music".equals(pathParts[2])) {
-
-				addPlaylistMusic(pathParts[1], request, response);
+			if (pathParts.length == 2 && "music".equals(pathParts[1])) {
+				// /{id}/music
+				addPlaylistMusic(pathParts[0], request, response);
 
 			} else {
 				ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid API path");
@@ -186,7 +198,7 @@ public class PlaylistAPIServlet extends HttpServlet {
 	}
 
 	private void addPlaylistMusic(String playlistIdStr, HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+			throws ServletException, IOException, NumberFormatException {
 		// TODO Auto-generated method stub
 		int playlistId = Integer.parseInt(playlistIdStr);
 
@@ -202,15 +214,15 @@ public class PlaylistAPIServlet extends HttpServlet {
 			return;
 		}
 
-		String[] pathParts = pathInfo.split("/");
+		String[] pathParts = pathInfo.substring(1).split("/");
 
 		try {
-			if (pathParts.length == 2) {
-				updatePlaylist(pathParts[1], request, response);
-
-			} else if (pathParts.length == 4 && "music".equals(pathParts[2])) {
-
-				updatePlaylistMusic(pathParts[1], pathParts[3], request, response);
+			if (pathParts.length == 1) {
+				// {id}
+				updatePlaylist(pathParts[0], request, response);
+			} else if (pathParts.length == 3 && "music".equals(pathParts[1])) {
+				// {id}/music/{id}
+				updatePlaylistMusic(pathParts[0], pathParts[2], request, response);
 
 			} else {
 				ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid API path");
@@ -221,7 +233,7 @@ public class PlaylistAPIServlet extends HttpServlet {
 	}
 
 	private void updatePlaylistMusic(String playlistIdStr, String musicIdStr, HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
+			HttpServletResponse response) throws ServletException, IOException, NumberFormatException {
 		
 		int playlistId = Integer.parseInt(playlistIdStr);
 		int musicId = Integer.parseInt(musicIdStr);
@@ -262,11 +274,80 @@ public class PlaylistAPIServlet extends HttpServlet {
 	}
 
 	private void updatePlaylist(String playlistIdStr, HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+			throws ServletException, IOException, NumberFormatException {
 		// TODO Auto-generated method stub
 		int playlistId = Integer.parseInt(playlistIdStr);
 
 	}
 	
-	
+	@Override
+	protected void doDelete(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		String pathInfo = request.getPathInfo();
+		if (pathInfo == null || pathInfo.equals("/")) {
+			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Playlist ID is required");
+			return;
+		}
+
+		String[] pathParts = pathInfo.substring(1).split("/");
+
+		try {
+			if (pathParts.length == 1) {
+				// {id}
+				deletePlaylist(pathParts[0], request, response);
+			} else if (pathParts.length == 3 && "music".equals(pathParts[1])) {
+				// {id}/music/{id}
+				deletePlaylistMusic(pathParts[0], pathParts[2], request, response);
+
+			} else {
+				ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid API path");
+			}
+		} catch (NumberFormatException e) {
+			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "IDs must be numeric");
+		}
+	}
+
+	private void deletePlaylistMusic(String playlistIdStr, String musicIdStr, HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException, NumberFormatException  {
+		// TODO Auto-generated method stub
+		int playlistId = Integer.parseInt(playlistIdStr);
+		int musicId = Integer.parseInt(playlistIdStr);
+		
+		HttpSession session = request.getSession();
+		UserDTO currentUser = (UserDTO) session.getAttribute("user");
+
+		if (currentUser == null) {
+			ResponseUtil.sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "User not authenticated");
+			return;
+		}
+		
+		if (playlistService.removeSongFromPlaylist(playlistId, musicId, currentUser)) {
+			ResponseUtil.sendJson(response, "Successfully deleted music with ID " + musicId + " in playlist " + playlistId);
+		} else {
+			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Cannot delete playlist music");
+		}
+		
+		
+	}
+
+	private void deletePlaylist(String playlistIdStr, HttpServletRequest request, HttpServletResponse response) 
+			throws ServletException, IOException, NumberFormatException {
+		int playlistId = Integer.parseInt(playlistIdStr);	
+		
+		HttpSession session = request.getSession();
+		UserDTO currentUser = (UserDTO) session.getAttribute("user");
+
+		if (currentUser == null) {
+			ResponseUtil.sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "User not authenticated");
+			return;
+		}
+		
+		if (playlistService.removePlaylist(playlistId, currentUser)) {
+			ResponseUtil.sendJson(response, "Successfully deleted playlist with ID " + playlistId);
+		} else {
+			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Cannot delete playlist");
+		}
+		
+	}
 }

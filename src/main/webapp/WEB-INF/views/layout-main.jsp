@@ -112,13 +112,10 @@
 					            </li>
 					            </c:if>
 					
-					            <c:if test="${!(user.artist or (user.admin or user.superAdmin))}">
+					            <c:if test="${!(user.admin or user.superAdmin)}">
 					                <li>
 					                    <a class="dropdown-item" href="${pageContext.request.contextPath}/become-artist">Become an Artist</a>
-					                </li>
-					            </c:if>
-					
-					            <c:if test="${!(user.premium or (user.admin or user.superAdmin))}">
+					                </li>	
 					                <li>
 					                    <a class="dropdown-item" href="${pageContext.request.contextPath}/choose-plan">Go Premium</a>
 					                </li>

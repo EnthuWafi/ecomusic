@@ -21,8 +21,8 @@ import com.enth.ecomusic.util.AppContext;
 /**
  * Servlet Filter implementation class UpdateUserSessionFilter
  */
-@WebFilter("/*")
-public class UpdateUserSessionFilter extends HttpFilter implements Filter {
+@WebFilter({"/user/*", "/admin/*", "/artist/*"})
+public class RefreshUserSessionFilter extends HttpFilter implements Filter {
 
 	/**
 	 * 
@@ -32,7 +32,7 @@ public class UpdateUserSessionFilter extends HttpFilter implements Filter {
 	/**
 	 * @see HttpFilter#HttpFilter()
 	 */
-	public UpdateUserSessionFilter() {
+	public RefreshUserSessionFilter() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
@@ -49,25 +49,18 @@ public class UpdateUserSessionFilter extends HttpFilter implements Filter {
 	 */
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
-		// TODO Auto-generated method stub
+		// I do not fucking care, refresh user session everytime on these pages now
 		if (request instanceof HttpServletRequest) {
 			HttpServletRequest httpReq = (HttpServletRequest) request;
 			HttpSession session = httpReq.getSession(false);
 
 			if (session != null) {
 				UserDTO sessionUser = (UserDTO) session.getAttribute("user");
-				Long pendingSince = (Long) session.getAttribute("updatePendingSince");
-
-				boolean shouldReload = sessionUser != null
-		                && pendingSince != null
-		                && System.currentTimeMillis() - pendingSince > 5000;
 		                
-				if (shouldReload) {
-					AppContext ctx = (AppContext) this.getServletContext().getAttribute("appContext");
-					UserDTO fresh = ctx.getUserService().getUserDTOById(sessionUser.getUserId());
-					session.setAttribute("user", fresh);
-					session.removeAttribute("updatePendingSince");
-				}
+				AppContext ctx = (AppContext) this.getServletContext().getAttribute("appContext");
+				UserDTO fresh = ctx.getUserService().getUserDTOById(sessionUser.getUserId());
+				session.setAttribute("user", fresh);
+
 			}
 
 		}

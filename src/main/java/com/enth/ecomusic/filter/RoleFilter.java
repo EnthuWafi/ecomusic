@@ -21,7 +21,7 @@ import com.enth.ecomusic.util.ToastrType;
 /**
  * Servlet Filter implementation class RoleFilter
  */
-@WebFilter({ "/admin/*", "/artist/*", "/user/*", "/become-artist", "/choose-plan"})
+@WebFilter({ "/admin/*", "/artist/*", "/user/*"})
 public class RoleFilter extends HttpFilter implements Filter {
 
 	/**
@@ -87,22 +87,6 @@ public class RoleFilter extends HttpFilter implements Filter {
 			else if (path.startsWith("/user")) {
 			    if (!(isUser || isPremiumUser || isArtist)) {
 			        CommonUtil.addMessage(session, ToastrType.ERROR, "Access denied: Users only");
-			        httpResponse.sendRedirect(contextPath + "/home");
-			        return;
-			    }
-			}
-			
-			else if (path.startsWith("/become-artist")) {
-			    if (isSuperadmin || isAdmin || isArtist) {
-			        CommonUtil.addMessage(session, ToastrType.ERROR, "Access denied: Admin and artist denied!");
-			        httpResponse.sendRedirect(contextPath + "/home");
-			        return;
-			    }
-			}
-			
-			else if (path.startsWith("/choose-plan")) {
-			    if (isSuperadmin || isAdmin || isPremiumUser) {
-			        CommonUtil.addMessage(session, ToastrType.ERROR, "Access denied: Admin and premium user denied!");
 			        httpResponse.sendRedirect(contextPath + "/home");
 			        return;
 			    }

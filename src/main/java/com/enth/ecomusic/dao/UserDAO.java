@@ -161,8 +161,8 @@ public class UserDAO {
 			rs.getString("password"),
 			rs.getInt("role_id"),
 			rs.getString("image_url"),
-			rs.getInt("is_premium") == 1,
-			rs.getInt("is_artist") == 1,
+			(rs.getInt("is_premium") == 1 ? true : false),
+			(rs.getInt("is_artist") == 1 ? true : false),
 			rs.getTimestamp("updated_at").toLocalDateTime(),
 			rs.getTimestamp("created_at").toLocalDateTime()
 		);

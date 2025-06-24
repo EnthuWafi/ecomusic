@@ -232,10 +232,6 @@ const AdminDashboard = () => {
 									<div className="ms-3 flex-grow-1">
 										<div className="kpi-value text-white">{formatCurrency(kpiData.monthlyRevenue)}</div>
 										<div className="kpi-label text-white opacity-75">Monthly Revenue</div>
-										<div className="yearly-revenue mt-2">
-											<small className="text-white opacity-75">Yearly Revenue:</small>
-											<div className="text-white fw-bold">{formatCurrency(kpiData.yearlyRevenue)}</div>
-										</div>
 									</div>
 								</div>
 							</div>

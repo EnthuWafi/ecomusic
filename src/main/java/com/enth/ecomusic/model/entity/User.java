@@ -14,8 +14,8 @@ public class User{
 	private int roleId; 
 	private String imageUrl;
 	
-	private boolean isPremium;
-	private boolean isArtist;
+	private boolean premium;
+	private boolean artist;
 	private LocalDateTime updatedAt;
 	private LocalDateTime createdAt;
 	
@@ -38,8 +38,8 @@ public class User{
 		this.password = password;
 		this.roleId = roleId;
 		this.imageUrl = imageUrl;
-		this.isPremium = isPremium;
-		this.isArtist = isArtist;
+		this.premium = isPremium;
+		this.artist = isArtist;
 		this.updatedAt = updatedAt;
 		this.createdAt = createdAt;
 	}
@@ -171,19 +171,19 @@ public class User{
 	}
 
 	public boolean isPremium() {
-		return isPremium;
+		return premium;
 	}
 
 	public void setPremium(boolean isPremium) {
-		this.isPremium = isPremium;
+		this.premium = isPremium;
 	}
 
 	public boolean isArtist() {
-		return isArtist;
+		return artist;
 	}
 
 	public void setArtist(boolean isArtist) {
-		this.isArtist = isArtist;
+		this.artist = isArtist;
 	}
 
 	public LocalDateTime getUpdatedAt() {

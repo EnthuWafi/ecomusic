@@ -182,7 +182,7 @@ public class PlaylistServlet extends HttpServlet {
 		newPlaylist.setVisibility(visibility);
 		newPlaylist.setUserId(currentUser.getUserId());
 
-		if (playlistService.addPlaylist(newPlaylist)) {
+		if (playlistService.addPlaylist(newPlaylist, currentUser)) {
 			CommonUtil.addMessage(request.getSession(), ToastrType.SUCCESS, "Playlist added successfully");
 			response.sendRedirect(request.getContextPath() + "/user/playlist");
 		} else {

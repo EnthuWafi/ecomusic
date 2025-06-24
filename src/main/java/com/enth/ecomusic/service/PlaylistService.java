@@ -81,8 +81,11 @@ public class PlaylistService {
 	 *                 name.
 	 * @return The created playlist, possibly with the new playlistId.
 	 */
-	public boolean addPlaylist(Playlist playlist) {
-		// The DAO method would handle the INSERT operation.
+	public boolean addPlaylist(Playlist playlist, UserDTO currentUser) {
+		if (!canModifyPlaylist(playlist, currentUser)) {
+			return false;
+		}
+		
 		return playlistDAO.insertPlaylist(playlist);
 	}
 
@@ -282,6 +285,7 @@ public class PlaylistService {
 		
 		return PlaylistMapper.INSTANCE.toDTO(playlistMusic);
 	}
+
 	
 	public boolean canAccessPublicPlaylist(Playlist playlist, UserDTO user) {
         return playlist != null &&

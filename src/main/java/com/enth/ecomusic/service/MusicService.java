@@ -38,7 +38,11 @@ public class MusicService {
 		this.moodCacheService = moodCacheService != null ? moodCacheService : new MoodCacheService();
 	}
 
-	public boolean uploadMusic(Music music, Part audioPart, Part imagePart) {
+	public boolean uploadMusic(Music music, Part audioPart, Part imagePart, UserDTO user) {
+		if (!canUploadMusic(user)) {
+			return false;
+		}
+		
 		try {
 			if (audioPart == null || audioPart.getSize() == 0
 					|| FileTypeUtil.getAudioExtension((audioPart.getContentType())) == null) {
@@ -168,6 +172,51 @@ public class MusicService {
 			return false;
 		}
 	}
+	
+	public boolean deleteMusic(Music music, UserDTO currentUser) {
+	    if (!canDeleteMusic(music, currentUser)) {
+	        return false;
+	    }
+
+	    try {
+	        String audioDir = AppConfig.get("audioFilePath");
+	        String imageDir = AppConfig.get("musicImageFilePath");
+
+	        // === DELETE AUDIO FILE ===
+	        String audioFileName = music.getAudioFileUrl();
+	        if (audioFileName != null && !audioFileName.isEmpty()) {
+	            File audioFile = new File(audioDir + File.separator + audioFileName);
+	            if (audioFile.exists()) {
+	                Files.delete(audioFile.toPath());
+	            }
+	        }
+
+	        // === DELETE IMAGE + THUMBNAIL ===
+	        String imageFileName = music.getImageUrl();
+	        if (imageFileName != null && !imageFileName.isEmpty()) {
+	            File imageFile = new File(imageDir + File.separator + imageFileName);
+	            File thumbFile = new File(imageDir + File.separator + "thumb_" + imageFileName);
+
+	            if (imageFile.exists()) {
+	                Files.delete(imageFile.toPath());
+	            }
+
+	            if (thumbFile.exists()) {
+	                Files.delete(thumbFile.toPath());
+	            }
+	        }
+
+	        // === DELETE DB RECORD ===
+	        return musicDAO.deleteMusic(music.getMusicId());
+
+	    } catch (IOException e) {
+	        System.err.println("Error deleting music files: " + e.getMessage());
+	        e.printStackTrace();
+	        return false;
+	    }
+	}
+
+	
 
 	public MusicDTO getMusicDTOWithoutAudioById(int musicId, UserDTO currentUser) {
 		Music music = this.getMusicById(musicId);
@@ -267,6 +316,10 @@ public class MusicService {
 	
 	//check if user can access music,
 	//an owner should be able to see regardless even if music is private
+	public boolean canUploadMusic(UserDTO user) {
+		return user.isArtist();
+	}
+	
 	public boolean canAccessMusic(Music music, UserDTO user) {
 		if (music == null) return false;
 
@@ -275,9 +328,9 @@ public class MusicService {
 		boolean isPremiumUser = user != null && user.isPremium();
 		boolean isPublic = music.getVisibility() == VisibilityType.PUBLIC;
 
-		if (isOwner) return true; // Artist always has access
+		if (isOwner) return true;
 
-		if (isAdmin && isPublic) return true; // Admins can access public tracks
+		if (isAdmin && isPublic) return true;
 
 		if (isPublic) {
 			if (music.isPremiumContent()) {
@@ -287,7 +340,7 @@ public class MusicService {
 			}
 		}
 
-		return false; // All other cases (e.g., private & not owner or admin)
+		return false; //
 	}
 	
 	public boolean canSeeMusic(Music music, UserDTO user) {
@@ -302,12 +355,13 @@ public class MusicService {
 	public boolean canModifyMusic(Music music, UserDTO user) {
 		return music != null &&
 	               user != null &&
-	               music.getArtistId() == user.getUserId() && user.isAdmin();
+	               music.getArtistId() == user.getUserId() && user.isArtist();
 	}
 
 	public boolean canDeleteMusic(Music music, UserDTO user) {
 		return music != null &&
 	               user != null &&
-	               (music.getArtistId() == user.getUserId() || user.hasRole(RoleType.ADMIN));
+	               ( music.getArtistId() == user.getUserId() || 
+	               (user.isAdmin() || user.isSuperAdmin()) );
 	}
 }

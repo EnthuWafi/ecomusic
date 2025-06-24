@@ -351,7 +351,7 @@ public class MusicDAO {
 		String query = """
 				WITH RankedData AS (
 				   SELECT
-				       m.title, (
+				        m.music_id, m.title, (
 				                SCORE(1) * ? +
 				                m.like_count_cache * ? +
 				                m.total_plays_cache * ? +
@@ -363,7 +363,7 @@ public class MusicDAO {
 				)
 				SELECT * FROM (
 					SELECT r.*, ROW_NUMBER() OVER (ORDER BY r.relevance_score DESC) AS rnum FROM RankedData r
-				) WHERE rnum BETWEEN 1 AND ?
+				) WHERE rnum <= ?
 				
 				""";
 		
