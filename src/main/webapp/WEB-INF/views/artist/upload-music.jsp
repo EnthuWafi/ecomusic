@@ -53,6 +53,16 @@
                         Premium Content
                     </label>
                 </div>
+                
+                <div class="mb-3">
+                    <label for="visibility" class="form-label">Visibility</label>
+                    <select class="form-select" id="visibility" name="visibility" required>
+                        <option value="" disabled selected>Select visibility</option>
+                          <option value="public">PUBLIC</option>
+                          <option value="private">PRIVATE</option>
+                    </select>
+                </div>
+                
 
                 <button type="submit" class="btn btn-primary">Upload</button>
             </form>

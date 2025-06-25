@@ -79,12 +79,12 @@ public class AudioStreamServlet extends HttpServlet {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;
 		}
-
-		// Optional: permission check
-		// if (!userHasAccess(req.getUserPrincipal(), songId)) {
-		// response.sendError(HttpServletResponse.SC_FORBIDDEN);
-		// return;
-		// }
+		
+		if (!musicService.canAccessMusic(music, currentUser)) {
+			response.sendError(HttpServletResponse.SC_FORBIDDEN);
+			return;
+		}
+		
 		String mimeType = getServletContext().getMimeType(file.getName());
 		if (mimeType == null) {
 			mimeType = "application/octet-stream";

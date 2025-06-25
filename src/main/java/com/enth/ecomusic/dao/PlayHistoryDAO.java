@@ -15,7 +15,7 @@ public class PlayHistoryDAO {
 
 		try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-			stmt.setInt(1, playHistory.getUserId());
+			stmt.setObject(1, playHistory.getUserId(), java.sql.Types.INTEGER);
 			stmt.setInt(2, playHistory.getMusicId());
 			stmt.setLong(3, playHistory.getListenDuration());
 			stmt.setInt(4, playHistory.isWasSkipped() ? 1 : 0);
@@ -136,7 +136,7 @@ public class PlayHistoryDAO {
 		String query = """
 				SELECT *
 				FROM (
-				    SELECT p.*, ROW_NUMBER() OVER (ORDER BY p.played_at DESC) AS rnum
+				    SELECT p.*, DISTINCT(p.music_id), ROW_NUMBER() OVER (ORDER BY p.played_at DESC) AS rnum
 				    FROM PlayHistory p
 				    WHERE p.user_id = ?
 				)

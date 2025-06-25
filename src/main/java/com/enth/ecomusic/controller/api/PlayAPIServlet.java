@@ -76,25 +76,30 @@ public class PlayAPIServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		String pathInfo = request.getPathInfo();
 		if (pathInfo == null || pathInfo.equals("/")) {
-			createPlayHistoryRecord(request, response);
+			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Music ID is required in the path");
 			return;
 		}
 
-		ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid API path");
+		String[] pathParts = pathInfo.substring(1).split("/");
+
+		try {
+			if (pathParts.length == 1) {
+				int musicId = Integer.parseInt(pathParts[0]);
+				createPlayHistoryRecord(musicId, request, response);
+			} else {
+				ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid API path");
+			}
+		} catch (NumberFormatException e) {
+			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "IDs must be numeric");
+		}
 	}
 
-	private void createPlayHistoryRecord(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	private void createPlayHistoryRecord(int musicId, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		HttpSession session = request.getSession();
 		UserDTO currentUser = (UserDTO) session.getAttribute("user");
-
-		if (currentUser == null) {
-			ResponseUtil.sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "User not authenticated");
-			return;
-		}
 		
 		String jsonBody;
         try {
@@ -106,16 +111,13 @@ public class PlayAPIServlet extends HttpServlet {
         }
 
         Map<String, Object> requestBody;
-        int musicId;
         long listenDuration;
         boolean wasSkipped;
         try {
             requestBody = JsonUtil.fromJson(jsonBody, new TypeToken<Map<String, Object>>() {});
-            Object musicObj = requestBody.get("musicId");
             Object listenObj = requestBody.get("listenDuration");
             Object skipObj = requestBody.get("wasSkipped");
             
-            musicId = (musicObj instanceof Number) ? ((Number) musicObj).intValue() : Integer.parseInt(musicObj.toString());
             listenDuration = (listenObj instanceof Number) ? ((Number) listenObj).longValue() : Long.parseLong(listenObj.toString());
             wasSkipped = (skipObj instanceof Boolean) ? ((Boolean) skipObj).booleanValue() : Boolean.parseBoolean(skipObj.toString());
         } catch (Exception e) {
@@ -124,7 +126,7 @@ public class PlayAPIServlet extends HttpServlet {
         }
         
         PlayHistory ph = new PlayHistory();
-        ph.setUserId(currentUser.getUserId());
+        ph.setUserId(currentUser != null ? currentUser.getUserId() : null);
         ph.setMusicId(musicId);
         ph.setListenDuration(listenDuration);
         ph.setWasSkipped(wasSkipped);
@@ -132,6 +134,7 @@ public class PlayAPIServlet extends HttpServlet {
         boolean success = playHistoryService.recordPlay(ph, currentUser);
         
         if (success) {
+        	System.out.println("Successfully created a play history record");
         	ResponseUtil.sendJson(response, "Successfully created a play history record");
 		} else {
 			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Cannot create a play history music record");

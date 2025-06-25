@@ -287,13 +287,7 @@ const AdminDashboard = () => {
     className: "kpi-value text-white"
   }, formatCurrency(kpiData.monthlyRevenue)), /*#__PURE__*/React.createElement("div", {
     className: "kpi-label text-white opacity-75"
-  }, "Monthly Revenue"), /*#__PURE__*/React.createElement("div", {
-    className: "yearly-revenue mt-2"
-  }, /*#__PURE__*/React.createElement("small", {
-    className: "text-white opacity-75"
-  }, "Yearly Revenue:"), /*#__PURE__*/React.createElement("div", {
-    className: "text-white fw-bold"
-  }, formatCurrency(kpiData.yearlyRevenue))))))))), /*#__PURE__*/React.createElement("div", {
+  }, "Monthly Revenue"))))))), /*#__PURE__*/React.createElement("div", {
     className: "row g-4 mb-4"
   }, /*#__PURE__*/React.createElement("div", {
     className: "col-md-6"

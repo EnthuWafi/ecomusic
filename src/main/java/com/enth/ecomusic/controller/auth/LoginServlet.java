@@ -48,7 +48,7 @@ public class LoginServlet extends HttpServlet {
 
 		HttpSession session = request.getSession();
 
-		UserDTO userDTO = userService.authenticateUser(email, password);
+		UserDTO userDTO = userService.getAuthenticatedUser(email, password);
 		if (userDTO != null) {	
 			session.setAttribute("user", userDTO);
 			

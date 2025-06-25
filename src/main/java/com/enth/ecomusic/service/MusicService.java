@@ -229,7 +229,7 @@ public class MusicService {
 
 	public MusicDTO getMusicDTOById(int musicId, UserDTO currentUser) {
 		Music music = this.getMusicById(musicId);
-		if (!canAccessMusic(music, currentUser)) return null;
+		if (!canSeeMusic(music, currentUser)) return null;
 		MusicDTO dto = MusicMapper.INSTANCE.toDTO(music);
 
 		return dto;
@@ -237,7 +237,7 @@ public class MusicService {
 
 	public MusicDetailDTO getMusicDetailDTOById(int musicId, UserDTO currentUser) {
 		Music music = this.getMusicById(musicId);
-		if (!canAccessMusic(music, currentUser)) return null;
+		if (!canSeeMusic(music, currentUser)) return null;
 		User user = userService.getUserById(music.getArtistId());
 		music.setArtist(user);
 
@@ -320,11 +320,11 @@ public class MusicService {
 		return user.isArtist();
 	}
 	
-	public boolean canAccessMusic(Music music, UserDTO user) {
+	public boolean canAccessMusic(MusicDTO music, UserDTO user) {
 		if (music == null) return false;
 
 		boolean isOwner = user != null && music.getArtistId() == user.getUserId();
-		boolean isAdmin = user != null && user.hasRole(RoleType.ADMIN);
+		boolean isAdmin = user != null && (user.isAdmin() || user.isSuperAdmin());
 		boolean isPremiumUser = user != null && user.isPremium();
 		boolean isPublic = music.getVisibility() == VisibilityType.PUBLIC;
 

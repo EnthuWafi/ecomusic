@@ -55,12 +55,12 @@ public class RefreshUserSessionFilter extends HttpFilter implements Filter {
 			HttpSession session = httpReq.getSession(false);
 
 			if (session != null) {
-				UserDTO sessionUser = (UserDTO) session.getAttribute("user");
-		                
-				AppContext ctx = (AppContext) this.getServletContext().getAttribute("appContext");
-				UserDTO fresh = ctx.getUserService().getUserDTOById(sessionUser.getUserId());
-				session.setAttribute("user", fresh);
-
+			    UserDTO sessionUser = (UserDTO) session.getAttribute("user");
+			    if (sessionUser != null) {
+			        AppContext ctx = (AppContext) request.getServletContext().getAttribute("appContext");
+			        UserDTO fresh = ctx.getUserService().getUserDTOById(sessionUser.getUserId());
+			        session.setAttribute("user", fresh);
+			    }
 			}
 
 		}

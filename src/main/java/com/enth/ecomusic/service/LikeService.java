@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.enth.ecomusic.dao.LikeDAO;
 import com.enth.ecomusic.model.dto.LikeDTO;
+import com.enth.ecomusic.model.dto.UserDTO;
 import com.enth.ecomusic.model.entity.Like;
 import com.enth.ecomusic.model.mapper.LikeMapper;
 
@@ -18,7 +19,7 @@ public class LikeService {
         this.musicService = musicService;
 
     }
-
+    
     /**
      * Records a user's like for a specific song.
      * This operation checks if the like already exists before adding to prevent duplicates.
@@ -26,7 +27,10 @@ public class LikeService {
      * @param like The Like object containing userId and musicId.
      * @return true if the like was added successfully (or already existed), false if an error occurred.
      */
-    public boolean likeSong(Like like) {
+    public boolean likeSong(Like like, UserDTO currentUser) {
+    	if (!canLikeSong(currentUser)) {
+    		return false;
+    	}
     	return likeDAO.addLike(like);
      
     }
@@ -38,7 +42,10 @@ public class LikeService {
      * @param musicId The ID of the song.
      * @return true if the like was successfully removed (or didn't exist), false if an error occurred.
      */
-    public boolean unlikeSong(int userId, int musicId) {
+    public boolean unlikeSong(int userId, int musicId, UserDTO currentUser) {
+    	if (!canUnlikeSong(userId, currentUser)) {
+    		return false;
+    	}
     	return likeDAO.removeLike(userId, musicId);
     }
 
@@ -72,12 +79,20 @@ public class LikeService {
         return likeDTOList;
     }
     
-    public Integer countLikedSongByUserId(int userId) {
+    public Integer getCountLikedSongByUserId(int userId) {
     	return likeDAO.countLikeByUserId(userId);
     }
     
-    public Integer countLikedByMusicId(int musicId) {
+    public Integer getCountLikedByMusicId(int musicId) {
     	return likeDAO.countLikeByMusicId(musicId);
+    }
+    
+    private boolean canLikeSong(UserDTO user) {
+    	return user != null && !(user.isAdmin() || user.isSuperAdmin());
+    }
+    
+    private boolean canUnlikeSong(int targetUserId, UserDTO user) {
+    	return user != null && targetUserId == user.getUserId();
     }
 
 }

@@ -63,8 +63,9 @@ public class PlayHistoryService {
 	
 	
 	public boolean canRecordPlay(UserDTO user) {
-		//as long as not admin, you can record play history
-		return !(user.isAdmin() || user.isSuperAdmin());
+	    if (user == null) return true; // Anonymous users can record play
+	    if (user.isAdmin() || user.isSuperAdmin()) return false; // Admins can't
+	    return true; // Regular users can
 	}
 
 }

@@ -76,7 +76,8 @@ public class MusicAPIServlet extends HttpServlet {
 			if (pathParts.length == 1 && "search".equals(pathParts[0])) {
 				handleFetchSearch(request, response);
 			} else if (pathParts.length == 1) {
-				handleFetchMusic(pathParts[0], request, response);
+				int musicId = Integer.parseInt(pathParts[0]);
+				handleFetchMusic(musicId, request, response);
 			} else {
 				ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid API path");
 			}
@@ -123,10 +124,17 @@ public class MusicAPIServlet extends HttpServlet {
 
 	}
 
-	private void handleFetchMusic(String musicIdStr, HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException, NumberFormatException {
-		// TODO Auto-generated method stub
+	private void handleFetchMusic(int musicId, HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		
+		HttpSession session = request.getSession();
+		UserDTO currentUser = (UserDTO) session.getAttribute("user");
+		
+		Map<String, Object> data = new HashMap<>();
+		MusicDTO music = musicService.getMusicDTOById(musicId, currentUser);
+		data.put("results", music);
 
+		ResponseUtil.sendJson(response, data);
 	}
 
 	/**

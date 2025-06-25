@@ -158,10 +158,12 @@
 							<outputFilename>class-diagram.puml</outputFilename>
 							<useShortClassNamesInFieldsAndMethods>true</useShortClassNamesInFieldsAndMethods>
 							<useSmetana>true</useSmetana>
-							<maxVisibilityMethods>PROTECTED</maxVisibilityMethods>
+							<methodBlacklistRegexp>^(get|count|is|can|has|refresh|stream|parse).*</methodBlacklistRegexp>
+							<fieldBlacklistRegexp>.*</fieldBlacklistRegexp>
+							<maxVisibilityMethods>PUBLIC</maxVisibilityMethods>
 							<additionalPlantUmlConfigs>
 								<additionalPlantUmlConfig>skinparam linetype polyline</additionalPlantUmlConfig>
-								<additionalPlantUmlConfig>left to right direction</additionalPlantUmlConfig>
+								<additionalPlantUmlConfig>top to bottom direction</additionalPlantUmlConfig>
 								<additionalPlantUmlConfig>scale 2/3</additionalPlantUmlConfig>
 							</additionalPlantUmlConfigs>
 						</configuration>

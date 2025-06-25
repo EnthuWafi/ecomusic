@@ -54,6 +54,15 @@
                     </label>
                 </div>
                 
+                <div class="mb-3">
+                    <label for="visibility" class="form-label">Visibility</label>
+                    <select class="form-select" id="visibility" name="visibility" required>
+                        <option value="" disabled selected>Select visibility</option>
+                          <option value="public">PUBLIC</option>
+                          <option value="private">PRIVATE</option>
+                    </select>
+                </div>
+                
                 <span class="text-muted">**changes may take a few minutes to appear in search results</span>
 
                 <button type="submit" class="btn btn-primary">Update</button>
@@ -117,6 +126,17 @@
             const premiumCheckbox = document.getElementById('premiumContent');
             if (premiumCheckbox) {
                 premiumCheckbox.checked = musicDTO.premiumContent;
+            }
+            
+            const visibilitySelect = document.getElementById('visibility');
+            if (visibilitySelect && musicDTO.visibility) {
+                // Ensure the option exists before setting value
+                const visibilityOption = moodSelect.querySelector(`option[value="${musicDTO.visibility.value}"]`);
+                if (visibilityOption) {
+                	visibilitySelect.value = musicDTO.moodId;
+                } else {
+                    console.warn(`Visibility Type ${musicDTO.visibility.value} not found in visibilityList options.`);
+                }
             }
         }
     });

@@ -90,7 +90,7 @@ public class UserService {
 		return dto;
 	}
 
-	public UserDTO authenticateUser(String usernameOrEmail, String password) {
+	public UserDTO getAuthenticatedUser(String usernameOrEmail, String password) {
 		User user = userDAO.getUserByUsernameOrEmail(usernameOrEmail);
 		
 		if (user != null && CommonUtil.checkPassword(password, user.getPassword())) {

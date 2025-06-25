@@ -43,20 +43,15 @@ public class PlayMusicServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		String pathInfo = request.getPathInfo();
-		int id = CommonUtil.extractIdFromPath(pathInfo);
-		UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
 		
-		if (pathInfo.matches("/\\d+")) {
-			MusicDetailDTO music = musicService.getMusicDetailDTOById(id, currentUser);	
-			
-			request.setAttribute("pageTitle", "Listen to Music");
-			request.setAttribute("musicDTO", music);			
+		if (pathInfo.matches("/\\d+")) {		
+			request.setAttribute("pageTitle", "Listen to Music");			
 			request.setAttribute("contentPage", "/WEB-INF/views/common/play-music.jsp");
+			request.getRequestDispatcher("/WEB-INF/views/layout-main.jsp").forward(request, response);
 		} else {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;
-		}
-		request.getRequestDispatcher("/WEB-INF/views/layout-main.jsp").forward(request, response);
+		}	
 		
 	}
 
