@@ -217,16 +217,6 @@ public class MusicService {
 	}
 
 	
-
-	public MusicDTO getMusicDTOWithoutAudioById(int musicId, UserDTO currentUser) {
-		Music music = this.getMusicById(musicId);
-		music.setAudioFileUrl(null);
-		if (!canSeeMusic(music, currentUser)) return null;
-		MusicDTO dto = MusicMapper.INSTANCE.toDTO(music);
-
-		return dto;
-	}
-
 	public MusicDTO getMusicDTOById(int musicId, UserDTO currentUser) {
 		Music music = this.getMusicById(musicId);
 		if (!canSeeMusic(music, currentUser)) return null;

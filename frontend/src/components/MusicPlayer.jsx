@@ -8,7 +8,8 @@ const MusicPlayer = ({ baseURL, musicId }) => {
 	const [isLiked, setIsLiked] = React.useState(false);
 	const [hasRecordedPlay, setHasRecordedPlay] = React.useState(false);
 	const [listeningTime, setListeningTime] = React.useState(0);
-
+	
+	const hasAccessRef = React.useRef(false);
 	const wavesurferRef = React.useRef(null);
 	const containerRef = React.useRef(null);
 	const listeningTimeRef = React.useRef(0);
@@ -16,8 +17,14 @@ const MusicPlayer = ({ baseURL, musicId }) => {
 	const hasRecordedPlayRef = React.useRef(false);
 	const currentTimeRef = React.useRef(0);
 	const durationRef = React.useRef(0);
+	const progressBarRef = React.useRef();
+	const isLikedRef = React.useRef(false);
 
 	// Keep refs in sync with state
+	React.useEffect(() => {
+		isLikedRef.current = isLiked;
+	}, [isLiked]);
+	
 	React.useEffect(() => {
 		currentTimeRef.current = currentTime;
 	}, [currentTime]);
@@ -73,10 +80,9 @@ const MusicPlayer = ({ baseURL, musicId }) => {
 
 			wavesurferRef.current.on('finish', () => {
 				setIsPlaying(false);
-				sendPlayRecord();
 				setCurrentTime(0);
 				stopTrackingTime();
-				
+				sendPlayRecord();
 			});
 		}
 
@@ -85,6 +91,23 @@ const MusicPlayer = ({ baseURL, musicId }) => {
 				wavesurferRef.current.destroy();
 			}
 		};
+	}, []);
+	
+	React.useEffect(() => {
+		let animationFrameId;
+
+		const updateProgressBar = () => {
+		  if (progressBarRef.current && wavesurferRef.current && durationRef.current > 0) {
+		    const current = wavesurferRef.current.getCurrentTime();
+		    const percent = (current / durationRef.current) * 100;
+		    progressBarRef.current.style.width = `${percent}%`;
+		  }
+		  animationFrameId = requestAnimationFrame(updateProgressBar);
+		};
+
+		animationFrameId = requestAnimationFrame(updateProgressBar);
+
+		return () => cancelAnimationFrame(animationFrameId);
 	}, []);
 
 	// Update volume when it changes
@@ -103,7 +126,6 @@ const MusicPlayer = ({ baseURL, musicId }) => {
 			// Reset tracking state for new music
 			setHasRecordedPlay(false);
 			setListeningTime(0);
-			// Also reset refs
 			hasRecordedPlayRef.current = false;
 			listeningTimeRef.current = 0;
 
@@ -116,7 +138,14 @@ const MusicPlayer = ({ baseURL, musicId }) => {
 
 					if (wavesurferRef.current) {
 						const audioUrl = `${baseURL}/stream/audio/${musicId}`;
-						await wavesurferRef.current.load(audioUrl);
+						try {
+							await wavesurferRef.current.load(audioUrl);
+							hasAccessRef.current = true;
+						} catch (err) {
+							console.warn("Unable to load audio stream:", err);
+							window.toastr.warning("You do not have access to this track.");
+							hasAccessRef.current = false;
+						}
 					}
 				}
 			} catch (error) {
@@ -169,7 +198,6 @@ const MusicPlayer = ({ baseURL, musicId }) => {
 
 			setListeningTime(prev => {
 				const newTime = prev + 1;
-				console.log('Listening time:', newTime);
 				return newTime;
 			});
 		}, 1000);
@@ -189,9 +217,9 @@ const MusicPlayer = ({ baseURL, musicId }) => {
 	React.useEffect(() => {
 		const handleUnload = () => {
 			console.log('Page unloading, sending play record');
-			if (listeningTimeRef.current > 5 && !hasRecordedPlayRef.current) {
+			if (listeningTimeRef.current > 5 && !hasRecordedPlayRef.current && hasAccessRef.current) {
 				const durationMs = listeningTimeRef.current * 1000;
-				const wasSkipped = currentTimeRef.current < (durationRef.current * 0.8);
+				const wasSkipped = listeningTimeRef.current < (durationRef.current * 0.8);
 
 				if (navigator.sendBeacon && baseURL && musicId) {
 					const data = JSON.stringify({
@@ -219,13 +247,15 @@ const MusicPlayer = ({ baseURL, musicId }) => {
 	const sendPlayRecord = async () => {
 		const listening = listeningTimeRef.current;
 		const hasPlayed = hasRecordedPlayRef.current;
+		const access = hasAccessRef.current;
 
 		console.log('sendPlayRecord called', {
 			hasRecordedPlay: hasPlayed,
 			listeningTime: listening,
+			hasAccess: access
 		});
 
-		if (!(listening > 0 && !hasPlayed)) {
+		if (!(listening > 0 && !hasPlayed && access)) {
 			console.log('Skipping play record - already recorded or no listening time');
 			return;
 		}
@@ -234,7 +264,7 @@ const MusicPlayer = ({ baseURL, musicId }) => {
 		stopTrackingTime();
 
 		const durationMs = listening * 1000;
-		const wasSkipped = currentTimeRef.current < (durationRef.current * 0.8);
+		const wasSkipped = listeningTimeRef.current < (durationRef.current * 0.8);
 
 		try {
 			const response = await fetch(`${baseURL}/api/play/${musicId}`, {
@@ -260,6 +290,7 @@ const MusicPlayer = ({ baseURL, musicId }) => {
 
 	// Toggle like
 	const toggleLike = async () => {
+		
 		try {
 			const method = isLiked ? 'DELETE' : 'POST';
 			const response = await fetch(`${baseURL}/api/like/${musicId}`, { method });
@@ -282,7 +313,7 @@ const MusicPlayer = ({ baseURL, musicId }) => {
 
 		} catch (error) {
 			if (window.toastr) {
-				window.toastr.error(`Error toggling like: ${error.message}`);
+				window.toastr.error(`Error toggling like: ${error.message.error}`);
 			}
 		}
 	};
@@ -466,9 +497,7 @@ const MusicPlayer = ({ baseURL, musicId }) => {
 									<div className="progress" style={{ height: '6px' }}>
 										<div
 											className="progress-bar bg-primary"
-											style={{
-												width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`
-											}}
+											ref={progressBarRef}
 										></div>
 									</div>
 								</>

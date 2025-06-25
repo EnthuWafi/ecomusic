@@ -39,7 +39,7 @@ public final class AppContext {
         this.playlistService = new PlaylistService(musicService, userService);
         this.subscriptionService = new SubscriptionService(userService);
         this.likeService = new LikeService(musicService);
-        this.playHistoryService = new PlayHistoryService();
+        this.playHistoryService = new PlayHistoryService(musicService);
         this.stripeService = new StripeService(subscriptionService);
         
     }

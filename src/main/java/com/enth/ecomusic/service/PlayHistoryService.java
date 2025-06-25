@@ -7,49 +7,35 @@ import java.util.stream.Collectors;
 import com.enth.ecomusic.dao.PlayHistoryDAO;
 import com.enth.ecomusic.model.dto.PlayHistoryDTO;
 import com.enth.ecomusic.model.dto.UserDTO;
+import com.enth.ecomusic.model.entity.Music;
 import com.enth.ecomusic.model.entity.PlayHistory;
+import com.enth.ecomusic.model.mapper.MusicMapper;
 import com.enth.ecomusic.model.mapper.PlayHistoryMapper;
 
 public class PlayHistoryService {
 
 	private final PlayHistoryDAO playHistoryDAO;
+	private final MusicService musicService;
 
-	public PlayHistoryService() {
+	public PlayHistoryService(MusicService musicService) {
 		this.playHistoryDAO = new PlayHistoryDAO();
+		this.musicService = musicService;
 	}
 
-	/**
-	 * Records a song play for a user. This operation adds a new entry to the play
-	 * history.
-	 *
-	 * @param playHistory The PlayHistory object containing userId, musicId, and
-	 *                    timestamp.
-	 * @return true if the play was recorded successfully, false otherwise.
-	 */
 	public boolean recordPlay(PlayHistory playHistory, UserDTO currentUser) {
 		if (!canRecordPlay(currentUser)) {
 			return false;
 		}
 		
+		Music music = musicService.getMusicById(playHistory.getMusicId());
+		if (music == null) {
+			return false;
+		}
+		if (!musicService.canAccessMusic(MusicMapper.INSTANCE.toDTO(music), currentUser)) return false;
+		
 		return playHistoryDAO.logPlay(playHistory);
 	}
 
-	/**
-	 * Retrieves a list of play history records for a given user.
-	 *
-	 * @param userId The ID of the user whose play history is to be retrieved.
-	 * @return A list of PlayHistory objects for the user, or an empty list if none
-	 *         found. Returns null if an error occurs.
-	 */
-	public List<PlayHistoryDTO> getPlayHistoryForUser(int userId) {
-		List<PlayHistory> playHistory = playHistoryDAO.getPlayHistoryByUserId(userId);
-		List<PlayHistoryDTO> playHistoryDTO = new ArrayList<>();
-		for (PlayHistory play : playHistory) {
-			playHistoryDTO.add(PlayHistoryMapper.INSTANCE.toDTO(play));
-		}
-		return playHistoryDTO;
-	}
-	
 	public List<PlayHistoryDTO> getRecentPlays(int userId, int limit) {
 	    List<PlayHistory> recentPlays = playHistoryDAO.getRecentPlaysByUserId(userId, limit);
 	    return recentPlays.stream()

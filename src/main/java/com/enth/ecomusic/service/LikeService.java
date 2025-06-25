@@ -7,7 +7,9 @@ import com.enth.ecomusic.dao.LikeDAO;
 import com.enth.ecomusic.model.dto.LikeDTO;
 import com.enth.ecomusic.model.dto.UserDTO;
 import com.enth.ecomusic.model.entity.Like;
+import com.enth.ecomusic.model.entity.Music;
 import com.enth.ecomusic.model.mapper.LikeMapper;
+import com.enth.ecomusic.model.mapper.MusicMapper;
 
 public class LikeService {
 
@@ -31,6 +33,12 @@ public class LikeService {
     	if (!canLikeSong(currentUser)) {
     		return false;
     	}
+		Music music = musicService.getMusicById(like.getMusicId());
+		if (music == null) {
+			return false;
+		}
+		if (!musicService.canAccessMusic(MusicMapper.INSTANCE.toDTO(music), currentUser)) return false;
+    	
     	return likeDAO.addLike(like);
      
     }

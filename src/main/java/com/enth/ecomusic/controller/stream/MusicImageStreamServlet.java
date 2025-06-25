@@ -68,7 +68,7 @@ public class MusicImageStreamServlet extends HttpServlet {
 		
 		boolean isThumbnailRequest = "thumb".equalsIgnoreCase(requestedSize);
 		
-		MusicDTO music = musicService.getMusicDTOWithoutAudioById(musicId, currentUser);
+		MusicDTO music = musicService.getMusicDTOById(musicId, currentUser);
 
 		String basePath = AppConfig.get("musicImageFilePath");
 		

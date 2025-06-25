@@ -122,7 +122,7 @@ public class LikeDAO {
 
 	public boolean isSongLikedByUser(int userId, int musicId) {
 		// TODO Auto-generated method stub
-		String sql = "SELECT * FROM Likes WHERE user_id = ? AND music_id";
+		String sql = "SELECT * FROM Likes WHERE user_id = ? AND music_id = ?";
 		
 		Integer result = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt, userId, musicId);
 		

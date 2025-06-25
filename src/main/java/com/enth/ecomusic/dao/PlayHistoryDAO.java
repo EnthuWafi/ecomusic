@@ -134,13 +134,18 @@ public class PlayHistoryDAO {
 
 	public List<PlayHistory> getRecentPlaysByUserId(int userId, int limit) {
 		String query = """
-				SELECT *
-				FROM (
-				    SELECT p.*, DISTINCT(p.music_id), ROW_NUMBER() OVER (ORDER BY p.played_at DESC) AS rnum
-				    FROM PlayHistory p
-				    WHERE p.user_id = ?
-				)
-				WHERE rnum <= ?
+				SELECT * FROM (
+				    SELECT *
+				    FROM (
+				        SELECT p.*, ROW_NUMBER() OVER (PARTITION BY p.music_id ORDER BY p.played_at DESC) AS rnum
+				        FROM PlayHistory p
+				        JOIN Music m ON m.music_id = p.music_id
+				        WHERE p.user_id = ? AND m.visibility = 'public'
+				    )
+				    WHERE rnum = 1
+				    ORDER BY played_at DESC
+					)
+				WHERE ROWNUM <= ?
 				""";
 
 		List<Object> params = new ArrayList<>();
