@@ -102,10 +102,7 @@ public class PlaylistMusicDAO {
             return false;
         }
     }
-    /**
-     * Sets the position of a specific song directly.
-     * This is the final step in the reordering process.
-     */
+
     public boolean setSongPosition(PlaylistMusic playlistMusic, int newPosition, Connection conn) {
         String sql = "UPDATE PlaylistMusic SET position = ? WHERE playlist_id = ? AND music_id = ?";
 

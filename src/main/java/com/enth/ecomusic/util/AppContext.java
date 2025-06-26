@@ -33,7 +33,6 @@ public final class AppContext {
         this.genreCacheService = new GenreCacheService();
         this.moodCacheService = new MoodCacheService();
 
-        // Services (reuse cache services)
         this.userService = new UserService(roleCacheService);
         this.musicService = new MusicService(userService, genreCacheService, moodCacheService);
         this.playlistService = new PlaylistService(musicService, userService);

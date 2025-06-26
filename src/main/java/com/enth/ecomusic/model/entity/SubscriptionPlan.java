@@ -140,11 +140,6 @@ public class SubscriptionPlan{
 	public void setCreatedAt(LocalDateTime createdAt) {
 		this.createdAt = createdAt;
 	}
-	
-	public Date getCreatedAtDate() {
-	    return Timestamp.valueOf(createdAt);
-	}
-
 
 	public PlanType getPlanType() {
 		return planType;

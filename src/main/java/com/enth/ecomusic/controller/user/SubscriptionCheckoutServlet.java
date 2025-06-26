@@ -12,6 +12,8 @@ import java.io.IOException;
 import com.enth.ecomusic.model.dto.SubscriptionPlanDTO;
 import com.enth.ecomusic.model.dto.UserDTO;
 import com.enth.ecomusic.model.entity.User;
+import com.enth.ecomusic.model.entity.UserSubscription;
+import com.enth.ecomusic.model.enums.PlanType;
 import com.enth.ecomusic.service.StripeService;
 import com.enth.ecomusic.service.SubscriptionService;
 import com.enth.ecomusic.util.AppContext;
@@ -48,8 +50,7 @@ public class SubscriptionCheckoutServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		response.sendRedirect(request.getContextPath() + "/become-artist");
+		response.sendRedirect(request.getContextPath());
 	}
 
 	@Override
@@ -71,15 +72,26 @@ public class SubscriptionCheckoutServlet extends HttpServlet {
 
 	    if (subscriptionPlanId == null || !subscriptionPlanId.matches("\\d+")) {
 	        CommonUtil.addMessage(session, ToastrType.ERROR, "Invalid subscription plan selected.");
-	        response.sendRedirect(request.getContextPath() + "/choose-plan");
+	        response.sendRedirect(request.getContextPath());
 	        return;
 	    }
-
+	    
 	    SubscriptionPlanDTO plan = subscriptionService.getSubscriptionPlanById(Integer.parseInt(subscriptionPlanId));
-
+	    
+	    
 	    if (plan == null) {
 	        CommonUtil.addMessage(session, ToastrType.ERROR, "That subscription plan doesn't exist.");
-	        response.sendRedirect(request.getContextPath() + "/choose-plan");
+	        response.sendRedirect(request.getContextPath());
+	        return;
+	    }
+	    
+	    String redirectStr = plan.getPlanType() == PlanType.CREATOR ? "/become-artist" : "/choose-plan";
+	    
+	    UserSubscription sub = subscriptionService.getLatestSubscriptionByUserAndPlan(user.getUserId(), plan.getPlanType());
+	    
+	    if (!(sub == null || sub.getEndDate() != null)) {
+	    	CommonUtil.addMessage(session, ToastrType.ERROR, "You already have an active plan for " + plan.getPlanType().getValue());
+	        response.sendRedirect(request.getContextPath());
 	        return;
 	    }
 
@@ -92,16 +104,16 @@ public class SubscriptionCheckoutServlet extends HttpServlet {
 
 	        if (sessionURL == null || sessionURL.isBlank()) {
 	            CommonUtil.addMessage(session, ToastrType.ERROR, "Failed to initiate checkout. Please try again.");
-	            response.sendRedirect(request.getContextPath() + "/choose-plan");
+	            response.sendRedirect(request.getContextPath() + redirectStr);
 	            return;
 	        }
 	        
 	        session.setAttribute("subscriptionIntent", plan.getPlanType());
 	        response.sendRedirect(sessionURL);
 	    } catch (StripeException e) {
-	        e.printStackTrace(); // Optional: use a logger
+	        e.printStackTrace(); 
 	        CommonUtil.addMessage(session, ToastrType.ERROR, "Something went wrong with Stripe. Try again later.");
-	        response.sendRedirect(request.getContextPath() + "/choose-plan");
+	        response.sendRedirect(request.getContextPath() + redirectStr);
 	    }
 	}
 

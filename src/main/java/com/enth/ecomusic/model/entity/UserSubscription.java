@@ -18,6 +18,7 @@ public class UserSubscription{
 
     // Optional
     private SubscriptionPlan subscriptionPlan;
+    private User user;
 
 
 	public UserSubscription(int subscriptionId, int userId, LocalDate startDate, LocalDate endDate, double amountPaid,
@@ -118,6 +119,17 @@ public class UserSubscription{
 	public void setSubscriptionPlan(SubscriptionPlan subscriptionPlan) {
 		this.subscriptionPlan = subscriptionPlan;
 	}
+
+
+	public User getUser() {
+		return user;
+	}
+
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+	
 	
 	
 

@@ -33,6 +33,17 @@ public class SubscriptionPlanDAO {
             return false;
         }
     }
+    
+    public boolean deleteSubscriptionPlan(int subscriptionPlanId) {
+    	String sql = "DELETE FROM SubscriptionPlans WHERE subscription_plan_id = ?";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, subscriptionPlanId);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     // READ by ID
     public SubscriptionPlan getSubscriptionPlanById(int id) {

@@ -69,6 +69,20 @@ public class SubscriptionDAO {
         }
         return null;
     }
+    
+    public UserSubscription getSubscriptionByPaymentGatewayRef(String paymentGatewayRef) {
+        String sql = "SELECT * FROM Subscriptions WHERE payment_gateway_ref = ?";
+        try (Connection conn = DBConnection.getConnection();PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, paymentGatewayRef);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return mapResultSetToSubscription(rs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     // READ (all for a user)
     public List<UserSubscription> getSubscriptionsByUserId(int userId) {
@@ -85,40 +99,7 @@ public class SubscriptionDAO {
         }
         return list;
     }
-
-    // UPDATE
-    public boolean updateSubscription(UserSubscription sub) {
-        String sql = "UPDATE Subscriptions SET user_id = ?, start_date = ?, end_date = ?, amount_paid = ?, "
-                   + "payment_status = ?, payment_gateway_ref = ? WHERE subscription_id = ?";
-        try (Connection conn = DBConnection.getConnection();PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, sub.getUserId());
-            stmt.setDate(2, sub.getStartDate() != null ? Date.valueOf(sub.getStartDate()) : null);
-            stmt.setDate(3, sub.getEndDate() != null ? Date.valueOf(sub.getEndDate()) : null);
-            stmt.setDouble(4, sub.getAmountPaid());
-            stmt.setString(5, sub.getPaymentStatus());
-            stmt.setString(6, sub.getPaymentGatewayRef());
-            stmt.setInt(7, sub.getSubscriptionId());
-
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    // DELETE
-    public boolean deleteSubscription(int id) {
-        String sql = "DELETE FROM Subscriptions WHERE subscription_id = ?";
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, id);
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    
+ 
     public UserSubscription getLatestSubscriptionByUserIdAndPlanType(int userId, PlanType plan) {
     	String sql = """
     			SELECT * FROM (
@@ -150,4 +131,16 @@ public class SubscriptionDAO {
                 rs.getInt("subscription_plan_id")
         );
     }
+
+    //update
+	public boolean updateSubscriptionEndDate(int subscriptionId, Connection conn) {
+		String sql = "UPDATE Subscriptions SET end_date = CURRENT_TIMESTAMP WHERE subscription_id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, subscriptionId);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+	}
 }

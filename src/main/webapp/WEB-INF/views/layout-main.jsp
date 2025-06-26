@@ -29,7 +29,8 @@
 <script src="${pageContext.request.contextPath}/assets/js/jquery.min.js"></script>
 <script src="${pageContext.request.contextPath}/assets/js/toastr.min.js"></script>
 
-<script src="https://unpkg.com/wavesurfer.js@7.9.7/dist/wavesurfer.min.js"></script>
+<script
+	src="https://unpkg.com/wavesurfer.js@7.9.7/dist/wavesurfer.min.js"></script>
 
 <meta charset="UTF-8">
 <!-- Custom CSS -->
@@ -40,7 +41,8 @@
 <body>
 
 	<script>
-	  window.baseUrl = document.querySelector('meta[name="app-base-url"]').getAttribute('content');
+		window.toastr.options.positionClass = 'toast-bottom-right';
+	  	window.baseUrl = document.querySelector('meta[name="app-base-url"]').getAttribute('content');
 	</script>
 	<c:set var="user" value="${sessionScope.user}" />
 	<!-- Top Navbar -->
@@ -244,11 +246,10 @@
 
 	<c:if test="${not empty flashMessages}">
 		<script>
-		toastr.options.positionClass = 'toast-bottom-right';
 		
 		<c:forEach var="msg" items="${flashMessages}">
 
-			toastr["${msg.type}"]("${msg.message}");
+			window.toastr["${msg.type}"]("${msg.message}");
 
 		</c:forEach>
 		</script>

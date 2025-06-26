@@ -116,15 +116,7 @@ public class UserService {
 		return userDAO.updateUser(user);
 	}
 
-	//for transaction
-	public boolean updateUserWithRoleName(int userId, RoleType roleType, Connection conn) {
-		Role role = roleCacheService.getByType(roleType);
-		if (role != null) {
-			return userDAO.updateUserRole(userId, role.getRoleId(), conn);
-		}
-		return false;
-	}
-	
+
 	public boolean updateUserSetPremium(int userId, boolean premium, Connection conn) {
 		return userDAO.updateUserSetPremium(userId, premium, conn);
 	}

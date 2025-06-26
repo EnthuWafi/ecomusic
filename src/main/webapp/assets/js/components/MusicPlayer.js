@@ -267,9 +267,9 @@ const MusicPlayer = ({
         method
       });
       if (!response.ok) {
-        const error = await response.text();
+        const error = await response.json();
         if (window.toastr) {
-          window.toastr.error(`Failed to ${isLiked ? 'unlike' : 'like'}: ${error}`);
+          window.toastr.error(`Failed to ${isLiked ? 'unlike' : 'like'}: ${error.error}`);
         }
         return;
       }
@@ -282,7 +282,7 @@ const MusicPlayer = ({
       }
     } catch (error) {
       if (window.toastr) {
-        window.toastr.error(`Error toggling like: ${error.message.error}`);
+        window.toastr.error(`Error toggling like: ${error.message}`);
       }
     }
   };

@@ -10,6 +10,7 @@ import com.enth.ecomusic.model.enums.PlanType;
 import com.enth.ecomusic.model.enums.RoleType;
 import com.enth.ecomusic.model.mapper.SubscriptionMapper;
 import com.enth.ecomusic.model.transaction.TransactionTemplate;
+import com.stripe.exception.StripeException;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -58,6 +59,50 @@ public class SubscriptionService {
 			return false;
 		}
 	}
+	
+	public boolean updateSubscriptionEndDate(String stripeSubscriptionId) {
+	    UserSubscription sub = subscriptionDAO.getSubscriptionByPaymentGatewayRef(stripeSubscriptionId);
+
+	    if (sub == null) {
+	        System.err.println("No subscription found for ID: " + stripeSubscriptionId);
+	        return false;
+	    }
+
+	    SubscriptionPlan plan = subscriptionPlanDAO.getSubscriptionPlanById(sub.getSubscriptionPlanId());
+
+	    if (plan == null) {
+	        System.err.println("No plan found for ID: " + sub.getSubscriptionPlanId());
+	        return false;
+	    }
+
+	    try (TransactionTemplate transaction = new TransactionTemplate()) {
+	        boolean userUpdated = false;
+	        switch (plan.getPlanType()) {
+	            case CREATOR:
+	                userUpdated = userService.updateUserSetArtist(sub.getUserId(), false, transaction.getConnection());
+	                break;
+	            case LISTENER:
+	                userUpdated = userService.updateUserSetPremium(sub.getUserId(), false, transaction.getConnection());
+	                break;
+	            default:
+	                System.err.println("Unknown plan type: " + plan.getPlanType());
+	                return false;
+	        }
+
+	        if (!userUpdated) {
+	            throw new SQLException("Failed to update user role.");
+	        }
+
+	        boolean update = subscriptionDAO.updateSubscriptionEndDate(sub.getSubscriptionId(), transaction.getConnection());
+
+	        transaction.commit();
+	        return update;
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return false;
+	    }
+	}
+
 
 	// GET by subscription ID (with plan loaded)
 	public SubscriptionDTO getSubscriptionById(int id) {
@@ -76,16 +121,6 @@ public class SubscriptionService {
 			subsDTO.add(SubscriptionMapper.INSTANCE.toDTO(sub));
 		}
 		return subsDTO;
-	}
-
-	// UPDATE
-	public boolean updateSubscription(UserSubscription sub) {
-		return subscriptionDAO.updateSubscription(sub);
-	}
-
-	// DELETE
-	public boolean deleteSubscription(int subscriptionId) {
-		return subscriptionDAO.deleteSubscription(subscriptionId);
 	}
 
 	private void attachPlanIfAvailable(UserSubscription sub) {
