@@ -148,4 +148,8 @@ public class UserService {
 		}
 		return userList;
 	}
+
+	public int getUserCount() {
+		return userDAO.countAllUser();
+	}
 }

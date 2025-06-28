@@ -10,9 +10,7 @@ import com.enth.ecomusic.model.enums.PlanType;
 import com.enth.ecomusic.model.enums.RoleType;
 import com.enth.ecomusic.model.mapper.SubscriptionMapper;
 import com.enth.ecomusic.model.transaction.TransactionTemplate;
-import com.stripe.exception.StripeException;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -102,6 +100,26 @@ public class SubscriptionService {
 	        return false;
 	    }
 	}
+	
+	public boolean updateSubscriptionAmountPaid(String stripeSubscriptionId, double amountPaid) {
+	    UserSubscription sub = subscriptionDAO.getSubscriptionByPaymentGatewayRef(stripeSubscriptionId);
+
+	    if (sub == null) {
+	        System.err.println("No subscription found for ID: " + stripeSubscriptionId);
+	        return false;
+	    }
+
+	    try (TransactionTemplate transaction = new TransactionTemplate()) {
+	        boolean update = subscriptionDAO.updateSubscriptionAmountPaid(sub.getSubscriptionId(), amountPaid, transaction.getConnection());
+
+	        transaction.commit();
+	        return update;
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return false;
+	    }
+	}
+	
 
 
 	// GET by subscription ID (with plan loaded)

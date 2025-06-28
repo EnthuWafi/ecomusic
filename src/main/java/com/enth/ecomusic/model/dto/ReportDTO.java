@@ -1,50 +1,44 @@
 package com.enth.ecomusic.model.dto;
 
-import java.time.LocalDate;
-
 public class ReportDTO {
-	private double totalRevenue;
-    private int totalSubscriptions;
-    private LocalDate startDate;
-    private LocalDate endDate;
+	private int totalUsers;
+    private int musicCount;
     
-    private int newUsers;
-    private double avgRevenuePerUser;
+    private int activeSubscriptionCount;
+    private int revenueCount;
     
-	public ReportDTO(double totalRevenue, int totalSubscriptions, LocalDate startDate, LocalDate endDate, int newUsers,
-			double avgRevenuePerUser) {
+    private int registeredUsersToday;
+    private int musicUploadedToday;
+    
+	public ReportDTO(int totalUsers, int musicCount, int activeSubscriptionCount, int revenueCount,
+			int registeredUsersToday, int musicUploadedToday) {
 		super();
-		this.totalRevenue = totalRevenue;
-		this.totalSubscriptions = totalSubscriptions;
-		this.startDate = startDate;
-		this.endDate = endDate;
-		this.newUsers = newUsers;
-		this.avgRevenuePerUser = avgRevenuePerUser;
+		this.totalUsers = totalUsers;
+		this.musicCount = musicCount;
+		this.activeSubscriptionCount = activeSubscriptionCount;
+		this.revenueCount = revenueCount;
+		this.registeredUsersToday = registeredUsersToday;
+		this.musicUploadedToday = musicUploadedToday;
 	}
-
-	public double getTotalRevenue() {
-		return totalRevenue;
+	public int getTotalUsers() {
+		return totalUsers;
 	}
-
-	public int getTotalSubscriptions() {
-		return totalSubscriptions;
+	public int getMusicCount() {
+		return musicCount;
 	}
-
-	public LocalDate getStartDate() {
-		return startDate;
+	public int getActiveSubscriptionCount() {
+		return activeSubscriptionCount;
 	}
-
-	public LocalDate getEndDate() {
-		return endDate;
+	public int getRevenueCount() {
+		return revenueCount;
 	}
-
-	public int getNewUsers() {
-		return newUsers;
+	public int getRegisteredUsersToday() {
+		return registeredUsersToday;
 	}
-
-	public double getAvgRevenuePerUser() {
-		return avgRevenuePerUser;
-	} 
+	public int getMusicUploadedToday() {
+		return musicUploadedToday;
+	}
+    
     
     
 }

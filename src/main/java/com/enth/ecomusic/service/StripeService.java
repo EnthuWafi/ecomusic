@@ -3,6 +3,7 @@ package com.enth.ecomusic.service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.List;
 
 import com.enth.ecomusic.model.dto.SubscriptionPlanDTO;
 import com.enth.ecomusic.model.entity.UserSubscription;
@@ -10,6 +11,7 @@ import com.enth.ecomusic.model.enums.PlanType;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Event;
 import com.stripe.model.Invoice;
+import com.stripe.model.InvoiceLineItem;
 import com.stripe.model.Subscription;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
@@ -79,10 +81,53 @@ public class StripeService {
 		bd = bd.setScale(2, RoundingMode.HALF_UP);
 		double amountPaid = bd.doubleValue();
 
-		UserSubscription sub = new UserSubscription(Integer.parseInt(userId), today, null, amountPaid, paymentStatus,
+		UserSubscription sub = new UserSubscription(Integer.parseInt(userId), today, null, cents, paymentStatus,
 				stripeSubId, Integer.parseInt(planIdStr));
 
-		subscriptionService.createSubscription(sub, planType);
+		boolean success = subscriptionService.createSubscription(sub, planType);
+		if (!success) {
+	        System.err.println("Failed to create subscription for ID: " + planIdStr);
+	    }
+
+	}
+
+	public void processRecurringPayment(Event event) throws StripeException {
+		Invoice invoice = (Invoice) event.getDataObjectDeserializer().getObject()
+				.orElseThrow(() -> new RuntimeException("Session data could not be deserialized"));
+
+		List<InvoiceLineItem> lineItems = invoice.getLines().getData();
+
+		String subscriptionStripeId = null;
+		for (InvoiceLineItem item : lineItems) {
+		    if (item.getSubscription() != null) {
+		    	subscriptionStripeId = item.getSubscription();
+		        break;
+		    }
+		}
+	
+		
+		long cents = invoice.getAmountPaid();
+		BigDecimal bd = BigDecimal.valueOf(cents, 2);
+		bd = bd.setScale(2, RoundingMode.HALF_UP);
+		double amountPaid = bd.doubleValue();
+
+		boolean success = subscriptionService.updateSubscriptionAmountPaid(subscriptionStripeId, amountPaid);
+		if (!success) {
+	        System.err.println("Failed to update subscription for ID: " + subscriptionStripeId);
+	    }
+
+	}
+
+	public void processSubscriptionCancellation(Event event) throws StripeException {
+		Subscription subscription = (Subscription)  event.getDataObjectDeserializer().getObject()
+				.orElseThrow(() -> new RuntimeException("Session data could not be deserialized"));
+		
+		String subscriptionStripeId = subscription.getId();
+		
+		boolean success = subscriptionService.updateSubscriptionEndDate(subscriptionStripeId);
+		if (!success) {
+	        System.err.println("Failed to delete subscription for ID: " + subscriptionStripeId);
+	    }
 	}
 
 }

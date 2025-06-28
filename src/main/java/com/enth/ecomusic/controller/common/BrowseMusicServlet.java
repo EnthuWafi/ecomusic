@@ -50,7 +50,7 @@ public class BrowseMusicServlet extends HttpServlet {
         }
 
         List<MusicDetailDTO> musicList = musicService.getPaginatedMusicDetailDTO(page, pageSize);
-        int totalRecords = musicService.getMusicCount(); 
+        int totalRecords = musicService.getPublicMusicCount(); 
         int totalPages = (int) Math.ceil(totalRecords / (double) pageSize);
 
         request.setAttribute("currentPage", page);

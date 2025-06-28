@@ -259,13 +259,17 @@ public class MusicService {
 
 		return musicList;
 	}
-
+	
 	public int getMusicCount() {
+		return musicDAO.countAllMusic();
+	}
+
+	public int getPublicMusicCount() {
 		return musicDAO.countPublicMusic();
 	}
 
-	public int getMusicCountByArtist(int artistId) {
-		return musicDAO.countMusicByArtist(artistId);
+	public int getMusicCountByArtist(int artistId, int currentUserId) {
+		return musicDAO.countVisibleMusicByArtist(artistId, currentUserId);
 	}
 
 	public List<MusicDTO> getPaginatedMusicDTOByArtistId(int artistId, int page, int pageSize) {

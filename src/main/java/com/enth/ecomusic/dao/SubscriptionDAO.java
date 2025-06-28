@@ -2,6 +2,7 @@ package com.enth.ecomusic.dao;
 
 import com.enth.ecomusic.model.entity.UserSubscription;
 import com.enth.ecomusic.model.enums.PlanType;
+import com.enth.ecomusic.model.mapper.ResultSetMapper;
 import com.enth.ecomusic.util.DAOUtil;
 import com.enth.ecomusic.util.DBConnection;
 
@@ -142,5 +143,35 @@ public class SubscriptionDAO {
             e.printStackTrace();
             return false;
         }
+	}
+
+	public boolean updateSubscriptionAmountPaid(int subscriptionId, double amountPaid, Connection conn) {
+		String sql = "UPDATE Subscriptions SET amount_paid = ? WHERE subscription_id = ?";
+		
+		return DAOUtil.executeUpdate(sql, amountPaid, subscriptionId);
+	}
+	
+	public int countActiveSubscription() {
+		String sql = "SELECT COUNT(*) FROM Subscriptions WHERE end_date = null";
+		
+		Integer count = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt);
+		
+		return count != null ? count : 0;
+	}
+	
+	public int countAllSubscription() {
+		String sql = "SELECT COUNT(*) FROM Subscriptions";
+		
+		Integer count = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt);
+		
+		return count != null ? count : 0;
+	}
+	
+	public double getTotalAmountPaid() {
+		String sql = "SELECT SUM(amount_paid) FROM Subscriptions";
+		
+		Double amountPaid = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToDouble);
+		
+		return amountPaid != null ? amountPaid : 0;
 	}
 }

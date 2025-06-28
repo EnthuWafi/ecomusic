@@ -258,6 +258,13 @@ public class MusicDAO {
 		return (result != null) ? result : 0;
 	}
 
+	public int countAllMusic() {
+		String sql = "SELECT COUNT(*) FROM Music";
+		
+		Integer count = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt);
+		
+		return count != null ? count : 0;
+	}
 	// count (public)
 	public Integer countPublicMusic() {
 		String sql = "SELECT COUNT(*) FROM Music m WHERE visibility = 'public'";
@@ -266,15 +273,16 @@ public class MusicDAO {
 
 		return (result != null) ? result : 0;
 	}
+	
+	public Integer countUploadedMusicToday() {
+		String sql = "SELECT COUNT(*) FROM Music m WHERE TRUNC(created_at) = TRUNC(SYSDATE)";
 
-	public Integer countMusicByArtist(int artistId) {
-		String sql = "SELECT COUNT(*) FROM Music WHERE artist_id = ?";
-
-		Integer result = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt, artistId);
+		Integer result = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt);
 
 		return (result != null) ? result : 0;
 	}
-	
+
+
 	public int countVisibleMusicByArtist(int artistId, int currentUserId) {
 		String sql = """
 		    SELECT COUNT(*) FROM Music
@@ -285,43 +293,9 @@ public class MusicDAO {
 		    )
 		""";
 
-		return DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt, artistId, currentUserId);
-	}
-
-	// UPDATE
-	public boolean updateMusic(Music music) {
-		String sql = "UPDATE Music SET artist_id = ?, title = ?, genre_id = ?, mood_id = ?, description = ?, "
-				+ "audio_file_url = ?, image_url = ?, premium_content = ?, visibility = ? WHERE music_id = ?";
-
-		try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-			stmt.setInt(1, music.getArtistId());
-			stmt.setString(2, music.getTitle());
-			stmt.setInt(3, music.getGenreId());
-			stmt.setInt(4, music.getMoodId());
-			stmt.setString(5, music.getDescription());
-			stmt.setString(6, music.getAudioFileUrl());
-			stmt.setString(7, music.getImageUrl());
-			stmt.setInt(8, music.isPremiumContent() ? 1 : 0);
-			stmt.setString(9, music.getVisibility().getValue());
-			stmt.setInt(10, music.getMusicId());
-
-			return stmt.executeUpdate() > 0;
-		} catch (SQLException e) {
-			System.err.println("Error updating music: " + e.getMessage());
-			return false;
-		}
-	}
-
-	// DELETE
-	public boolean deleteMusic(int musicId) {
-		String sql = "DELETE FROM Music WHERE music_id = ?";
-		try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-			stmt.setInt(1, musicId);
-			return stmt.executeUpdate() > 0;
-		} catch (SQLException e) {
-			System.err.println("Error deleting music: " + e.getMessage());
-			return false;
-		}
+		Integer count = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt, artistId, currentUserId);
+		
+		return count != null ? count : 0;
 	}
 
 	// Helper method to map ResultSet to Music object
@@ -377,6 +351,42 @@ public class MusicDAO {
 		
 		return DAOUtil.executeQuery(query, ResultSetMapper::mapToMusicSearchDTO, params.toArray());
 
+	}
+
+	// UPDATE
+	public boolean updateMusic(Music music) {
+		String sql = "UPDATE Music SET artist_id = ?, title = ?, genre_id = ?, mood_id = ?, description = ?, "
+				+ "audio_file_url = ?, image_url = ?, premium_content = ?, visibility = ? WHERE music_id = ?";
+
+		try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+			stmt.setInt(1, music.getArtistId());
+			stmt.setString(2, music.getTitle());
+			stmt.setInt(3, music.getGenreId());
+			stmt.setInt(4, music.getMoodId());
+			stmt.setString(5, music.getDescription());
+			stmt.setString(6, music.getAudioFileUrl());
+			stmt.setString(7, music.getImageUrl());
+			stmt.setInt(8, music.isPremiumContent() ? 1 : 0);
+			stmt.setString(9, music.getVisibility().getValue());
+			stmt.setInt(10, music.getMusicId());
+
+			return stmt.executeUpdate() > 0;
+		} catch (SQLException e) {
+			System.err.println("Error updating music: " + e.getMessage());
+			return false;
+		}
+	}
+
+	// DELETE
+	public boolean deleteMusic(int musicId) {
+		String sql = "DELETE FROM Music WHERE music_id = ?";
+		try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+			stmt.setInt(1, musicId);
+			return stmt.executeUpdate() > 0;
+		} catch (SQLException e) {
+			System.err.println("Error deleting music: " + e.getMessage());
+			return false;
+		}
 	}
 
 }

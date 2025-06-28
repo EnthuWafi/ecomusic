@@ -52,6 +52,10 @@ public class ResultSetMapper {
 		return rs.getInt(1);
 	}
 	
+	public static Double mapToDouble(ResultSet rs) throws SQLException {
+		return rs.getDouble(1);
+	}
+	
 	public static MusicSearchDTO mapToMusicSearchDTO(ResultSet rs) throws SQLException {
 		MusicSearchDTO dto = new MusicSearchDTO(rs.getInt("music_id"), rs.getString("title"));
 		return dto;

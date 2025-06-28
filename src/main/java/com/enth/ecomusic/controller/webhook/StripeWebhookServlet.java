@@ -68,16 +68,37 @@ public class StripeWebhookServlet extends HttpServlet {
 			handleCheckoutCompleted(event);
 			break;
 		case "invoice.paid":
-			// Handle recurring subscription payments if needed
+			handleRecurringPayment(event);
 			break;
 		case "customer.subscription.deleted":
-			// Handle cancellations
+			handleSubscriptionCancellation(event);
 			break;
 		default:
 			logger.info("Unhandled event type: " + event.getType());
 		}
 
 		response.setStatus(HttpServletResponse.SC_OK);
+	}
+
+	private void handleSubscriptionCancellation(Event event) {
+		try {
+			stripeService.processSubscriptionCancellation(event);
+			logger.info("Subscription Cancellation event processed successfully");
+
+		} catch (StripeException | NumberFormatException e) {
+			logger.severe("Error processing customer.subscription.deleted: " + e.getMessage());
+		}
+	}
+
+	private void handleRecurringPayment(Event event) {
+		try {
+			stripeService.processRecurringPayment(event);
+			logger.info("Recurring payment event processed successfully");
+
+		} catch (StripeException | NumberFormatException e) {
+			logger.severe("Error processing invoice.paid: " + e.getMessage());
+		}
+		
 	}
 
 	private void handleCheckoutCompleted(Event event) {
