@@ -1,341 +1,221 @@
-const AdminDashboard = () => {
-	const [kpiData, setKpiData] = React.useState({
-		totalUsers: 15420,
-		activeSubscriptions: 8934,
-		totalTracks: 47892,
-		monthlyRevenue: 89750,
-		yearlyRevenue: 967340,
-		todaySignups: 127,
-		todayUploads: 89
-	});
 
-	const [recentActivity] = React.useState([
-		{ id: 1, artist: "Alex Chen", track: "Midnight Dreams", time: "2 minutes ago", avatar: "AC" },
-		{ id: 2, artist: "Sarah Johnson", track: "Ocean Waves", time: "8 minutes ago", avatar: "SJ" },
-		{ id: 3, artist: "Mike Rodriguez", track: "City Lights", time: "15 minutes ago", avatar: "MR" },
-		{ id: 4, artist: "Emma Thompson", track: "Forest Path", time: "23 minutes ago", avatar: "ET" },
-		{ id: 5, artist: "David Kim", track: "Neon Nights", time: "31 minutes ago", avatar: "DK" },
-		{ id: 6, artist: "Lisa Wang", track: "Mountain Echo", time: "45 minutes ago", avatar: "LW" },
-		{ id: 7, artist: "James Brown", track: "Summer Breeze", time: "1 hour ago", avatar: "JB" },
-		{ id: 8, artist: "Anna Garcia", track: "Digital Soul", time: "1 hour ago", avatar: "AG" }
-	]);
+const KpiCard = ({ title, value }) => (
+	<div className="col-md-4 mb-3">
+		<div className="card text-white bg-primary h-100 shadow-sm">
+			<div className="card-body">
+				<h5 className="card-title">{title}</h5>
+				<p className="card-text fs-4 fw-bold">{value}</p>
+			</div>
+		</div>
+	</div>
+);
 
-	const userGrowthRef = React.useRef(null);
-	const uploadsRef = React.useRef(null);
-	const userGrowthChart = React.useRef(null);
-	const uploadsChart = React.useRef(null);
-
-	React.useEffect(() => {
-		// User Growth Chart
-		if (userGrowthRef.current) {
-			const ctx = userGrowthRef.current.getContext('2d');
-
-			if (userGrowthChart.current) {
-				userGrowthChart.current.destroy();
-			}
-
-			userGrowthChart.current = new Chart(ctx, {
-				type: 'line',
-				data: {
-					labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-					datasets: [{
-						label: 'Total Users',
-						data: [8500, 9200, 10100, 11800, 13500, 15420],
-						borderColor: '#667eea',
-						backgroundColor: 'rgba(102, 126, 234, 0.1)',
-						borderWidth: 3,
-						fill: true,
-						tension: 0.4,
-						pointBackgroundColor: '#667eea',
-						pointBorderColor: '#fff',
-						pointBorderWidth: 2,
-						pointRadius: 6
-					}]
-				},
-				options: {
-					responsive: true,
-					maintainAspectRatio: false,
-					plugins: {
-						legend: {
-							display: false
-						}
-					},
-					scales: {
-						y: {
-							beginAtZero: false,
-							grid: {
-								color: 'rgba(0,0,0,0.1)'
-							}
-						},
-						x: {
-							grid: {
-								display: false
-							}
-						}
-					}
-				}
-			});
-		}
-
-		// Music Uploads Chart
-		if (uploadsRef.current) {
-			const ctx = uploadsRef.current.getContext('2d');
-
-			if (uploadsChart.current) {
-				uploadsChart.current.destroy();
-			}
-
-			uploadsChart.current = new Chart(ctx, {
-				type: 'bar',
-				data: {
-					labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'This Week'],
-					datasets: [{
-						label: 'Music Uploads',
-						data: [245, 312, 278, 389, 423],
-						backgroundColor: 'rgba(118, 75, 162, 0.8)',
-						borderColor: '#764ba2',
-						borderWidth: 2,
-						borderRadius: 8,
-						borderSkipped: false
-					}]
-				},
-				options: {
-					responsive: true,
-					maintainAspectRatio: false,
-					plugins: {
-						legend: {
-							display: false
-						}
-					},
-					scales: {
-						y: {
-							beginAtZero: true,
-							grid: {
-								color: 'rgba(0,0,0,0.1)'
-							}
-						},
-						x: {
-							grid: {
-								display: false
-							}
-						}
-					}
-				}
-			});
-		}
-
-		return () => {
-			if (userGrowthChart.current) {
-				userGrowthChart.current.destroy();
-			}
-			if (uploadsChart.current) {
-				uploadsChart.current.destroy();
-			}
-		};
-	}, []);
-
-	const formatCurrency = (amount) => {
-		return new Intl.NumberFormat('en-US', {
-			style: 'currency',
-			currency: 'USD',
-			minimumFractionDigits: 0
-		}).format(amount);
-	};
-
-	const formatNumber = (num) => {
-		return new Intl.NumberFormat('en-US').format(num);
+const TopMusicList = ({ items }) => {
+	const formatCount = (count) => {
+		return new Intl.NumberFormat('en', {
+			notation: "compact",
+			compactDisplay: "short",
+			maximumFractionDigits: 1
+		}).format(count);
 	};
 
 	return (
-		<div>
-			{/* Header */}
-			<div className="dashboard-header">
-				<div className="container">
-					<div className="row align-items-center">
-						<div className="col-md-8">
-							<h1 className="mb-2">
-								<i className="fas fa-music me-3"></i>
-								Music Platform Dashboard
-							</h1>
-							<p className="mb-0 ms-2 opacity-75">Real-time analytics and insights</p>
-						</div>
-						<div className="col-md-4 text-end">
-							<div className="d-flex align-items-center justify-content-end">
-								<i className="fas fa-calendar-alt me-2"></i>
-								<span>{new Date().toLocaleDateString('en-US', {
-									weekday: 'long',
-									year: 'numeric',
-									month: 'long',
-									day: 'numeric'
-								})}</span>
-							</div>
-						</div>
-					</div>
+		<div className="col-md-6 mb-4">
+			<div className="card shadow-sm h-100">
+				<div className="card-body">
+					<h5 className="card-title">Top 5 Music</h5>
+					<ul className="list-group list-group-flush">
+						{items.map((track, idx) => (
+							<li key={idx} className="list-group-item d-flex justify-content-between align-items-center">
+								<span>{track.title}</span>
+								<span className="badge bg-primary rounded-pill">
+									{formatCount(track.totalPlayCount)} plays
+								</span>
+							</li>
+						))}
+					</ul>
 				</div>
 			</div>
+		</div>
+	);
+};
 
-			<div className="container">
-				{/* KPI Cards */}
-				<div className="row g-4 mb-4">
-					<div className="col-xxl-3 col-md-6">
-						<div className="card kpi-card">
-							<div className="card-body p-4">
-								<div className="d-flex align-items-center">
-									<div className="kpi-icon" style={{ backgroundColor: '#3498db' }}>
-										<i className="fas fa-users"></i>
-									</div>
-									<div className="ms-3 flex-grow-1">
-										<div className="kpi-value">{formatNumber(kpiData.totalUsers)}</div>
-										<div className="kpi-label">Total Users</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div className="col-xxl-3 col-md-6">
-						<div className="card kpi-card">
-							<div className="card-body p-4">
-								<div className="d-flex align-items-center">
-									<div className="kpi-icon" style={{ backgroundColor: '#e74c3c' }}>
-										<i className="fas fa-crown"></i>
-									</div>
-									<div className="ms-3 flex-grow-1">
-										<div className="kpi-value">{formatNumber(kpiData.activeSubscriptions)}</div>
-										<div className="kpi-label">Active Subscriptions</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div className="col-xxl-3 col-md-6">
-						<div className="card kpi-card">
-							<div className="card-body p-4">
-								<div className="d-flex align-items-center">
-									<div className="kpi-icon" style={{ backgroundColor: '#9b59b6' }}>
-										<i className="fas fa-music"></i>
-									</div>
-									<div className="ms-3 flex-grow-1">
-										<div className="kpi-value">{formatNumber(kpiData.totalTracks)}</div>
-										<div className="kpi-label">Total Music Tracks</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div className="col-xxl-3 col-md-6">
-						<div className="card kpi-card revenue-card">
-							<div className="card-body p-4">
-								<div className="d-flex align-items-center">
-									<div className="kpi-icon" style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}>
-										<i className="fas fa-dollar-sign"></i>
-									</div>
-									<div className="ms-3 flex-grow-1">
-										<div className="kpi-value text-white">{formatCurrency(kpiData.monthlyRevenue)}</div>
-										<div className="kpi-label text-white opacity-75">Monthly Revenue</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				{/* Today's Stats */}
-				<div className="row g-4 mb-4">
-					<div className="col-md-6">
-						<div className="card kpi-card">
-							<div className="card-body p-4">
-								<div className="d-flex align-items-center">
-									<div className="kpi-icon" style={{ backgroundColor: '#f39c12' }}>
-										<i className="fas fa-user-plus"></i>
-									</div>
-									<div className="ms-3 flex-grow-1">
-										<div className="kpi-value">{formatNumber(kpiData.todaySignups)}</div>
-										<div className="kpi-label">Today's New Signups</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div className="col-md-6">
-						<div className="card kpi-card">
-							<div className="card-body p-4">
-								<div className="d-flex align-items-center">
-									<div className="kpi-icon" style={{ backgroundColor: '#1abc9c' }}>
-										<i className="fas fa-upload"></i>
-									</div>
-									<div className="ms-3 flex-grow-1">
-										<div className="kpi-value">{formatNumber(kpiData.todayUploads)}</div>
-										<div className="kpi-label">Today's Music Uploads</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				{/* Charts */}
-				<div className="row g-4 mb-4">
-					<div className="col-lg-8">
-						<div className="chart-container">
-							<h4 className="section-title">
-								<i className="fas fa-chart-line me-2"></i>
-								User Growth Over Time
-							</h4>
-							<div style={{ height: '300px' }}>
-								<canvas ref={userGrowthRef}></canvas>
-							</div>
-						</div>
-					</div>
-					<div className="col-lg-4">
-						<div className="chart-container">
-							<h4 className="section-title">
-								<i className="fas fa-chart-bar me-2"></i>
-								Weekly Music Uploads
-							</h4>
-							<div style={{ height: '300px' }}>
-								<canvas ref={uploadsRef}></canvas>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				{/* Recent Activity */}
-				<div className="row">
-					<div className="col-12">
-						<div className="chart-container">
-							<h4 className="section-title">
-								<i className="fas fa-clock me-2"></i>
-								Recent Music Uploads
-							</h4>
-							<div className="row">
-								{recentActivity.map((activity) => (
-									<div key={activity.id} className="col-lg-6">
-										<div className="activity-item">
-											<div className="d-flex align-items-center">
-												<div className="activity-avatar me-3">
-													{activity.avatar}
-												</div>
-												<div className="flex-grow-1">
-													<div className="fw-bold text-dark mb-1">
-														{activity.track}
-													</div>
-													<div className="text-muted small">
-														by {activity.artist}
-													</div>
-												</div>
-												<div className="text-muted small">
-													<i className="fas fa-clock me-1"></i>
-													{activity.time}
-												</div>
-											</div>
-										</div>
-									</div>
-								))}
-							</div>
-						</div>
-					</div>
-				</div>
+const ChartCard = ({ title, canvasRef }) => (
+	<div className="col-md-6 mb-4">
+		<div className="card shadow-sm">
+			<div className="card-body">
+				<h5 className="card-title">{title}</h5>
+				<canvas ref={canvasRef}></canvas>
 			</div>
+		</div>
+	</div>
+);
+
+const AdminDashboard = ({ baseUrl }) => {
+	const [kpiData, setKpiData] = React.useState(null);
+	const [topMusic, setTopMusic] = React.useState([]);
+	const [dateType, setDateType] = React.useState("daily");
+	const [loading, setLoading] = React.useState(true);
+
+	const playsRef = React.useRef(null);
+	const uploadsRef = React.useRef(null);
+	const revenueRef = React.useRef(null);
+	const usersRef = React.useRef(null);
+
+	const chartInstances = React.useRef({});
+
+	const getDateRange = (type) => {
+		const end = new Date();
+		const start = new Date();
+
+		switch (type) {
+			case "daily":
+				start.setDate(end.getDate() - 6);
+				break;
+			case "weekly":
+				start.setDate(end.getDate() - 7 * 6);
+				break;
+			case "monthly":
+				start.setMonth(end.getMonth() - 5);
+				break;
+			case "yearly":
+				start.setFullYear(end.getFullYear() - 4);
+				break;
+			default:
+				start.setDate(end.getDate() - 30);
+		}
+
+		return {
+			start: start.toISOString().slice(0, 10),
+			end: end.toISOString().slice(0, 10),
+		};
+	};
+
+	const { start, end } = getDateRange(dateType);
+
+	React.useEffect(() => {
+		const fetchKpisAndTopMusic = async () => {
+			try {
+				const [kpiRes, musicRes] = await Promise.all([
+					fetch(`${baseUrl}/api/report/kpis`),
+					fetch(`${baseUrl}/api/music?sort=top&limit=5`)
+				]);
+
+				const kpiJson = await kpiRes.json();
+				const musicJson = await musicRes.json();
+
+				setKpiData(kpiJson.data.results);
+				setTopMusic(musicJson.data.results);
+			} catch (err) {
+				console.error("Error fetching KPIs or Top Music:", err);
+			}
+			finally {
+				setLoading(false);
+			}
+		};
+
+		fetchKpisAndTopMusic();
+	}, [baseUrl]);
+
+	React.useEffect(() => {
+		const fetchAndRenderChart = async (type, ref) => {
+			try {
+				const res = await fetch(`${baseUrl}/api/report/chart?type=${type}&dateType=${dateType}&start=${start}&end=${end}`);
+				const chartJson = await res.json();
+
+				setTimeout(() => {
+					if (!ref.current) return;
+
+					// Destroy old chart if exists
+					if (chartInstances.current[type]) {
+						chartInstances.current[type].destroy();
+					}
+
+					const ctx = ref.current.getContext('2d');
+					if (!ctx) {
+						console.warn(`Canvas context not found for ${type}`);
+						return;
+					}
+
+					chartInstances.current[type] = new window.Chart(ctx, {
+						type: 'line',
+						data: {
+							labels: chartJson.data.results.labels,
+							datasets: chartJson.data.results.datasets
+						},
+						options: { responsive: true }
+					});
+				}, 50);
+			} catch (err) {
+				console.error(`Error fetching chart ${type}:`, err);
+			}
+		};
+
+		fetchAndRenderChart('plays', playsRef);
+		fetchAndRenderChart('music_uploads', uploadsRef);
+		fetchAndRenderChart('revenue', revenueRef);
+		fetchAndRenderChart('user_growth', usersRef);
+	}, [dateType, baseUrl]);
+
+	const formatToRM = (amount) => {
+		if (amount === null || amount === undefined || isNaN(amount)) {
+			return 'RM 0.00';
+		}
+
+		const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+
+		return new Intl.NumberFormat('ms-MY', {
+			style: 'currency',
+			currency: 'MYR',
+			minimumFractionDigits: 2,
+			maximumFractionDigits: 2
+		}).format(numAmount);
+	};
+
+	return (
+		<div className="container mt-5">
+			<h2 className="mb-4">Admin Dashboard</h2>
+
+			{loading ? (
+				<div className="text-center my-5">
+					<div className="spinner-border text-primary" role="status">
+						<span className="visually-hidden">Loading...</span>
+					</div>
+				</div>
+			) : (
+				<>
+					{kpiData && (
+						<div className="row mb-4">
+							<KpiCard title="Total Users" value={kpiData.userCount} />
+							<KpiCard title="Public Music" value={kpiData.musicCount} />
+							<KpiCard title="Active Subscriptions" value={kpiData.activeSubscriptionCount} />
+							<KpiCard title="Revenue" value={formatToRM(kpiData.revenueAmount)} />
+							<KpiCard title="Users Today" value={kpiData.registeredUsersToday} />
+							<KpiCard title="Uploads Today" value={kpiData.musicUploadedToday} />
+						</div>
+					)}
+
+					<div className="row">
+						<TopMusicList items={topMusic} />
+					</div>
+
+					<div className="mb-4">
+						<select className="form-select w-auto" value={dateType} onChange={e => setDateType(e.target.value)}>
+							<option value="daily">Daily</option>
+							<option value="weekly">Weekly</option>
+							<option value="monthly">Monthly</option>
+							<option value="yearly">Yearly</option>
+						</select>
+					</div>
+
+					<div className="row">
+						<ChartCard title="User Plays" canvasRef={playsRef} />
+						<ChartCard title="Music Uploads" canvasRef={uploadsRef} />
+						<ChartCard title="Revenue" canvasRef={revenueRef} />
+						<ChartCard title="User Registrations" canvasRef={usersRef} />
+					</div>
+				</>
+			)}
 		</div>
 	);
 };

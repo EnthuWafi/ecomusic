@@ -187,4 +187,14 @@ public class SubscriptionService {
 		return subscriptionPlan != null ? SubscriptionMapper.INSTANCE.toDTO(subscriptionPlan) : null;
 	}
 
+	public int getActiveSubscriptionCount() {
+		return subscriptionDAO.countActiveSubscription();
+	}
+
+	public double getRevenueAmount() {
+		return subscriptionDAO.getTotalAmountPaid();
+	}
+	
+	
+
 }

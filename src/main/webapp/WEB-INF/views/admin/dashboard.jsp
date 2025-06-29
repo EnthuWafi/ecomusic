@@ -7,5 +7,5 @@ src="${pageContext.request.contextPath}/assets/js/components/AdminDashboard.js">
 <script>
 	const container = document.getElementById('dashboard-root');
 	const root = ReactDOM.createRoot(container);
-	root.render(React.createElement(AdminDashboard, {}));
+	root.render(React.createElement(AdminDashboard, {baseUrl : window.baseUrl}));
 </script>

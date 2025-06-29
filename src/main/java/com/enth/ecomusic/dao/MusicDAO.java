@@ -78,41 +78,23 @@ public class MusicDAO {
 		return musicList;
 	}
 
-	// READ all
-	public List<Music> getAllMusic() {
-		List<Music> musicList = new ArrayList<>();
-		String sql = "SELECT * FROM Music";
+	public List<Music> getAllPublicMusicWithOffsetLimit(int offset, int limit) {
+		String query = """
+				SELECT *
+		        FROM (
+		            SELECT m.*, ROW_NUMBER() OVER (ORDER BY m.upload_date DESC) AS rnum
+		            FROM Music m
+		            WHERE m.visibility = 'public'
+		        ) sub
+		        WHERE rnum BETWEEN ? AND ?
+				""";
 
-		try (Connection conn = DBConnection.getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql);
-				ResultSet rs = stmt.executeQuery()) {
+		List<Object> params = new ArrayList<>();
+		
+		params.add(offset + 1);
+		params.add(offset + limit);
 
-			while (rs.next()) {
-				musicList.add(mapResultSetToMusic(rs));
-			}
-		} catch (SQLException e) {
-			System.err.println("Error fetching all music: " + e.getMessage());
-		}
-
-		return musicList;
-	}
-
-	public List<Music> getAllPublicMusic() {
-		List<Music> musicList = new ArrayList<>();
-		String sql = "SELECT m.* FROM Music m WHERE m.visibility = 'public'";
-
-		try (Connection conn = DBConnection.getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql);
-				ResultSet rs = stmt.executeQuery()) {
-
-			while (rs.next()) {
-				musicList.add(mapResultSetToMusic(rs));
-			}
-		} catch (SQLException e) {
-			System.err.println("Error fetching all music: " + e.getMessage());
-		}
-
-		return musicList;
+		return DAOUtil.executeQuery(query, this::mapResultSetToMusic, params.toArray());
 	}
 
 	// READ all paginated
@@ -260,11 +242,12 @@ public class MusicDAO {
 
 	public int countAllMusic() {
 		String sql = "SELECT COUNT(*) FROM Music";
-		
+
 		Integer count = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt);
-		
+
 		return count != null ? count : 0;
 	}
+
 	// count (public)
 	public Integer countPublicMusic() {
 		String sql = "SELECT COUNT(*) FROM Music m WHERE visibility = 'public'";
@@ -273,28 +256,27 @@ public class MusicDAO {
 
 		return (result != null) ? result : 0;
 	}
-	
+
 	public Integer countUploadedMusicToday() {
-		String sql = "SELECT COUNT(*) FROM Music m WHERE TRUNC(created_at) = TRUNC(SYSDATE)";
+		String sql = "SELECT COUNT(*) FROM Music m WHERE TRUNC(upload_date) = TRUNC(SYSDATE)";
 
 		Integer result = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt);
 
 		return (result != null) ? result : 0;
 	}
 
-
 	public int countVisibleMusicByArtist(int artistId, int currentUserId) {
 		String sql = """
-		    SELECT COUNT(*) FROM Music
-		    WHERE artist_id = ?
-		    AND (
-		        visibility = 'public'
-		        OR artist_id = ?
-		    )
-		""";
+				    SELECT COUNT(*) FROM Music
+				    WHERE artist_id = ?
+				    AND (
+				        visibility = 'public'
+				        OR artist_id = ?
+				    )
+				""";
 
 		Integer count = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt, artistId, currentUserId);
-		
+
 		return count != null ? count : 0;
 	}
 
@@ -316,11 +298,10 @@ public class MusicDAO {
 
 		VisibilityType visibility = VisibilityType.fromString(rs.getString("visibility"));
 
-		return new Music(musicId, artistId, title, description, updatedAt, uploadDate, audioFileUrl, imageUrl, premiumContent,
-				genreId, moodId, likeCount, totalPlayCount, visibility);
+		return new Music(musicId, artistId, title, description, updatedAt, uploadDate, audioFileUrl, imageUrl,
+				premiumContent, genreId, moodId, likeCount, totalPlayCount, visibility);
 	}
 
-	
 	public List<MusicSearchDTO> getRelevantMusicSearchDTO(String keyword, int limit) {
 		String query = """
 				WITH RankedData AS (
@@ -338,17 +319,16 @@ public class MusicDAO {
 				SELECT * FROM (
 					SELECT r.*, ROW_NUMBER() OVER (ORDER BY r.relevance_score DESC) AS rnum FROM RankedData r
 				) WHERE rnum <= ?
-				
 				""";
-		
+
 		List<Object> params = new ArrayList<>();
-	    params.add(TEXT_SCORE_WEIGHT);
-	    params.add(LIKE_COUNT_WEIGHT);
-	    params.add(TOTAL_PLAYS_WEIGHT);
-	    params.add(FRESHNESS_WEIGHT);
+		params.add(TEXT_SCORE_WEIGHT);
+		params.add(LIKE_COUNT_WEIGHT);
+		params.add(TOTAL_PLAYS_WEIGHT);
+		params.add(FRESHNESS_WEIGHT);
 		params.add(DAOUtil.buildOracleTextQuery(keyword));
 		params.add(limit);
-		
+
 		return DAOUtil.executeQuery(query, ResultSetMapper::mapToMusicSearchDTO, params.toArray());
 
 	}
@@ -387,6 +367,25 @@ public class MusicDAO {
 			System.err.println("Error deleting music: " + e.getMessage());
 			return false;
 		}
+	}
+
+	public List<Music> getTopPlayedMusic(int offset, int limit) {
+		String query = """
+				SELECT *
+				FROM (
+				    SELECT m.*, ROW_NUMBER() OVER (ORDER BY m.total_plays_cache DESC) AS rnum
+				    FROM Music m
+				    WHERE m.visibility = 'public'
+				) sub
+				WHERE rnum BETWEEN ? AND ?
+
+				""";
+
+		List<Object> params = new ArrayList<>();
+		params.add(offset + 1);
+		params.add(offset + limit);
+
+		return DAOUtil.executeQuery(query, this::mapResultSetToMusic, params.toArray());
 	}
 
 }

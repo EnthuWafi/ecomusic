@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -358,4 +359,30 @@ public class MusicService {
 	               ( music.getArtistId() == user.getUserId() || 
 	               (user.isAdmin() || user.isSuperAdmin()) );
 	}
+
+	public int getMusicUploadedTodayCount() {
+		// TODO Auto-generated method stub
+		return musicDAO.countUploadedMusicToday();
+	}
+
+	public List<MusicDTO> getTopPlayedMusicDTO(int offset,int limit) {
+		List<Music> musicList = musicDAO.getTopPlayedMusic(offset,limit);
+		return musicList.stream()
+				.map(music -> {
+			setGenreMood(music);
+			MusicDTO dto = MusicMapper.INSTANCE.toDTO(music);
+			return dto;
+		}).collect(Collectors.toList());
+	}
+
+	public List<MusicDTO> getAllMusicDTO(int offset, int limit) {
+		List<Music> musicList = musicDAO.getAllPublicMusicWithOffsetLimit(offset, limit);
+		return musicList.stream()
+				.map(music -> {
+			setGenreMood(music);
+			MusicDTO dto = MusicMapper.INSTANCE.toDTO(music);
+			return dto;
+		}).collect(Collectors.toList());
+	}
+	
 }

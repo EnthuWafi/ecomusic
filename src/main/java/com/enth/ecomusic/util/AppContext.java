@@ -6,6 +6,7 @@ import com.enth.ecomusic.service.MoodCacheService;
 import com.enth.ecomusic.service.MusicService;
 import com.enth.ecomusic.service.PlayHistoryService;
 import com.enth.ecomusic.service.PlaylistService;
+import com.enth.ecomusic.service.ReportService;
 import com.enth.ecomusic.service.RoleCacheService;
 import com.enth.ecomusic.service.StripeService;
 import com.enth.ecomusic.service.SubscriptionService;
@@ -26,6 +27,7 @@ public final class AppContext {
     private final LikeService likeService;
     private final PlayHistoryService playHistoryService;
     private final StripeService stripeService;
+    private final ReportService reportService;
 
     public AppContext() {
         // Cache first
@@ -40,6 +42,7 @@ public final class AppContext {
         this.likeService = new LikeService(musicService);
         this.playHistoryService = new PlayHistoryService(musicService);
         this.stripeService = new StripeService(subscriptionService);
+        this.reportService = new ReportService(subscriptionService, userService, musicService);
         
     }
 
@@ -82,6 +85,12 @@ public final class AppContext {
 	public StripeService getStripeService() {
 		return stripeService;
 	}
+
+	public ReportService getReportService() {
+		return reportService;
+	}
+	
+	
     
     
 }

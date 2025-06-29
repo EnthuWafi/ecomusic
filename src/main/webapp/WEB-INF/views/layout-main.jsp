@@ -46,7 +46,7 @@
 	</script>
 	<c:set var="user" value="${sessionScope.user}" />
 	<!-- Top Navbar -->
-	<nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3 fixed-top">
 		<a class="navbar-brand d-flex align-items-center"
 			href="${pageContext.request.contextPath}/home"> <img
 			src="${pageContext.request.contextPath}/assets/images/logo.svg"
@@ -158,12 +158,13 @@
 		</div>
 	</nav>
 
-	<div class="container-fluid">
+	<div class="container-fluid mt-5">
 		<div class="row">
 			<!-- Sidebar -->
-			<c:if
-				test="${not empty user and not (user.admin or user.superAdmin)}">
-				<nav class="col-md-2 d-none d-lg-block bg-dark sidebar px-3 pt-4">
+			<nav class="col-md-2 d-none d-lg-block bg-dark sidebar px-3 pt-4">
+				<c:if
+					test="${not empty user and not (user.admin or user.superAdmin)}">
+
 					<h6 class="text-uppercase">Your Library</h6>
 					<ul class="nav flex-column mb-3">
 						<li class="nav-item"><a class="nav-link text-white px-0"
@@ -172,15 +173,8 @@
 							href="#">Liked Songs</a></li>
 					</ul>
 					<div id="playlist-sidebar-root"></div>
-				</nav>
-			</c:if>
-			<c:if test="${empty user}">
-				<nav class="col-md-2 d-none d-lg-block bg-dark sidebar px-3 pt-4">
-
-				</nav>
-			</c:if>
-			<c:if test="${not empty user and (user.admin or user.superAdmin)}">
-				<nav class="col-md-2 d-none d-lg-block bg-dark sidebar px-3 pt-4">
+				</c:if>
+				<c:if test="${not empty user and (user.admin or user.superAdmin)}">
 					<h6 class="text-uppercase">Manage</h6>
 					<ul class="nav flex-column mb-3">
 						<li class="nav-item"><a class="nav-link text-white"
@@ -202,9 +196,9 @@
 							href="${pageContext.request.contextPath}/admin/logs"><i
 								class="bi bi-clipboard-data"></i> Logs</a></li>
 					</ul>
-				</nav>
-			</c:if>
 
+				</c:if>
+			</nav>
 			<!-- Main Content -->
 			<main class="col-md-10 px-4 pt-4 text-white" id="main-content">
 				<c:import url="${contentPage}" />

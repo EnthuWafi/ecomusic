@@ -108,6 +108,7 @@ public class DAOUtil {
                 }
             }
         } catch (SQLException e) {
+        	System.err.println("SQL: " + sql);
             System.err.println("Single query failed: " + e.getMessage());
         }
         return null;

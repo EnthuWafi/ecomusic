@@ -152,4 +152,8 @@ public class UserService {
 	public int getUserCount() {
 		return userDAO.countAllUser();
 	}
+
+	public int getRegisteredUserTodayCount() {
+		return userDAO.countRegisteredUserToday();
+	}
 }

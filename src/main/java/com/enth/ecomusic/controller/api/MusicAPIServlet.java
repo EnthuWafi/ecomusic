@@ -10,6 +10,8 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,11 +90,27 @@ public class MusicAPIServlet extends HttpServlet {
 
 	private void handleFetchListMusic(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
+
+		String sortStr = StringUtils.defaultString(request.getParameter("sort"));
+		String limitStr = StringUtils.defaultString(request.getParameter("limit"));
+		String offsetStr = StringUtils.defaultString(request.getParameter("offset"));
+
+		int limit = StringUtils.isNumeric(limitStr) ? Integer.parseInt(limitStr) : 5;
+		int offset = StringUtils.isNumeric(offsetStr) ? Integer.parseInt(offsetStr) : 0;
+
+		List<MusicDTO> musicList;
+		if ("top".equalsIgnoreCase(sortStr)) {
+			musicList = musicService.getTopPlayedMusicDTO(offset, limit);
+		} else {
+			musicList = musicService.getAllMusicDTO(offset, limit);
+		}
+
 		Map<String, Object> data = new HashMap<>();
+		data.put("limit", limit);
+		data.put("offset", offset);
+		data.put("results", musicList);
 
 		ResponseUtil.sendJson(response, data);
-
 	}
 
 	private void handleFetchSearch(HttpServletRequest request, HttpServletResponse response)
@@ -126,10 +144,10 @@ public class MusicAPIServlet extends HttpServlet {
 
 	private void handleFetchMusic(int musicId, HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		
+
 		HttpSession session = request.getSession();
 		UserDTO currentUser = (UserDTO) session.getAttribute("user");
-		
+
 		Map<String, Object> data = new HashMap<>();
 		MusicDTO music = musicService.getMusicDTOById(musicId, currentUser);
 		data.put("results", music);
