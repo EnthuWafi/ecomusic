@@ -4,9 +4,9 @@
 
 <div id="player-root"></div>
 
-<script
-	src="${pageContext.request.contextPath}/assets/js/components/MusicPlayer.js"></script>
-<script>
+
+<script type="module">
+	import { MusicPlayer } from "${pageContext.request.contextPath}/assets/js/components/MusicPlayer.js";
 	const path = window.location.pathname;
 	const idMatch = path.match(/\/(\d+)(\/)?$/);
 	const musicId = idMatch ? idMatch[1] : null;

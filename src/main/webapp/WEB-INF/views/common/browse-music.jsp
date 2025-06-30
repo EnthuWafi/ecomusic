@@ -19,17 +19,35 @@
 
 
 					<div class="card-body">
-						<h5 class="card-title mb-1 text-truncate"
+						<h5
+							class="card-title mb-1 text-truncate text-white text-decoration-none"
 							title="${musicDTO.music.title}">
 							<a
 								href="${pageContext.request.contextPath}/music/play/${musicDTO.music.musicId}">${musicDTO.music.title}</a>
 						</h5>
 						<p class="card-text mb-2 small text-secondary">by
 							${musicDTO.artistUsername}</p>
-						<span
-							class="badge rounded-pill 
-							${musicDTO.music.premiumContent ? 'bg-warning text-dark' : 'bg-primary'}">
-							${musicDTO.music.premiumContent ? 'Premium' : 'Free'} </span>
+						<div class="d-flex align-items-center flex-wrap gap-2">
+
+							<!-- Free / Premium badge -->
+							<span
+								class="badge rounded-pill 
+				${musicDTO.music.premiumContent ? 'bg-warning text-dark' : 'bg-primary'}">
+								${musicDTO.music.premiumContent ? 'Premium' : 'Free'} </span>
+
+							<!-- Play count -->
+							<span class="small text-muted d-flex align-items-center">
+								<i class="bi bi-play-fill me-1"></i>
+								${musicDTO.music.totalPlayCountString}
+							</span>
+
+							<!-- Like count -->
+							<span class="small text-muted d-flex align-items-center">
+								<i class="bi bi-heart-fill me-1"></i>
+								${musicDTO.music.likeCountString}
+							</span>
+
+						</div>
 					</div>
 
 				</div>
@@ -42,20 +60,20 @@
 <!-- Pagination controls -->
 <nav>
 	<ul class="pagination justify-content-center pt-4 text-dark">
-	
+
 		<c:if test="${currentPage > 1}">
 			<li class="page-item"><a class="page-link"
 				href="?page=${currentPage - 1}">Previous</a></li>
 		</c:if>
-	
+
 		<c:forEach var="i" begin="1" end="${totalPages}">
 			<li class="page-item"><a class="page-link" href="?page=${i}">${i}</a></li>
 		</c:forEach>
-	
+
 		<c:if test="${currentPage < totalPages}">
 			<li class="page-item"><a class="page-link"
 				href="?page=${currentPage + 1}">Next</a></li>
 		</c:if>
-	
+
 	</ul>
 </nav>

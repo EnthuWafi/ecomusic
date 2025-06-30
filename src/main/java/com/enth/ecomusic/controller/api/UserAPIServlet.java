@@ -14,17 +14,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.enth.ecomusic.model.dto.UserDTO;
 import com.enth.ecomusic.model.entity.Music;
+import com.enth.ecomusic.model.entity.Role;
 import com.enth.ecomusic.model.entity.User;
 import com.enth.ecomusic.model.enums.RoleType;
 import com.enth.ecomusic.model.enums.VisibilityType;
 import com.enth.ecomusic.service.UserService;
 import com.enth.ecomusic.util.AppContext;
+import com.enth.ecomusic.util.JsonUtil;
 import com.enth.ecomusic.util.MultipartUtil;
 import com.enth.ecomusic.util.ResponseUtil;
+import com.google.gson.reflect.TypeToken;
 
 /**
  * Servlet implementation class UserAPIServlet
@@ -70,15 +74,27 @@ public class UserAPIServlet extends HttpServlet {
 		String[] pathParts = pathInfo.substring(1).split("/");
 
 		try {
-			if (pathParts.length == 1) {
+			if (pathParts.length == 1 && "role".equals(pathParts[0])) {
+				handleFetchRole(request, response);
+			} 
+			else if (pathParts.length == 1) {
 				int userId = Integer.parseInt(pathParts[0]);
 				handleFetchUser(userId, request, response);
-			} else {
+			}else {
 				ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid API path");
 			}
 		} catch (NumberFormatException e) {
 			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "IDs must be numeric");
 		}
+	}
+
+	private void handleFetchRole(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException  {
+
+		List<Role> roles = userService.getRoles();
+		Map<String, Object> data = new HashMap<>();
+		data.put("results", roles);
+
+		ResponseUtil.sendJson(response, data);
 	}
 
 	private void handleFetchUser(int userId, HttpServletRequest request, HttpServletResponse response)
@@ -190,6 +206,9 @@ public class UserAPIServlet extends HttpServlet {
 			if (pathParts.length == 1) {
 				int userId = Integer.parseInt(pathParts[0]);
 				editUser(userId, request, response);
+			} else if (pathParts.length == 2 && "role".equals(pathParts[1])) {
+				int userId = Integer.parseInt(pathParts[0]);
+				editUserRole(userId, request, response);
 			} else {
 				ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid API path");
 			}
@@ -198,11 +217,56 @@ public class UserAPIServlet extends HttpServlet {
 		}
 	}
 
+	private void editUserRole(int userId, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		HttpSession session = request.getSession();
+		UserDTO currentUser = (UserDTO) session.getAttribute("user");
+
+		if (currentUser == null) {
+			ResponseUtil.sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "User not authenticated");
+			return;
+		}
+
+		String jsonBody;
+		try {
+			// Read JSON body
+			jsonBody = IOUtils.toString(request.getReader());
+		} catch (IOException e) {
+			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Failed to read request body: " + e.getMessage());
+			return;
+		}
+
+		try {
+			// Parse JSON into a map
+			Map<String, Object> body = JsonUtil.fromJson(jsonBody, new TypeToken<Map<String, Object>>() {});
+
+			String roleTypeStr = (String) body.get("roleType");
+			if (roleTypeStr == null || roleTypeStr.isBlank()) {
+				ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Missing or empty 'roleType'");
+				return;
+			}
+
+			RoleType roleType = RoleType.fromString(roleTypeStr);
+
+			boolean success = userService.updateUserSetRole(userId, roleType, currentUser);
+
+			if (success) {
+				ResponseUtil.sendJson(response, "User role updated successfully");
+			} else {
+				ResponseUtil.sendError(response, HttpServletResponse.SC_FORBIDDEN, "You are not allowed to update this role");
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid JSON or server error: " + e.getMessage());
+		}
+	}
+
+
 	private void editUser(int userId, HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		HttpSession session = request.getSession();
 		UserDTO currentUser = (UserDTO) session.getAttribute("user");
-
+		
 		if (currentUser == null) {
 			ResponseUtil.sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "User not authenticated");
 			return;
@@ -219,8 +283,10 @@ public class UserAPIServlet extends HttpServlet {
 			String roleTypeStr = MultipartUtil.getString(request.getPart("roleType"));
 			Part imagePart = request.getPart("image");
 
-			// === Convert Role ===
-			RoleType roleType = RoleType.fromString(roleTypeStr);
+			RoleType roleType = null;
+			if (!(roleTypeStr == null)) {
+				roleType = RoleType.fromString(roleTypeStr);
+			}
 
 			// === Build User Entity ===
 			User user = new User();

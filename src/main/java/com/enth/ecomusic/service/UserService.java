@@ -81,7 +81,6 @@ public class UserService {
 			return false;
 		}
 
-		// Load the existing user from DB to avoid tampering
 		User existingUser = userDAO.getUserById(user.getUserId());
 		if (existingUser == null) {
 			return false;
@@ -93,7 +92,7 @@ public class UserService {
 		}
 
 		int finalRole;
-		if (currentUser.isSuperAdmin()) {
+		if (currentUser.isSuperAdmin() && requestedRole != null) {
 			finalRole = roleCacheService.getByType(requestedRole).getRoleId();
 		} else {
 			finalRole = existingUser.getRoleId();
@@ -199,6 +198,40 @@ public class UserService {
 		}).collect(Collectors.toList());
 	}
 
+	public boolean updateUserSetRole(int userId, RoleType role, UserDTO currentUser) {
+
+		User existingUser = userDAO.getUserById(userId);
+		if (existingUser == null) {
+			return false;
+		}
+
+		boolean canModify = canModifyUser(existingUser, currentUser);
+		if (!canModify) {
+			return false;
+		}
+
+		int finalRole;
+		if (currentUser.isSuperAdmin() && role != null) {
+			finalRole = roleCacheService.getByType(role).getRoleId();
+		} else {
+			return false;
+		}
+
+		// if user modify is current user account
+		boolean isDemotingSelf = existingUser.getUserId() == currentUser.getUserId() && currentUser.isSuperAdmin()
+				&& finalRole != roleCacheService.getByType(RoleType.SUPERADMIN).getRoleId();
+
+		if (isDemotingSelf) {
+			int superAdminCount = this.getSuperAdminCount();
+			if (superAdminCount <= 1) {
+				System.err.println("Cannot demote the only superadmin.");
+				return false;
+			}
+		}
+		
+		return userDAO.updateUserRole(userId, finalRole);
+	}
+	
 	public boolean updateUserSetPremium(int userId, boolean premium, Connection conn) {
 		return userDAO.updateUserSetPremium(userId, premium, conn);
 	}
@@ -304,5 +337,13 @@ public class UserService {
 			return false;
 
 		return currentUser.isSuperAdmin();
+	}
+
+	public List<Role> getRoles() {
+		return roleCacheService.getAll();
+	}
+	
+	public Role getRoleById(int roleId) {
+		return roleCacheService.getById(roleId);
 	}
 }

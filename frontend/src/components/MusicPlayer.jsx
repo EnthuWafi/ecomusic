@@ -1,4 +1,5 @@
-const MusicPlayer = ({ baseURL, musicId }) => {
+
+export const MusicPlayer = ({ baseURL, musicId }) => {
 	const [musicData, setMusicData] = React.useState(null);
 	const [isLoading, setIsLoading] = React.useState(false);
 	const [isPlaying, setIsPlaying] = React.useState(false);

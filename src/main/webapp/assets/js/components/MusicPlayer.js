@@ -1,4 +1,4 @@
-const MusicPlayer = ({
+export const MusicPlayer = ({
   baseURL,
   musicId
 }) => {

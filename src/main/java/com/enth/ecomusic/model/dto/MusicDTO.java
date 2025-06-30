@@ -3,6 +3,7 @@ package com.enth.ecomusic.model.dto;
 import java.time.LocalDateTime;
 
 import com.enth.ecomusic.model.enums.VisibilityType;
+import com.enth.ecomusic.util.NumberFormatUtil;
 
 public class MusicDTO{
     /**
@@ -132,6 +133,13 @@ public class MusicDTO{
 
 	public LocalDateTime getUpdatedAt() {
 		return updatedAt;
+	}
+	
+	public String getTotalPlayCountString() {
+		return NumberFormatUtil.format(totalPlayCount);
+	}
+	public String getLikeCountString() {
+		return NumberFormatUtil.format(likeCount);
 	}
 
 	
