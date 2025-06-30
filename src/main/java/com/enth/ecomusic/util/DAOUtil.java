@@ -113,6 +113,25 @@ public class DAOUtil {
         }
         return null;
     }
+    
+    public static <T> T executeSingleQuery(Connection conn, String sql, RowMapper<T> mapper, Object... params) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            for (int i = 0; i < params.length; i++) {
+                stmt.setObject(i + 1, params[i]);
+            }
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapper.map(rs);
+                }
+            }
+        } catch (SQLException e) {
+        	System.err.println("SQL: " + sql);
+            System.err.println("Single query failed: " + e.getMessage());
+        }
+        return null;
+    }
 
     /**
      * Executes an update operation (INSERT, UPDATE, DELETE).

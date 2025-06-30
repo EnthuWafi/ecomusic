@@ -77,6 +77,24 @@ public class UserDAO {
 		}
 		return users;
 	}
+	
+	public List<User> getAllUserWithOffsetLimit(int offset, int limit) {
+		String query = """
+				SELECT *
+		        FROM (
+		            SELECT u.*, ROW_NUMBER() OVER (ORDER BY u.created_at DESC) AS rnum
+		            FROM Users u
+		        )
+		        WHERE rnum BETWEEN ? AND ?
+				""";
+
+		List<Object> params = new ArrayList<>();
+		
+		params.add(offset + 1);
+		params.add(offset + limit);
+
+		return DAOUtil.executeQuery(query, this::mapUserFromResultSet, params.toArray());
+	}
 
 	// UPDATE
 	public boolean updateUser(User user) {
@@ -139,6 +157,31 @@ public class UserDAO {
 	
 	public int countAllUser() {
 		String sql = "SELECT COUNT(*) FROM Users";
+		
+		Integer count = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt);
+		
+		return count != null ? count : 0;
+	}
+	
+	public int countUserByRoleId(int roleId) {
+		String sql = "SELECT COUNT(*) FROM Users WHERE role_id = ? AND (is_artist = 0 AND is_premium = 0)";
+		
+		Integer count = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt, roleId);
+		
+		return count != null ? count : 0;
+	}
+	
+	public int countAllArtist() {
+		String sql = "SELECT COUNT(*) FROM Users WHERE is_artist = 1";
+		
+		Integer count = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt);
+		
+		return count != null ? count : 0;
+	}
+	
+
+	public int countAllPremium() {
+		String sql = "SELECT COUNT(*) FROM Users WHERE is_premium = 1";
 		
 		Integer count = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt);
 		

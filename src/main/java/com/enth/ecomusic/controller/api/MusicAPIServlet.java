@@ -10,8 +10,6 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +24,6 @@ import com.enth.ecomusic.model.enums.VisibilityType;
 import com.enth.ecomusic.model.mapper.MusicMapper;
 import com.enth.ecomusic.service.MusicService;
 import com.enth.ecomusic.util.AppContext;
-import com.enth.ecomusic.util.JsonUtil;
 import com.enth.ecomusic.util.MultipartUtil;
 import com.enth.ecomusic.util.ResponseUtil;
 
@@ -246,7 +243,8 @@ public class MusicAPIServlet extends HttpServlet {
 
 		try {
 			if (pathParts.length == 1) {
-				editMusicPut(pathParts[0], request, response);
+				int musicId = Integer.parseInt(pathParts[0]);
+				editMusicPut(musicId, request, response);
 			} else {
 				ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid API path");
 			}
@@ -255,10 +253,8 @@ public class MusicAPIServlet extends HttpServlet {
 		}
 	}
 
-	private void editMusicPut(String musicIdStr, HttpServletRequest request, HttpServletResponse response)
+	private void editMusicPut(int musicId, HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException, NumberFormatException {
-
-		int musicId = Integer.parseInt(musicIdStr);
 
 		HttpSession session = request.getSession();
 		UserDTO currentUser = (UserDTO) session.getAttribute("user");
@@ -341,7 +337,8 @@ public class MusicAPIServlet extends HttpServlet {
 
 		try {
 			if (pathParts.length == 1) {
-				deleteMusic(pathParts[0], request, response);
+				int musicId = Integer.parseInt(pathParts[0]);
+				deleteMusic(musicId, request, response);
 			} else {
 				ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid API path");
 			}
@@ -350,10 +347,9 @@ public class MusicAPIServlet extends HttpServlet {
 		}
 	}
 
-	private void deleteMusic(String musicIdStr, HttpServletRequest request, HttpServletResponse response)
+	private void deleteMusic(int musicId, HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException, NumberFormatException {
 
-		int musicId = Integer.parseInt(musicIdStr);
 		HttpSession session = request.getSession();
 		UserDTO currentUser = (UserDTO) session.getAttribute("user");
 

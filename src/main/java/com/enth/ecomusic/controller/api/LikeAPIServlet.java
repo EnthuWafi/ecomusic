@@ -8,17 +8,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
-import java.util.Map;
-
-import org.apache.commons.io.IOUtils;
-
 import com.enth.ecomusic.model.dto.UserDTO;
 import com.enth.ecomusic.model.entity.Like;
 import com.enth.ecomusic.service.LikeService;
 import com.enth.ecomusic.util.AppContext;
-import com.enth.ecomusic.util.JsonUtil;
 import com.enth.ecomusic.util.ResponseUtil;
-import com.google.gson.reflect.TypeToken;
 
 /**
  * Servlet implementation class LikeAPIServlet

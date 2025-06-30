@@ -11,7 +11,6 @@ import java.io.IOException;
 
 import com.enth.ecomusic.model.dto.SubscriptionPlanDTO;
 import com.enth.ecomusic.model.dto.UserDTO;
-import com.enth.ecomusic.model.entity.User;
 import com.enth.ecomusic.model.entity.UserSubscription;
 import com.enth.ecomusic.model.enums.PlanType;
 import com.enth.ecomusic.service.StripeService;

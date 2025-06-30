@@ -1,57 +1,9 @@
+import KpiCard from "./KpiCard.js";
+import ChartCard from "./ChartCard.js";
+import TopMusicList from "./TopMusicList.js";
 
-const KpiCard = ({ title, value }) => (
-	<div className="col-md-4 mb-3">
-		<div className="card text-white bg-primary h-100 shadow-sm">
-			<div className="card-body">
-				<h5 className="card-title">{title}</h5>
-				<p className="card-text fs-4 fw-bold">{value}</p>
-			</div>
-		</div>
-	</div>
-);
 
-const TopMusicList = ({ items }) => {
-	const formatCount = (count) => {
-		return new Intl.NumberFormat('en', {
-			notation: "compact",
-			compactDisplay: "short",
-			maximumFractionDigits: 1
-		}).format(count);
-	};
-
-	return (
-		<div className="col-md-6 mb-4">
-			<div className="card shadow-sm h-100">
-				<div className="card-body">
-					<h5 className="card-title">Top 5 Music</h5>
-					<ul className="list-group list-group-flush">
-						{items.map((track, idx) => (
-							<li key={idx} className="list-group-item d-flex justify-content-between align-items-center">
-								<span>{track.title}</span>
-								<span className="badge bg-primary rounded-pill">
-									{formatCount(track.totalPlayCount)} plays
-								</span>
-							</li>
-						))}
-					</ul>
-				</div>
-			</div>
-		</div>
-	);
-};
-
-const ChartCard = ({ title, canvasRef }) => (
-	<div className="col-md-6 mb-4">
-		<div className="card shadow-sm">
-			<div className="card-body">
-				<h5 className="card-title">{title}</h5>
-				<canvas ref={canvasRef}></canvas>
-			</div>
-		</div>
-	</div>
-);
-
-const AdminDashboard = ({ baseUrl }) => {
+export const AdminDashboard = ({ baseUrl }) => {
 	const [kpiData, setKpiData] = React.useState(null);
 	const [topMusic, setTopMusic] = React.useState([]);
 	const [dateType, setDateType] = React.useState("daily");
@@ -61,8 +13,6 @@ const AdminDashboard = ({ baseUrl }) => {
 	const uploadsRef = React.useRef(null);
 	const revenueRef = React.useRef(null);
 	const usersRef = React.useRef(null);
-
-	const chartInstances = React.useRef({});
 
 	const getDateRange = (type) => {
 		const end = new Date();
@@ -117,45 +67,7 @@ const AdminDashboard = ({ baseUrl }) => {
 		fetchKpisAndTopMusic();
 	}, [baseUrl]);
 
-	React.useEffect(() => {
-		const fetchAndRenderChart = async (type, ref) => {
-			try {
-				const res = await fetch(`${baseUrl}/api/report/chart?type=${type}&dateType=${dateType}&start=${start}&end=${end}`);
-				const chartJson = await res.json();
-
-				setTimeout(() => {
-					if (!ref.current) return;
-
-					// Destroy old chart if exists
-					if (chartInstances.current[type]) {
-						chartInstances.current[type].destroy();
-					}
-
-					const ctx = ref.current.getContext('2d');
-					if (!ctx) {
-						console.warn(`Canvas context not found for ${type}`);
-						return;
-					}
-
-					chartInstances.current[type] = new window.Chart(ctx, {
-						type: 'line',
-						data: {
-							labels: chartJson.data.results.labels,
-							datasets: chartJson.data.results.datasets
-						},
-						options: { responsive: true }
-					});
-				}, 50);
-			} catch (err) {
-				console.error(`Error fetching chart ${type}:`, err);
-			}
-		};
-
-		fetchAndRenderChart('plays', playsRef);
-		fetchAndRenderChart('music_uploads', uploadsRef);
-		fetchAndRenderChart('revenue', revenueRef);
-		fetchAndRenderChart('user_growth', usersRef);
-	}, [dateType, baseUrl]);
+	
 
 	const formatToRM = (amount) => {
 		if (amount === null || amount === undefined || isNaN(amount)) {
@@ -209,10 +121,10 @@ const AdminDashboard = ({ baseUrl }) => {
 					</div>
 
 					<div className="row">
-						<ChartCard title="User Plays" canvasRef={playsRef} />
-						<ChartCard title="Music Uploads" canvasRef={uploadsRef} />
-						<ChartCard title="Revenue" canvasRef={revenueRef} />
-						<ChartCard title="User Registrations" canvasRef={usersRef} />
+						<ChartCard baseUrl={baseUrl} dateType={dateType} start={start} end={end} type="plays" title="User Plays" canvasRef={playsRef} />
+						<ChartCard baseUrl={baseUrl} dateType={dateType} start={start} end={end} type="music_uploads" title="Music Uploads" canvasRef={uploadsRef} />
+						<ChartCard baseUrl={baseUrl} dateType={dateType} start={start} end={end} type="revenue" title="Revenue" canvasRef={revenueRef} />
+						<ChartCard baseUrl={baseUrl} dateType={dateType} start={start} end={end} type="user_growth" title="User Registrations" canvasRef={usersRef} />
 					</div>
 				</>
 			)}

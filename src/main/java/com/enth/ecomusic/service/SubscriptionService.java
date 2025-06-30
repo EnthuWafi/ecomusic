@@ -7,7 +7,6 @@ import com.enth.ecomusic.model.dto.SubscriptionPlanDTO;
 import com.enth.ecomusic.model.entity.SubscriptionPlan;
 import com.enth.ecomusic.model.entity.UserSubscription;
 import com.enth.ecomusic.model.enums.PlanType;
-import com.enth.ecomusic.model.enums.RoleType;
 import com.enth.ecomusic.model.mapper.SubscriptionMapper;
 import com.enth.ecomusic.model.transaction.TransactionTemplate;
 

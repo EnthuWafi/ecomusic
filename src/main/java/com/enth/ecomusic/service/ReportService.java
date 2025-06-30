@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import com.enth.ecomusic.dao.ReportDAO;
 import com.enth.ecomusic.model.dto.ChartDTO;
 import com.enth.ecomusic.model.dto.ReportKPIDTO;
-import com.enth.ecomusic.model.mapper.ReportMapper;
+import com.enth.ecomusic.model.dto.ReportUserKPIDTO;
 
 public class ReportService {
 	
@@ -38,6 +38,17 @@ public class ReportService {
 	    int musicUploadedToday = musicService.getMusicUploadedTodayCount();
 		
 		return new ReportKPIDTO(userCount, musicCount, activeSubscriptionCount, totalRevenueAmount, registeredUsersToday, musicUploadedToday);
+	}
+	
+	public ReportUserKPIDTO getReportUserKPIDTO() {
+		int totalUserCount = userService.getUserCount();
+		int adminCount = userService.getAdminCount();
+		int superAdminCount = userService.getSuperAdminCount();
+		int artistCount = userService.getArtistCount();
+		int premiumCount = userService.getPremiumCount();
+		int userCount = userService.getNormalUserCount();
+		
+		return new ReportUserKPIDTO(totalUserCount, adminCount, superAdminCount, artistCount, premiumCount, userCount);
 	}
 	
 	private String getDateFormat(String dateType) {

@@ -8,16 +8,16 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * Servlet implementation class AdminMusicServlet
+ * Servlet implementation class AdminSubscriptionServlet
  */
-@WebServlet("/admin/music")
-public class AdminMusicServlet extends HttpServlet {
+@WebServlet("/admin/subscription")
+public class AdminSubscriptionServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public AdminMusicServlet() {
+    public AdminSubscriptionServlet() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -25,11 +25,10 @@ public class AdminMusicServlet extends HttpServlet {
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		request.setAttribute("pageTitle", "Admin Dashboard");
-		request.setAttribute("contentPage", "/WEB-INF/views/admin/view-music-list.jsp");
+		request.setAttribute("contentPage", "/WEB-INF/views/admin/view-subscription-list.jsp");
 		request.getRequestDispatcher("/WEB-INF/views/layout-main.jsp").forward(request, response);
 	}
-
 
 }

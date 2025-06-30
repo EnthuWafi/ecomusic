@@ -7,11 +7,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import com.enth.ecomusic.model.dto.MusicDetailDTO;
-import com.enth.ecomusic.model.dto.UserDTO;
 import com.enth.ecomusic.service.MusicService;
 import com.enth.ecomusic.util.AppContext;
-import com.enth.ecomusic.util.CommonUtil;
 
 /**
  * Servlet implementation class MusicServlet

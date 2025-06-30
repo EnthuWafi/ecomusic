@@ -32,6 +32,12 @@ public class PlaylistMusicDAO {
     	return DAOUtil.executeSingleQuery(sql, this::mapResultSetToPlaylistMusic, playlistId, musicId);
     }
     
+    public PlaylistMusic getPlaylistMusic(int playlistId, int musicId, Connection conn) {
+    	String sql = "SELECT * FROM PlaylistMusic WHERE playlist_id = ? AND music_id = ? FOR UPDATE";
+    	
+    	return DAOUtil.executeSingleQuery(conn, sql, this::mapResultSetToPlaylistMusic, playlistId, musicId);
+    }
+    
     public List<PlaylistMusic> getPlaylistMusicListByPlaylistId(int playlistId) {
         List<PlaylistMusic> list = new ArrayList<>();
         String sql = "SELECT * FROM PlaylistMusic WHERE playlist_id = ? ORDER BY position ASC";

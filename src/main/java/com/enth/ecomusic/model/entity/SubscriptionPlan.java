@@ -1,8 +1,6 @@
 package com.enth.ecomusic.model.entity;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 import com.enth.ecomusic.model.enums.PlanType;

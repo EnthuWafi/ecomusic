@@ -61,7 +61,7 @@ public class RegisterServlet extends HttpServlet {
 	    }
 
 	    User user = new User(fname, lname, username, null, email, password);
-	    boolean success = userService.registerUserAccount(user, null, RoleType.USER);
+	    boolean success = userService.registerUserAccount(user, null, RoleType.USER, null);
 
 	    if (success) {
 	        CommonUtil.addMessage(session, ToastrType.SUCCESS, "Registration successful. Please log in.");

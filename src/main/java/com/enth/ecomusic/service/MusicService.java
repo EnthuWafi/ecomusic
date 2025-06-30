@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -16,7 +15,6 @@ import com.enth.ecomusic.model.dto.MusicSearchDTO;
 import com.enth.ecomusic.model.dto.UserDTO;
 import com.enth.ecomusic.model.entity.Music;
 import com.enth.ecomusic.model.entity.User;
-import com.enth.ecomusic.model.enums.RoleType;
 import com.enth.ecomusic.model.enums.VisibilityType;
 import com.enth.ecomusic.model.mapper.MusicMapper;
 import com.enth.ecomusic.util.AppConfig;

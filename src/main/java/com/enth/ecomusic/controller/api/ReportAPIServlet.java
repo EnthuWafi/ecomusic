@@ -30,35 +30,37 @@ import com.enth.ecomusic.util.ResponseUtil;
 @WebServlet("/api/report/*")
 public class ReportAPIServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-      
+
 	private ReportService reportService;
-	private MusicService musicService;
+	
 	@Override
 	public void init() throws ServletException {
 		// TODO Auto-generated method stub
 		super.init();
 		AppContext ctx = (AppContext) getServletContext().getAttribute("appContext");
-		this.musicService = ctx.getMusicService();
 		this.reportService = ctx.getReportService();
 	}
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public ReportAPIServlet() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#HttpServlet()
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public ReportAPIServlet() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		String pathInfo = request.getPathInfo();
 		if (pathInfo == null || pathInfo.equals("/")) {
 			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid API path");
 			return;
 		}
-		
+
 		HttpSession session = request.getSession();
 		UserDTO currentUser = (UserDTO) session.getAttribute("user");
 
@@ -66,7 +68,7 @@ public class ReportAPIServlet extends HttpServlet {
 			ResponseUtil.sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "User not authenticated");
 			return;
 		}
-		
+
 		if (!(currentUser.isAdmin() || currentUser.isSuperAdmin())) {
 			ResponseUtil.sendError(response, HttpServletResponse.SC_FORBIDDEN, "User forbidden!");
 			return;
@@ -80,7 +82,7 @@ public class ReportAPIServlet extends HttpServlet {
 
 			} else if (pathParts.length == 1 && "chart".equals(pathParts[0])) {
 				handleFetchChart(request, response);
-				
+
 			} else {
 				ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid API path");
 			}
@@ -88,67 +90,84 @@ public class ReportAPIServlet extends HttpServlet {
 			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "IDs must be numeric");
 		}
 	}
-	private void handleFetchChart(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	    String typeStr = StringUtils.defaultIfBlank(request.getParameter("type"), "plays");
-	    String dateTypeStr = StringUtils.defaultIfBlank(request.getParameter("dateType"), "daily");
-	    String startStr = request.getParameter("start");
-	    String endStr = request.getParameter("end");
 
-	    LocalDate start = null;
-	    LocalDate end = null;
+	private void handleFetchChart(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		String typeStr = StringUtils.defaultIfBlank(request.getParameter("type"), "plays");
+		String dateTypeStr = StringUtils.defaultIfBlank(request.getParameter("dateType"), "daily");
+		String startStr = request.getParameter("start");
+		String endStr = request.getParameter("end");
 
-	    try {
-	        if (StringUtils.isNotBlank(startStr)) {
-	            start = LocalDate.parse(startStr); // expect format: yyyy-MM-dd
-	        }
-	        if (StringUtils.isNotBlank(endStr)) {
-	            end = LocalDate.parse(endStr);
-	        }
-	    } catch (DateTimeParseException e) {
-	        ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid date format. Use yyyy-MM-dd.");
-	        return;
-	    }
+		LocalDate start = null;
+		LocalDate end = null;
 
-	    ChartDTO chartDTO;
+		try {
+			if (StringUtils.isNotBlank(startStr)) {
+				start = LocalDate.parse(startStr); // expect format: yyyy-MM-dd
+			}
+			if (StringUtils.isNotBlank(endStr)) {
+				end = LocalDate.parse(endStr);
+			}
+		} catch (DateTimeParseException e) {
+			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST,
+					"Invalid date format. Use yyyy-MM-dd.");
+			return;
+		}
 
-	    switch (typeStr.toLowerCase()) {
-	        case "plays":
-	            chartDTO = reportService.getUserPlayChartDTO(start, end, dateTypeStr);
-	            break;
-	        case "music_uploads":
-	            chartDTO = reportService.getMusicUploadChartDTO(start, end, dateTypeStr);
-	            break;
-	        case "revenue":
-	        	chartDTO = reportService.getRevenueSumChartDTO(start, end, dateTypeStr);
-	        	break;
-	        case "user_growth":
-	        	chartDTO = reportService.getUserGrowthChartDTO(start, end, dateTypeStr);
-	        	break;
-	        default:
-	            ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Unsupported chart type: " + typeStr);
-	            return;
-	    }
+		ChartDTO chartDTO;
 
-	    Map<String, Object> data = new HashMap<>();
-	    data.put("type", typeStr);
-	    data.put("dateType", dateTypeStr);
-	    data.put("start", startStr);
-	    data.put("end", endStr);
-	    data.put("results", chartDTO);
+		switch (typeStr.toLowerCase()) {
+		case "plays":
+			chartDTO = reportService.getUserPlayChartDTO(start, end, dateTypeStr);
+			break;
+		case "music_uploads":
+			chartDTO = reportService.getMusicUploadChartDTO(start, end, dateTypeStr);
+			break;
+		case "revenue":
+			chartDTO = reportService.getRevenueSumChartDTO(start, end, dateTypeStr);
+			break;
+		case "user_growth":
+			chartDTO = reportService.getUserGrowthChartDTO(start, end, dateTypeStr);
+			break;
+		default:
+			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Unsupported chart type: " + typeStr);
+			return;
+		}
 
-	    ResponseUtil.sendJson(response, data);
+		Map<String, Object> data = new HashMap<>();
+		data.put("type", typeStr);
+		data.put("dateType", dateTypeStr);
+		data.put("start", startStr);
+		data.put("end", endStr);
+		data.put("results", chartDTO);
+
+		ResponseUtil.sendJson(response, data);
 	}
 
-	private void handleFetchKPI(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	
+	private void handleFetchKPI(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		
+		String typeStr = StringUtils.defaultIfBlank(request.getParameter("type"), "dashboard");
+		
+		Object reportDTO;
+		switch (typeStr.toLowerCase()) {
+		case "dashboard":
+			reportDTO = reportService.getReportKPIDTO();
+			break;
+		case "user":
+			reportDTO = reportService.getReportUserKPIDTO();
+			break;
+		default:
+			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Unsupported KPI type: " + typeStr);
+			return;
+		}
+		
 		Map<String, Object> data = new HashMap<>();
-		ReportKPIDTO reportDTO = reportService.getReportKPIDTO();
+		
 		data.put("results", reportDTO);
 
 		ResponseUtil.sendJson(response, data);
-		
-		
-	}
 
+	}
 
 }

@@ -80,17 +80,46 @@ public class MusicDAO {
 
 	public List<Music> getAllPublicMusicWithOffsetLimit(int offset, int limit) {
 		String query = """
-				SELECT *
-		        FROM (
-		            SELECT m.*, ROW_NUMBER() OVER (ORDER BY m.upload_date DESC) AS rnum
-		            FROM Music m
-		            WHERE m.visibility = 'public'
-		        ) sub
+				SELECT * FROM (
+				      SELECT m.*, ROW_NUMBER() OVER (ORDER BY m.upload_date DESC) AS rnum
+				      FROM Music m
+				      WHERE m.visibility = 'public'
+				  )
 		        WHERE rnum BETWEEN ? AND ?
 				""";
 
 		List<Object> params = new ArrayList<>();
+
+		params.add(offset + 1);
+		params.add(offset + limit);
+
+		return DAOUtil.executeQuery(query, this::mapResultSetToMusic, params.toArray());
+	}
+
+	public List<Music> getAllPublicRelevantMusicWithOffsetLimit(int offset, int limit) {
+		String query = """
+				SELECT *
+				      FROM (
+				          WITH RankedData AS (
+						   SELECT
+						       m.*
+						       (
+						        m.like_count_cache * ? +
+						        m.total_plays_cache * ? +
+						        (SYSDATE - m.upload_date) * ?
+						    ) AS relevance_score
+						   FROM Music m
+						   WHERE m.visibility = 'public'
 		
+						   )
+						SELECT r.*, ROW_NUMBER() OVER (ORDER BY r.relevance_score DESC) AS rnum
+						FROM RankedData r
+				      )
+				      WHERE rnum BETWEEN ? AND ?
+				""";
+
+		List<Object> params = new ArrayList<>();
+
 		params.add(offset + 1);
 		params.add(offset + limit);
 

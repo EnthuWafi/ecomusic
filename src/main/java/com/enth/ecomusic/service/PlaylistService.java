@@ -214,7 +214,7 @@ public class PlaylistService {
 
 		try (TransactionTemplate transaction = new TransactionTemplate()) {
 
-			PlaylistMusic playlistMusic = playlistMusicDAO.getPlaylistMusic(playlistId, musicId);
+			PlaylistMusic playlistMusic = playlistMusicDAO.getPlaylistMusic(playlistId, musicId, transaction.getConnection());
 
 			if (playlistMusic == null) {
 				throw new SQLException(

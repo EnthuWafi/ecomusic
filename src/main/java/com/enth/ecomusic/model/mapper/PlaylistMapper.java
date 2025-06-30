@@ -5,7 +5,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import com.enth.ecomusic.model.dto.PlaylistDTO;
-import com.enth.ecomusic.model.dto.PlaylistDetailDTO;
 import com.enth.ecomusic.model.dto.PlaylistMusicDTO;
 import com.enth.ecomusic.model.entity.Playlist;
 import com.enth.ecomusic.model.entity.PlaylistMusic;
