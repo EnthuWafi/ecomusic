@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 
 import com.enth.ecomusic.dao.UserDAO;
 import com.enth.ecomusic.model.dto.UserDTO;
-import com.enth.ecomusic.model.entity.Music;
 import com.enth.ecomusic.model.entity.Role;
 import com.enth.ecomusic.model.entity.User;
 import com.enth.ecomusic.model.enums.RoleType;

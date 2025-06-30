@@ -417,4 +417,15 @@ public class MusicDAO {
 		return DAOUtil.executeQuery(query, this::mapResultSetToMusic, params.toArray());
 	}
 
+	//Should be called when artist refuse to pay their due!
+	public boolean updateAllMusicSetPrivateByArtistId(int artistId) {
+		String sql = "UPDATE Music SET visibility = 'private' WHERE artist_id = ?";
+		try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+			stmt.setInt(1, artistId);
+			return stmt.executeUpdate() > 0;
+		} catch (SQLException e) {
+			System.err.println("Error deleting music: " + e.getMessage());
+			return false;
+		}
+	}
 }

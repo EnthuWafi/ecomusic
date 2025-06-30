@@ -56,7 +56,8 @@ export const MusicPlayer = ({ baseURL, musicId }) => {
 				responsive: true,
 				height: 60,
 				autoplay: false,
-				mediaControls: false
+				mediaControls: false,
+				normalize: true
 			});
 
 			// Event listeners

@@ -18,11 +18,9 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.enth.ecomusic.model.dto.UserDTO;
-import com.enth.ecomusic.model.entity.Music;
 import com.enth.ecomusic.model.entity.Role;
 import com.enth.ecomusic.model.entity.User;
 import com.enth.ecomusic.model.enums.RoleType;
-import com.enth.ecomusic.model.enums.VisibilityType;
 import com.enth.ecomusic.service.UserService;
 import com.enth.ecomusic.util.AppContext;
 import com.enth.ecomusic.util.JsonUtil;

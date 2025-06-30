@@ -17,7 +17,7 @@
         <!-- Quick Access Section -->
         <div class="quick-access">
             <div class="quick-access-item">
-                <a href="${pageContext.request.contextPath}/user/liked" class="quick-link">
+                <div onclick="window.location.href = '${pageContext.request.contextPath}/user/liked'" class="quick-link">
                     <div class="quick-icon liked-songs">
                         <i class="fas fa-heart"></i>
                     </div>
@@ -25,7 +25,7 @@
                         <h3>Liked Songs</h3>
                         <p>${fn:length(likes)} songs</p>
                     </div>
-                </a>
+                </div>
             </div>
         </div>
 
@@ -88,7 +88,7 @@
                         <c:forEach var="playlist" items="${playlists}" varStatus="status">
                             <c:if test="${status.index < 6}"> <!-- Show only first 6 playlists -->
                                 <div class="playlist-card">
-                                    <a href="${pageContext.request.contextPath}/user/playlist/${playlist.playlistId}" class="playlist-link">
+                                    <div onclick="window.location.href = '${pageContext.request.contextPath}/user/playlist/${playlist.playlistId}'" class="playlist-link">
                                         <div class="playlist-image">
                                             <c:choose>
                                                 <c:when test="${not empty playlist.musicList and not empty playlist.musicList[0].music.imageUrl}">
@@ -124,7 +124,7 @@
                                                 • ${playlist.visibility}
                                             </p>
                                         </div>
-                                    </a>
+                                    </div>
                                 </div>
                             </c:if>
                         </c:forEach>

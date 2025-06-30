@@ -16,10 +16,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 import com.enth.ecomusic.model.dto.ChartDTO;
-import com.enth.ecomusic.model.dto.MusicDTO;
-import com.enth.ecomusic.model.dto.ReportKPIDTO;
 import com.enth.ecomusic.model.dto.UserDTO;
-import com.enth.ecomusic.service.MusicService;
 import com.enth.ecomusic.service.ReportService;
 import com.enth.ecomusic.util.AppContext;
 import com.enth.ecomusic.util.ResponseUtil;
