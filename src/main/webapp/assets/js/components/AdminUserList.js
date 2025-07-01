@@ -91,7 +91,7 @@ export const AdminUserList = ({
     }, error);
   }
   return /*#__PURE__*/React.createElement("div", {
-    className: "container mt-5"
+    className: "container-xl mt-5"
   }, /*#__PURE__*/React.createElement("h2", {
     className: "mb-4"
   }, "User Management"), kpiData && /*#__PURE__*/React.createElement("div", {
@@ -127,11 +127,25 @@ export const AdminUserList = ({
     onClick: () => setShowAddModal(true)
   }, /*#__PURE__*/React.createElement("i", {
     className: "bi bi-person-plus"
-  }), " Add Admin")), /*#__PURE__*/React.createElement("table", {
+  }), " Add Admin")), /*#__PURE__*/React.createElement("div", {
+    className: "table-responsive"
+  }, /*#__PURE__*/React.createElement("table", {
     className: "table table-hover"
   }, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "Username"), /*#__PURE__*/React.createElement("th", null, "Email"), /*#__PURE__*/React.createElement("th", null, "Role"), /*#__PURE__*/React.createElement("th", null, "Actions"))), /*#__PURE__*/React.createElement("tbody", null, users.map(user => /*#__PURE__*/React.createElement("tr", {
     key: user.userId
-  }, /*#__PURE__*/React.createElement("td", null, user.username), /*#__PURE__*/React.createElement("td", null, user.email), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("select", {
+  }, /*#__PURE__*/React.createElement("td", {
+    className: "d-flex align-items-center"
+  }, /*#__PURE__*/React.createElement("img", {
+    src: `${baseUrl}/stream/image/user/${user.userId}`,
+    alt: "User",
+    style: {
+      width: "32px",
+      height: "32px",
+      objectFit: "cover",
+      borderRadius: "50%",
+      marginRight: "10px"
+    }
+  }), /*#__PURE__*/React.createElement("span", null, user.username)), /*#__PURE__*/React.createElement("td", null, user.email), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("select", {
     className: "form-select form-select-sm",
     value: user.roleName,
     onChange: e => handleRoleChange(user.userId, e.target.value)
@@ -149,7 +163,7 @@ export const AdminUserList = ({
   }, "Edit"), /*#__PURE__*/React.createElement("button", {
     className: "btn btn-sm btn-danger",
     onClick: () => handleDelete(user.userId)
-  }, "Delete")))))))), pendingRoleChange && /*#__PURE__*/React.createElement("div", {
+  }, "Delete"))))))))), pendingRoleChange && /*#__PURE__*/React.createElement("div", {
     className: "modal show d-block",
     tabIndex: "-1"
   }, /*#__PURE__*/React.createElement("div", {

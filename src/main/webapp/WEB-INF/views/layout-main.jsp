@@ -65,7 +65,7 @@
 				<li class="nav-item px-2"><a class="nav-link"
 					href="${pageContext.request.contextPath}/music/browse">Browse</a></li>
 
-				<c:if test="${not empty user && (user.user or user.premium)}">
+				<c:if test="${not empty user && user.user}">
 					<li class="nav-item px-2"><a class="nav-link"
 						href="${pageContext.request.contextPath}/user/library">Library</a>
 					</li>
@@ -73,7 +73,7 @@
 
 				<c:if test="${not empty user && user.artist}">
 					<li class="nav-item px-2"><a class="nav-link"
-						href="${pageContext.request.contextPath}/user/library">Library</a>
+						href="${pageContext.request.contextPath}/artist/dashboard">Dashboard</a>
 					</li>
 					<li class="nav-item px-2"><a class="nav-link"
 						href="${pageContext.request.contextPath}/artist/music">Music</a></li>
@@ -95,7 +95,7 @@
 							<li><a class="dropdown-item"
 								href="${pageContext.request.contextPath}/admin/subscription">Subscriptions</a></li>
 							<li><a class="dropdown-item"
-								href="${pageContext.request.contextPath}/admin/reports">Reports</a></li>
+								href="${pageContext.request.contextPath}/admin/subscription-plan">Subscription Plans</a></li>
 						</ul></li>
 
 				</c:if>
@@ -190,17 +190,14 @@
 							href="${pageContext.request.contextPath}/admin/subscription"><i
 								class="bi bi-calendar-check"></i> Subscriptions</a></li>
 						<li class="nav-item"><a class="nav-link text-white"
-							href="${pageContext.request.contextPath}/admin/reports"><i
-								class="bi bi-graph-up-arrow"></i> Reports</a></li>
-						<li class="nav-item"><a class="nav-link text-white"
-							href="${pageContext.request.contextPath}/admin/logs"><i
-								class="bi bi-clipboard-data"></i> Logs</a></li>
+							href="${pageContext.request.contextPath}/admin/subscription-plan"><i
+								class="bi bi-calendar"></i> Subscription Plans</a></li>
 					</ul>
 
 				</c:if>
 			</nav>
 			<!-- Main Content -->
-			<main class="col-md-10 px-4 pt-4 text-white" id="main-content">
+			<main class="col-sm-12 col-md-10  mx-auto px-4 pt-4 text-white" id="main-content">
 				<c:import url="${contentPage}" />
 			</main>
 		</div>

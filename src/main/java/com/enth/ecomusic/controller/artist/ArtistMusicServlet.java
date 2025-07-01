@@ -52,7 +52,7 @@ public class ArtistMusicServlet extends HttpServlet {
         }
 		
 		UserDTO user = (UserDTO) request.getSession().getAttribute("user");
-		List<MusicDTO> musicList = musicService.getPaginatedMusicDTOByArtistId(user.getUserId(), page, pageSize);
+		List<MusicDTO> musicList = musicService.getPaginatedMusicDTOByArtistId(user.getUserId(), user.getUserId(), page, pageSize);
 		int totalRecords = musicService.getMusicCountByArtist(user.getUserId(), user.getUserId()); 
         int totalPages = (int) Math.ceil(totalRecords / (double) pageSize);
 		

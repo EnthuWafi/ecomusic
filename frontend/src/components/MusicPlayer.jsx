@@ -360,25 +360,11 @@ export const MusicPlayer = ({ baseURL, musicId }) => {
 			<div className="row justify-content-center">
 				<div className="col-md-8">
 					<div className="card shadow-lg">
-						<div className="card-header bg-primary text-white">
-							<h4 className="mb-0">
-								<i className="bi bi-music-note-beamed me-2"></i>
-								Music Player
-							</h4>
+						<div className="card-header bg-primary">
 						</div>
 
 						<div className="card-body">
-							{/* Debug Info - Remove in production */}
-							{musicData && (
-								<div className="alert alert-info mb-3">
-									<small>
-										Debug: Listening Time: {listeningTime}s |
-										Has Recorded: {hasRecordedPlay ? 'Yes' : 'No'} |
-										Is Playing: {isPlaying ? 'Yes' : 'No'}
-									</small>
-								</div>
-							)}
-
+				
 							{/* Loading State */}
 							{isLoading && (
 								<div className="text-center mb-4">
@@ -402,7 +388,7 @@ export const MusicPlayer = ({ baseURL, musicId }) => {
 									</div>
 									<div className="col-md-9">
 										<h3 className="mb-2">{musicData.title}</h3>
-										<p className="text-muted mb-2">{musicData.description}</p>
+										<p className="text-muted mb-2"><pre>{musicData.description}</pre></p>
 										<div className="d-flex flex-wrap gap-2 mb-3">
 											<span className="badge bg-secondary">{musicData.genreName}</span>
 											<span className="badge bg-info">{musicData.moodName}</span>

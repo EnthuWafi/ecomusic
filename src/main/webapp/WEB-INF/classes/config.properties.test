@@ -10,3 +10,5 @@ music.score.weight.textScore=0.5
 music.score.weight.likeCount=0.3
 music.score.weight.totalPlays=0.15
 music.score.weight.freshness=-0.05
+mailUsername=
+mailAppPassword=

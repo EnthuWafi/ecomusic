@@ -13,6 +13,8 @@ import com.enth.ecomusic.util.AppContext;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Event;
+import com.stripe.model.EventDataObjectDeserializer;
+import com.stripe.model.StripeObject;
 import com.stripe.net.Webhook;
 
 import java.io.IOException;
@@ -62,6 +64,19 @@ public class StripeWebhookServlet extends HttpServlet {
 			return;
 		}
 
+		if (event == null) {
+			logger.warning("Stripe event is null.");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return;
+		}
+
+		EventDataObjectDeserializer dataObjectDeserializer = event.getDataObjectDeserializer();
+		if (!dataObjectDeserializer.getObject().isPresent()) {
+			// Deserialization failed, probably due to an API version mismatch.
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Likely API version mismatch");
+			return;
+		}
+
 		// Handle event types
 		switch (event.getType()) {
 		case "checkout.session.completed":
@@ -98,7 +113,7 @@ public class StripeWebhookServlet extends HttpServlet {
 		} catch (StripeException | NumberFormatException e) {
 			logger.severe("Error processing invoice.paid: " + e.getMessage());
 		}
-		
+
 	}
 
 	private void handleCheckoutCompleted(Event event) {

@@ -10,7 +10,7 @@ export const AdminUserList = ({ baseUrl }) => {
 	const [error, setError] = React.useState(null);
 
 	const [editUser, setEditUser] = React.useState(null);
-	const [pendingRoleChange, setPendingRoleChange] = React.useState(null); 
+	const [pendingRoleChange, setPendingRoleChange] = React.useState(null);
 	const [showAddModal, setShowAddModal] = React.useState(false);
 
 	React.useEffect(() => {
@@ -55,7 +55,7 @@ export const AdminUserList = ({ baseUrl }) => {
 	const handleRoleChange = (userId, newRole) => {
 		setPendingRoleChange({ userId, newRole });
 	};
-	
+
 	const confirmRoleChange = async () => {
 		const { userId, newRole } = pendingRoleChange;
 		try {
@@ -94,7 +94,7 @@ export const AdminUserList = ({ baseUrl }) => {
 	}
 
 	return (
-		<div className="container mt-5">
+		<div className="container-xl mt-5">
 			<h2 className="mb-4">User Management</h2>
 
 			{kpiData && (
@@ -107,8 +107,8 @@ export const AdminUserList = ({ baseUrl }) => {
 					<KpiCard title="Regular Users" value={kpiData.userCount} />
 				</div>
 			)}
-			
-			
+
+
 
 			<div className="card shadow-sm">
 				<div className="card-body">
@@ -118,52 +118,67 @@ export const AdminUserList = ({ baseUrl }) => {
 							<i className="bi bi-person-plus"></i> Add Admin
 						</button>
 					</div>
-					<table className="table table-hover">
-						<thead>
-							<tr>
-								<th>Username</th>
-								<th>Email</th>
-								<th>Role</th>
-								<th>Actions</th>
-							</tr>
-						</thead>
-						<tbody>
-							{users.map((user) => (
-								<tr key={user.userId}>
-									<td>{user.username}</td>
-									<td>{user.email}</td>
-									<td>
-										<select
-											className="form-select form-select-sm"
-											value={user.roleName}
-											onChange={(e) => handleRoleChange(user.userId, e.target.value)}
-										>
-											<option value="user">User</option>
-											<option value="admin">Admin</option>
-											<option value="superadmin">Superadmin</option>
-										</select>
-									</td>
-									<td>
-										<button
-											className="btn btn-sm btn-primary me-2"
-											onClick={() => setEditUser({ ...user })}
-										>
-											Edit
-										</button>
-										<button
-											className="btn btn-sm btn-danger"
-											onClick={() => handleDelete(user.userId)}
-										>
-											Delete
-										</button>
-									</td>
+					<div className="table-responsive">
+						<table className="table table-hover">
+							<thead>
+								<tr>
+									<th>Username</th>
+									<th>Email</th>
+									<th>Role</th>
+									<th>Actions</th>
 								</tr>
-							))}
-						</tbody>
-					</table>
+							</thead>
+							<tbody>
+								{users.map((user) => (
+									<tr key={user.userId}>
+										<td className="d-flex align-items-center">
+											<img
+												src={`${baseUrl}/stream/image/user/${user.userId}`}
+												alt="User"
+												style={{
+													width: "32px",
+													height: "32px",
+													objectFit: "cover",
+													borderRadius: "50%",
+													marginRight: "10px"
+												}}
+											/>
+											<span>{user.username}</span>
+										</td>
+										<td>{user.email}</td>
+										<td>
+											<select
+												className="form-select form-select-sm"
+												value={user.roleName}
+												onChange={(e) => handleRoleChange(user.userId, e.target.value)}
+											>
+												<option value="user">User</option>
+												<option value="admin">Admin</option>
+												<option value="superadmin">Superadmin</option>
+											</select>
+										</td>
+										<td>
+											<button
+												className="btn btn-sm btn-primary me-2"
+												onClick={() => setEditUser({ ...user })}
+											>
+												Edit
+											</button>
+											<button
+												className="btn btn-sm btn-danger"
+												onClick={() => handleDelete(user.userId)}
+											>
+												Delete
+											</button>
+										</td>
+									</tr>
+								))}
+							</tbody>
+						</table>
+					</div>
 				</div>
 			</div>
-			
+
 			{pendingRoleChange && (
 				<div className="modal show d-block" tabIndex="-1">
 					<div className="modal-dialog">
@@ -185,16 +200,16 @@ export const AdminUserList = ({ baseUrl }) => {
 					</div>
 				</div>
 			)}
-			
+
 			{showAddModal && (
-			  <UserCreateModal
-			    onClose={() => setShowAddModal(false)}
-			    onCreated={() => {
-			      setShowAddModal(false);
-			      location.reload();
-			    }}
-			    baseUrl={baseUrl}
-			  />
+				<UserCreateModal
+					onClose={() => setShowAddModal(false)}
+					onCreated={() => {
+						setShowAddModal(false);
+						location.reload();
+					}}
+					baseUrl={baseUrl}
+				/>
 			)}
 
 			{editUser && (

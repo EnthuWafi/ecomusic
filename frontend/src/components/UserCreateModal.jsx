@@ -55,18 +55,60 @@ const UserCreateModal = ({ onClose, onCreated, baseUrl }) => {
 						<button type="button" className="btn-close" onClick={onClose}></button>
 					</div>
 					<div className="modal-body">
-						{["firstName", "lastName", "username", "email", "password"].map((field) => (
-							<div className="mb-3" key={field}>
-								<label className="form-label text-capitalize">{field.replace(/([A-Z])/g, ' $1')}</label>
-								<input
-									type={field === "password" ? "password" : "text"}
-									autoComplete="off"
-									className="form-control"
-									value={formData[field]}
-									onChange={(e) => handleChange(field, e.target.value)}
-								/>
-							</div>
-						))}
+						<div className="mb-3">
+							<label className="form-label">First Name</label>
+							<input
+								type="text"
+								autoComplete="off"
+								className="form-control"
+								value={formData.firstName}
+								onChange={(e) => handleChange("firstName", e.target.value)}
+							/>
+						</div>
+
+						<div className="mb-3">
+							<label className="form-label">Last Name</label>
+							<input
+								type="text"
+								autoComplete="off"
+								className="form-control"
+								value={formData.lastName}
+								onChange={(e) => handleChange("lastName", e.target.value)}
+							/>
+						</div>
+
+						<div className="mb-3">
+							<label className="form-label">Username</label>
+							<input
+								type="text"
+								autoComplete="new-username" // prevent autofill
+								className="form-control"
+								value={formData.username}
+								onChange={(e) => handleChange("username", e.target.value)}
+							/>
+						</div>
+
+						<div className="mb-3">
+							<label className="form-label">Email</label>
+							<input
+								type="email"
+								autoComplete="off"
+								className="form-control"
+								value={formData.email}
+								onChange={(e) => handleChange("email", e.target.value)}
+							/>
+						</div>
+
+						<div className="mb-3">
+							<label className="form-label">Password</label>
+							<input
+								type="password"
+								autoComplete="new-password" // prevent browser autofill
+								className="form-control"
+								value={formData.password}
+								onChange={(e) => handleChange("password", e.target.value)}
+							/>
+						</div>
 
 						<div className="mb-3">
 							<label className="form-label">Bio</label>

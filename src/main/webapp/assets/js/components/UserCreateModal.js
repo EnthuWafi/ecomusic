@@ -64,18 +64,59 @@ const UserCreateModal = ({
     onClick: onClose
   })), /*#__PURE__*/React.createElement("div", {
     className: "modal-body"
-  }, ["firstName", "lastName", "username", "email", "password"].map(field => /*#__PURE__*/React.createElement("div", {
-    className: "mb-3",
-    key: field
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "mb-3"
   }, /*#__PURE__*/React.createElement("label", {
-    className: "form-label text-capitalize"
-  }, field.replace(/([A-Z])/g, ' $1')), /*#__PURE__*/React.createElement("input", {
-    type: field === "password" ? "password" : "text",
+    className: "form-label"
+  }, "First Name"), /*#__PURE__*/React.createElement("input", {
+    type: "text",
     autoComplete: "off",
     className: "form-control",
-    value: formData[field],
-    onChange: e => handleChange(field, e.target.value)
-  }))), /*#__PURE__*/React.createElement("div", {
+    value: formData.firstName,
+    onChange: e => handleChange("firstName", e.target.value)
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "mb-3"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "Last Name"), /*#__PURE__*/React.createElement("input", {
+    type: "text",
+    autoComplete: "off",
+    className: "form-control",
+    value: formData.lastName,
+    onChange: e => handleChange("lastName", e.target.value)
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "mb-3"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "Username"), /*#__PURE__*/React.createElement("input", {
+    type: "text",
+    autoComplete: "new-username" // prevent autofill
+    ,
+    className: "form-control",
+    value: formData.username,
+    onChange: e => handleChange("username", e.target.value)
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "mb-3"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "Email"), /*#__PURE__*/React.createElement("input", {
+    type: "email",
+    autoComplete: "off",
+    className: "form-control",
+    value: formData.email,
+    onChange: e => handleChange("email", e.target.value)
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "mb-3"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "Password"), /*#__PURE__*/React.createElement("input", {
+    type: "password",
+    autoComplete: "new-password" // prevent browser autofill
+    ,
+    className: "form-control",
+    value: formData.password,
+    onChange: e => handleChange("password", e.target.value)
+  })), /*#__PURE__*/React.createElement("div", {
     className: "mb-3"
   }, /*#__PURE__*/React.createElement("label", {
     className: "form-label"

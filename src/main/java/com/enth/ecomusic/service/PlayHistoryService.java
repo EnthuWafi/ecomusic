@@ -35,11 +35,9 @@ public class PlayHistoryService {
 		return playHistoryDAO.logPlay(playHistory);
 	}
 
-	public List<PlayHistoryDTO> getRecentPlays(int userId, int limit) {
+	public List<PlayHistory> getRecentPlays(int userId, int limit) {
 	    List<PlayHistory> recentPlays = playHistoryDAO.getRecentPlaysByUserId(userId, limit);
-	    return recentPlays.stream()
-	        .map(PlayHistoryMapper.INSTANCE::toDTO)
-	        .collect(Collectors.toList());
+	    return recentPlays;
 	}
 
 	public boolean clearPlayHistoryForUser(int userId) {

@@ -170,7 +170,10 @@ public class UserService {
 
 	public UserDTO getUserDTOByUsernameOrEmail(String identifier) {
 		User user = userDAO.getUserByUsernameOrEmail(identifier);
-		fetchRole(user);
+		if (user != null) {
+			fetchRole(user);
+		}
+		
 		UserDTO dto = UserMapper.INSTANCE.toDTO(user);
 		return dto;
 	}

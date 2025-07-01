@@ -43,6 +43,11 @@ public class StripeService {
 	// Redirect
 	public String createRedirectCheckoutSessionForPlan(SubscriptionPlanDTO plan, String returnUrl, String userId,
 			String email) throws StripeException {
+		
+		if (plan == null) {
+			return null;
+		}
+
 		SessionCreateParams params = SessionCreateParams.builder().setMode(SessionCreateParams.Mode.SUBSCRIPTION)
 				.setSuccessUrl(returnUrl + "?session_id={CHECKOUT_SESSION_ID}").setCancelUrl(returnUrl)
 				.setClientReferenceId(userId)
@@ -57,6 +62,7 @@ public class StripeService {
 	}
 
 	public void processCheckoutCompleted(Event event) throws StripeException {
+		
 		Session session = (Session) event.getDataObjectDeserializer().getObject()
 				.orElseThrow(() -> new RuntimeException("Session data could not be deserialized"));
 
@@ -81,7 +87,7 @@ public class StripeService {
 		bd = bd.setScale(2, RoundingMode.HALF_UP);
 		double amountPaid = bd.doubleValue();
 
-		UserSubscription sub = new UserSubscription(Integer.parseInt(userId), today, null, cents, paymentStatus,
+		UserSubscription sub = new UserSubscription(Integer.parseInt(userId), today, null, amountPaid, paymentStatus,
 				stripeSubId, Integer.parseInt(planIdStr));
 
 		boolean success = subscriptionService.createSubscription(sub, planType);
@@ -95,6 +101,12 @@ public class StripeService {
 		Invoice invoice = (Invoice) event.getDataObjectDeserializer().getObject()
 				.orElseThrow(() -> new RuntimeException("Session data could not be deserialized"));
 
+		if ("subscription_create".equals(invoice.getBillingReason())) {
+			System.err.println("Skipping invoice.paid event — initial subscription invoice");
+	        return;
+	    }
+		
+		
 		List<InvoiceLineItem> lineItems = invoice.getLines().getData();
 
 		String subscriptionStripeId = null;

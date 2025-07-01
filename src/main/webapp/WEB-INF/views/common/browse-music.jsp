@@ -20,9 +20,9 @@
 
 					<div class="card-body">
 						<h5
-							class="card-title mb-1 text-truncate text-white text-decoration-none"
+							class="card-title mb-1 text-truncate"
 							title="${musicDTO.music.title}">
-							<a
+							<a class="text-white text-decoration-none"
 								href="${pageContext.request.contextPath}/music/play/${musicDTO.music.musicId}">${musicDTO.music.title}</a>
 						</h5>
 						<p class="card-text mb-2 small text-secondary">by

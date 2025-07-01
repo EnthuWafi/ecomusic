@@ -1,0 +1,258 @@
+@charset "UTF-8";
+
+.navbar-custom {
+	background: #333;
+	border-bottom: 1px solid #444;
+}
+
+.player-card {
+	background: linear-gradient(135deg, #f4a6cd, #e8b4e3);
+	border-radius: 8px;
+	padding: 20px;
+	margin-bottom: 30px;
+	position: relative;
+	overflow: hidden;
+}
+
+.player-card::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.1);
+	z-index: 1;
+}
+
+.player-content {
+	position: relative;
+	z-index: 2;
+}
+
+.play-btn {
+	background: #000;
+	border: none;
+	border-radius: 50%;
+	width: 60px;
+	height: 60px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: #fff;
+	font-size: 20px;
+	margin-bottom: 20px;
+}
+
+.track-info {
+	color: #000;
+	margin-bottom: 20px;
+}
+
+.track-title {
+	font-size: 1.5rem;
+	font-weight: bold;
+	margin-bottom: 5px;
+}
+
+.track-artist {
+	font-size: 1rem;
+	opacity: 0.8;
+}
+
+.waveform-container {
+	background: rgba(255, 255, 255, 0.2);
+	border-radius: 4px;
+	padding: 10px;
+	margin: 20px 0;
+}
+
+.track-stats {
+	display: flex;
+	gap: 20px;
+	color: #666;
+	font-size: 0.9rem;
+}
+
+.track-stats span {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+}
+
+.avatar {
+	width: 50px;
+	height: 50px;
+	border-radius: 50%;
+	object-fit: cover;
+}
+
+.avatar-large {
+	width: 120px;
+	height: 120px;
+	border-radius: 50%;
+	object-fit: cover;
+}
+
+.profile-header {
+	background: linear-gradient(135deg, #ff8a00, #e52e71);
+	border-radius: 8px;
+	padding: 30px;
+	margin-bottom: 30px;
+	position: relative;
+	overflow: hidden;
+}
+
+.profile-content {
+	position: relative;
+	z-index: 2;
+}
+
+.profile-stats {
+	display: flex;
+	gap: 30px;
+	margin-top: 20px;
+}
+
+.stat-item {
+	text-align: center;
+}
+
+.stat-number {
+	font-size: 1.5rem;
+	font-weight: bold;
+	display: block;
+}
+
+.stat-label {
+	font-size: 0.9rem;
+	opacity: 0.8;
+}
+
+.track-item {
+	background: #2a2a2a;
+	border-radius: 8px;
+	padding: 15px;
+	margin-bottom: 15px;
+	display: flex;
+	align-items: center;
+	gap: 15px;
+}
+
+.track-item:hover {
+	background: #333;
+	cursor: pointer;
+}
+
+.track-thumbnail {
+	width: 60px;
+	height: 60px;
+	border-radius: 4px;
+	object-fit: cover;
+}
+
+.track-details {
+	flex: 1;
+}
+
+.track-name {
+	font-weight: 600;
+	margin-bottom: 5px;
+}
+
+.track-meta {
+	color: #999;
+	font-size: 0.85rem;
+}
+
+.action-buttons {
+	display: flex;
+	gap: 10px;
+	margin-top: 15px;
+}
+
+.btn-action {
+	background: rgba(255, 255, 255, 0.1);
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	color: #fff;
+	padding: 8px 15px;
+	border-radius: 20px;
+	font-size: 0.85rem;
+}
+
+.btn-action:hover {
+	background: rgba(255, 255, 255, 0.2);
+	color: #fff;
+}
+
+.comment-section {
+	background: #2a2a2a;
+	border-radius: 8px;
+	padding: 20px;
+	margin-top: 20px;
+}
+
+.comment-input {
+	background: #1a1a1a;
+	border: 1px solid #444;
+	border-radius: 20px;
+	padding: 10px 20px;
+	color: #fff;
+	width: 100%;
+}
+
+.comment-input:focus {
+	background: #1a1a1a;
+	border-color: #ff8a00;
+	color: #fff;
+	box-shadow: none;
+}
+
+.section-tabs {
+	border-bottom: 1px solid #444;
+	margin-bottom: 20px;
+}
+
+.nav-tabs .nav-link {
+	border: none;
+	color: #999;
+	background: none;
+	padding: 15px 0;
+	margin-right: 30px;
+	border-bottom: 2px solid transparent;
+}
+
+.nav-tabs .nav-link.active {
+	color: #fff;
+	background: none;
+	border-bottom-color: #ff8a00;
+}
+
+.fans-section {
+	background: #2a2a2a;
+	border-radius: 8px;
+	padding: 20px;
+}
+
+.fan-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 10px 0;
+	border-bottom: 1px solid #444;
+}
+
+.fan-item:last-child {
+	border-bottom: none;
+}
+
+.fan-info {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.fan-plays {
+	color: #999;
+	font-size: 0.85rem;
+}

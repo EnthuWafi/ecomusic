@@ -220,7 +220,7 @@ public class MusicDAO {
 				pageSize, params.toArray());
 	}
 
-	public List<MusicDTO> getPaginatedMusicByArtistId(int artistId, int page, int pageSize) {
+	public List<MusicDTO> getPaginatedMusicByArtistId(int currentUserId, int artistId, int page, int pageSize) {
 		String query = """
 				   SELECT
 				       m.music_id, m.artist_id, m.title, m.audio_file_url,
@@ -231,10 +231,9 @@ public class MusicDAO {
 				   FROM Music m
 				   JOIN genres g ON m.genre_id = g.genre_id
 				   JOIN moods mo ON m.mood_id = mo.mood_id
-
-				   WHERE  m.visibility = 'public' AND m.artist_id = ?
+				   WHERE  (m.visibility = 'public' OR m.artist_id = ?) AND m.artist_id = ?
 				""";
-		return DAOUtil.executePaginatedQuery(query, ResultSetMapper::mapToMusicDTO, page, pageSize, artistId);
+		return DAOUtil.executePaginatedQuery(query, ResultSetMapper::mapToMusicDTO, page, pageSize, currentUserId, artistId);
 	}
 
 	// count

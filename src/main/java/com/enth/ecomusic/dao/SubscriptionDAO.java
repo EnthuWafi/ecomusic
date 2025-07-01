@@ -104,10 +104,10 @@ public class SubscriptionDAO {
     public UserSubscription getLatestSubscriptionByUserIdAndPlanType(int userId, PlanType plan) {
     	String sql = """
     			SELECT * FROM (
-			        SELECT s.* FROM Subscriptions 
+			        SELECT s.* FROM Subscriptions s
 			        JOIN SubscriptionPlans sp ON s.subscription_plan_id = sp.subscription_plan_id
-			        WHERE user_id = ? AND sp.plan_type = ?
-			        ORDER BY created_at DESC
+			        WHERE s.user_id = ? AND sp.plan_type = ?
+			        ORDER BY s.created_at DESC
 			    ) WHERE ROWNUM = 1
     			""";
     	

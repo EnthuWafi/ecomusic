@@ -2,6 +2,7 @@ package com.enth.ecomusic.util;
 
 import com.enth.ecomusic.service.GenreCacheService;
 import com.enth.ecomusic.service.LikeService;
+import com.enth.ecomusic.service.MailService;
 import com.enth.ecomusic.service.MoodCacheService;
 import com.enth.ecomusic.service.MusicService;
 import com.enth.ecomusic.service.PlayHistoryService;
@@ -28,6 +29,7 @@ public final class AppContext {
     private final PlayHistoryService playHistoryService;
     private final StripeService stripeService;
     private final ReportService reportService;
+    private final MailService mailService;
 
     public AppContext() {
         // Cache first
@@ -43,7 +45,7 @@ public final class AppContext {
         this.playHistoryService = new PlayHistoryService(musicService);
         this.stripeService = new StripeService(subscriptionService);
         this.reportService = new ReportService(subscriptionService, userService, musicService);
-        
+        this.mailService = new MailService("smtp.gmail.com", 587, AppConfig.get("mailUsername"), AppConfig.get("mailAppPassword"));
     }
 
     public UserService getUserService() {
@@ -88,6 +90,10 @@ public final class AppContext {
 
 	public ReportService getReportService() {
 		return reportService;
+	}
+
+	public MailService getMailService() {
+		return mailService;
 	}
 	
 	

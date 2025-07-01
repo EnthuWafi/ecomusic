@@ -331,16 +331,10 @@ export const MusicPlayer = ({
   }, /*#__PURE__*/React.createElement("div", {
     className: "card shadow-lg"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "card-header bg-primary text-white"
-  }, /*#__PURE__*/React.createElement("h4", {
-    className: "mb-0"
-  }, /*#__PURE__*/React.createElement("i", {
-    className: "bi bi-music-note-beamed me-2"
-  }), "Music Player")), /*#__PURE__*/React.createElement("div", {
+    className: "card-header bg-primary"
+  }), /*#__PURE__*/React.createElement("div", {
     className: "card-body"
-  }, musicData && /*#__PURE__*/React.createElement("div", {
-    className: "alert alert-info mb-3"
-  }, /*#__PURE__*/React.createElement("small", null, "Debug: Listening Time: ", listeningTime, "s | Has Recorded: ", hasRecordedPlay ? 'Yes' : 'No', " | Is Playing: ", isPlaying ? 'Yes' : 'No')), isLoading && /*#__PURE__*/React.createElement("div", {
+  }, isLoading && /*#__PURE__*/React.createElement("div", {
     className: "text-center mb-4"
   }, /*#__PURE__*/React.createElement("div", {
     className: "spinner-border text-primary",
@@ -367,7 +361,7 @@ export const MusicPlayer = ({
     className: "mb-2"
   }, musicData.title), /*#__PURE__*/React.createElement("p", {
     className: "text-muted mb-2"
-  }, musicData.description), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("pre", null, musicData.description)), /*#__PURE__*/React.createElement("div", {
     className: "d-flex flex-wrap gap-2 mb-3"
   }, /*#__PURE__*/React.createElement("span", {
     className: "badge bg-secondary"
