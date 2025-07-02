@@ -1,6 +1,9 @@
+import { PlaylistChooseModal } from "./PlaylistChooseModal.js";
 export const MusicPlayer = ({
-  baseURL,
-  musicId
+  baseUrl,
+  musicId,
+  isAdmin = false,
+  userId
 }) => {
   const [musicData, setMusicData] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -11,6 +14,7 @@ export const MusicPlayer = ({
   const [isLiked, setIsLiked] = React.useState(false);
   const [hasRecordedPlay, setHasRecordedPlay] = React.useState(false);
   const [listeningTime, setListeningTime] = React.useState(0);
+  const [showPlaylistModal, setShowPlaylistModal] = React.useState(false);
   const hasAccessRef = React.useRef(false);
   const wavesurferRef = React.useRef(null);
   const containerRef = React.useRef(null);
@@ -54,7 +58,9 @@ export const MusicPlayer = ({
         height: 60,
         autoplay: false,
         mediaControls: false,
-        normalize: true
+        normalize: true,
+        interact: true,
+        dragToSeek: true
       });
 
       // Event listeners
@@ -110,7 +116,7 @@ export const MusicPlayer = ({
   // Load music data and audio
   React.useEffect(() => {
     const loadMusic = async () => {
-      if (!baseURL || !musicId) return;
+      if (!baseUrl || !musicId) return;
       setIsLoading(true);
       // Reset tracking state for new music
       setHasRecordedPlay(false);
@@ -118,12 +124,12 @@ export const MusicPlayer = ({
       hasRecordedPlayRef.current = false;
       listeningTimeRef.current = 0;
       try {
-        const response = await fetch(`${baseURL}/api/music/${musicId}`);
+        const response = await fetch(`${baseUrl}/api/music/${musicId}`);
         const data = await response.json();
         if (data.success) {
           setMusicData(data.data.results);
           if (wavesurferRef.current) {
-            const audioUrl = `${baseURL}/stream/audio/${musicId}`;
+            const audioUrl = `${baseUrl}/stream/audio/${musicId}`;
             try {
               await wavesurferRef.current.load(audioUrl);
               hasAccessRef.current = true;
@@ -141,14 +147,14 @@ export const MusicPlayer = ({
       }
     };
     loadMusic();
-  }, [baseURL, musicId]);
+  }, [baseUrl, musicId]);
 
   // Check if music is liked
   React.useEffect(() => {
     const checkIfLiked = async () => {
-      if (!baseURL || !musicId) return;
+      if (!baseUrl || !musicId) return;
       try {
-        const response = await fetch(`${baseURL}/api/like/${musicId}`);
+        const response = await fetch(`${baseUrl}/api/like/${musicId}`);
         if (response.ok) {
           const data = await response.json();
           setIsLiked(data.data === true);
@@ -160,7 +166,7 @@ export const MusicPlayer = ({
       }
     };
     checkIfLiked();
-  }, [baseURL, musicId]);
+  }, [baseUrl, musicId]);
   const startTrackingTime = () => {
     // Don't start if already tracking or play already recorded
     if (intervalRef.current || hasRecordedPlayRef.current) {
@@ -198,12 +204,12 @@ export const MusicPlayer = ({
       if (listeningTimeRef.current > 5 && !hasRecordedPlayRef.current && hasAccessRef.current) {
         const durationMs = listeningTimeRef.current * 1000;
         const wasSkipped = listeningTimeRef.current < durationRef.current * 0.8;
-        if (navigator.sendBeacon && baseURL && musicId) {
+        if (navigator.sendBeacon && baseUrl && musicId) {
           const data = JSON.stringify({
             listenDuration: durationMs,
             wasSkipped: wasSkipped
           });
-          navigator.sendBeacon(`${baseURL}/api/play/${musicId}`, data);
+          navigator.sendBeacon(`${baseUrl}/api/play/${musicId}`, data);
         }
       }
     };
@@ -216,7 +222,7 @@ export const MusicPlayer = ({
         intervalRef.current = null;
       }
     };
-  }, [baseURL, musicId]);
+  }, [baseUrl, musicId]);
 
   // Record play function
   const sendPlayRecord = async () => {
@@ -238,7 +244,7 @@ export const MusicPlayer = ({
     const durationMs = listening * 1000;
     const wasSkipped = listeningTimeRef.current < durationRef.current * 0.8;
     try {
-      const response = await fetch(`${baseURL}/api/play/${musicId}`, {
+      const response = await fetch(`${baseUrl}/api/play/${musicId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -264,7 +270,7 @@ export const MusicPlayer = ({
   const toggleLike = async () => {
     try {
       const method = isLiked ? 'DELETE' : 'POST';
-      const response = await fetch(`${baseURL}/api/like/${musicId}`, {
+      const response = await fetch(`${baseUrl}/api/like/${musicId}`, {
         method
       });
       if (!response.ok) {
@@ -278,7 +284,7 @@ export const MusicPlayer = ({
       if (musicData) {
         setMusicData({
           ...musicData,
-          likeCount: isLiked ? musicData.likeCount - 1 : musicData.likeCount + 1
+          likeCount: isLiked ? musicData.music.likeCount - 1 : musicData.music.likeCount + 1
         });
       }
     } catch (error) {
@@ -312,44 +318,31 @@ export const MusicPlayer = ({
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
-  // Seek to position
-  const handleSeek = e => {
-    if (wavesurferRef.current && duration > 0) {
-      const rect = e.currentTarget.getBoundingClientRect();
-      const clickX = e.clientX - rect.left;
-      const width = rect.width;
-      const seekTime = clickX / width * duration;
-      wavesurferRef.current.seekTo(seekTime / duration);
+  // Handle playlist selection
+  const handlePlaylistSelected = playlistId => {
+    setShowPlaylistModal(false);
+    // You can add success notification here if needed
+    if (window.toastr) {
+      window.toastr.success('Added to playlist successfully!');
     }
   };
-  return /*#__PURE__*/React.createElement("div", {
-    className: "container mt-5"
-  }, /*#__PURE__*/React.createElement("div", {
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "row justify-content-center"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "col-md-8"
+    className: "col-md-12"
   }, /*#__PURE__*/React.createElement("div", {
     className: "card shadow-lg"
   }, /*#__PURE__*/React.createElement("div", {
     className: "card-header bg-primary"
   }), /*#__PURE__*/React.createElement("div", {
     className: "card-body"
-  }, isLoading && /*#__PURE__*/React.createElement("div", {
-    className: "text-center mb-4"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "spinner-border text-primary",
-    role: "status"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "visually-hidden"
-  }, "Loading...")), /*#__PURE__*/React.createElement("p", {
-    className: "mt-2 text-muted"
-  }, "Loading music...")), musicData && /*#__PURE__*/React.createElement("div", {
+  }, musicData && /*#__PURE__*/React.createElement("div", {
     className: "row mb-4"
   }, /*#__PURE__*/React.createElement("div", {
     className: "col-md-3"
   }, /*#__PURE__*/React.createElement("img", {
-    src: `${baseURL}/stream/image/music/${musicId}`,
-    alt: musicData.title,
+    src: `${baseUrl}/stream/image/music/${musicId}`,
+    alt: musicData.music.title,
     className: "img-fluid rounded shadow-sm",
     style: {
       aspectRatio: '1:1',
@@ -359,33 +352,37 @@ export const MusicPlayer = ({
     className: "col-md-9"
   }, /*#__PURE__*/React.createElement("h3", {
     className: "mb-2"
-  }, musicData.title), /*#__PURE__*/React.createElement("p", {
+  }, musicData.music.title), /*#__PURE__*/React.createElement("pre", null, /*#__PURE__*/React.createElement("p", {
     className: "text-muted mb-2"
-  }, /*#__PURE__*/React.createElement("pre", null, musicData.description)), /*#__PURE__*/React.createElement("div", {
+  }, musicData.music.description)), /*#__PURE__*/React.createElement("div", {
     className: "d-flex flex-wrap gap-2 mb-3"
   }, /*#__PURE__*/React.createElement("span", {
     className: "badge bg-secondary"
-  }, musicData.genreName), /*#__PURE__*/React.createElement("span", {
+  }, musicData.music.genreName), /*#__PURE__*/React.createElement("span", {
     className: "badge bg-info"
-  }, musicData.moodName), musicData.premiumContent && /*#__PURE__*/React.createElement("span", {
+  }, musicData.music.moodName), musicData.music.premiumContent && /*#__PURE__*/React.createElement("span", {
     className: "badge bg-warning"
   }, "Premium")), /*#__PURE__*/React.createElement("div", {
     className: "d-flex align-items-center gap-3 text-muted small"
   }, /*#__PURE__*/React.createElement("span", null, /*#__PURE__*/React.createElement("i", {
     className: "bi bi-heart-fill text-danger me-1"
-  }), musicData.likeCount, " likes"), /*#__PURE__*/React.createElement("span", null, /*#__PURE__*/React.createElement("i", {
+  }), musicData.music.likeCount, " likes"), /*#__PURE__*/React.createElement("span", null, /*#__PURE__*/React.createElement("i", {
     className: "bi bi-play-fill text-primary me-1"
-  }), musicData.totalPlayCount, " plays"), /*#__PURE__*/React.createElement("span", null, /*#__PURE__*/React.createElement("i", {
+  }), musicData.music.totalPlayCount, " plays"), /*#__PURE__*/React.createElement("span", null, /*#__PURE__*/React.createElement("i", {
     className: "bi bi-clock me-1"
-  }), new Date(musicData.uploadDate).toLocaleDateString())))), /*#__PURE__*/React.createElement("div", {
+  }), new Date(musicData.music.uploadDate).toLocaleDateString())))), isLoading && /*#__PURE__*/React.createElement("div", {
+    className: "text-center mb-4"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "spinner-border text-primary",
+    role: "status"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "visually-hidden"
+  }, "Loading...")), /*#__PURE__*/React.createElement("p", {
+    className: "mt-2 text-muted"
+  }, "Loading music...")), /*#__PURE__*/React.createElement("div", {
     className: "mb-4"
   }, /*#__PURE__*/React.createElement("div", {
-    ref: containerRef,
-    className: "border rounded p-2",
-    style: {
-      cursor: musicData ? 'pointer' : 'default'
-    },
-    onClick: musicData ? handleSeek : undefined
+    ref: containerRef
   }, !musicData && !isLoading && /*#__PURE__*/React.createElement("span", {
     className: "text-muted"
   }, "Waveform will appear here"))), musicData && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
@@ -414,7 +411,13 @@ export const MusicPlayer = ({
     disabled: !musicData
   }, /*#__PURE__*/React.createElement("i", {
     className: `bi ${isLiked ? 'bi-heart-fill' : 'bi-heart'} me-2`
-  }), "Like"), /*#__PURE__*/React.createElement("div", {
+  }), "Like"), !isAdmin && /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-outline-success",
+    onClick: () => setShowPlaylistModal(true),
+    disabled: !musicData
+  }, /*#__PURE__*/React.createElement("i", {
+    className: "bi bi-plus-lg me-2"
+  }), "Add to Playlist"), /*#__PURE__*/React.createElement("div", {
     className: "d-flex align-items-center gap-2"
   }, /*#__PURE__*/React.createElement("i", {
     className: "bi bi-volume-down text-muted"
@@ -438,5 +441,35 @@ export const MusicPlayer = ({
   }, /*#__PURE__*/React.createElement("div", {
     className: "progress-bar bg-primary",
     ref: progressBarRef
-  }))))))));
+  }))))))), musicData && /*#__PURE__*/React.createElement("div", {
+    className: "row justify-content-center mt-3"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "col-md-12"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "card shadow-sm p-3 d-flex flex-row align-items-center gap-3",
+    style: {
+      cursor: 'pointer'
+    },
+    onClick: () => window.location.href = `${baseUrl}/channel/${musicData.music.artistId}`
+  }, /*#__PURE__*/React.createElement("img", {
+    src: `${baseUrl}/stream/image/user/${musicData.music.artistId}`,
+    alt: musicData.artistUsername,
+    className: "rounded-circle",
+    style: {
+      width: '64px',
+      height: '64px',
+      objectFit: 'cover'
+    }
+  }), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h5", {
+    className: "mb-0"
+  }, musicData.artistUsername), /*#__PURE__*/React.createElement("p", {
+    className: "text-muted mb-0 small"
+  }, "View Artist Channel"))))), showPlaylistModal && /*#__PURE__*/React.createElement(PlaylistChooseModal, {
+    baseUrl: baseUrl,
+    musicId: musicId,
+    userId: userId,
+    onClose: () => setShowPlaylistModal(false),
+    onPlaylistSelected: handlePlaylistSelected
+  }));
 };
+export default MusicPlayer;

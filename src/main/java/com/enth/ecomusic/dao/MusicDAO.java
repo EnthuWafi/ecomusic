@@ -231,7 +231,7 @@ public class MusicDAO {
 				   FROM Music m
 				   JOIN genres g ON m.genre_id = g.genre_id
 				   JOIN moods mo ON m.mood_id = mo.mood_id
-				   WHERE  (m.visibility = 'public' OR m.artist_id = ?) AND m.artist_id = ?
+				   WHERE (m.visibility = 'public' OR m.artist_id = ?) AND m.artist_id = ?
 				""";
 		return DAOUtil.executePaginatedQuery(query, ResultSetMapper::mapToMusicDTO, page, pageSize, currentUserId, artistId);
 	}
@@ -417,14 +417,24 @@ public class MusicDAO {
 	}
 
 	//Should be called when artist refuse to pay their due!
-	public boolean updateAllMusicSetPrivateByArtistId(int artistId) {
+	public boolean updateAllMusicSetPrivateByArtistId(int artistId, Connection conn) {
 		String sql = "UPDATE Music SET visibility = 'private' WHERE artist_id = ?";
-		try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (PreparedStatement stmt = conn.prepareStatement(sql)) {
 			stmt.setInt(1, artistId);
 			return stmt.executeUpdate() > 0;
 		} catch (SQLException e) {
 			System.err.println("Error deleting music: " + e.getMessage());
 			return false;
 		}
+	}
+	
+	public int countPlaysByArtistId(int userId) {
+		String sql = """
+				SELECT SUM(total_plays_cache) FROM Music WHERE artist_id = ?
+				""";
+
+		Integer result = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt, userId);
+
+		return result != null ? result : 0;
 	}
 }

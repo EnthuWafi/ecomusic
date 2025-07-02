@@ -7,6 +7,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import org.apache.tomcat.jakartaee.commons.lang3.StringUtils;
+
 import com.enth.ecomusic.service.MusicService;
 import com.enth.ecomusic.util.AppContext;
 
@@ -41,7 +43,7 @@ public class PlayMusicServlet extends HttpServlet {
 		// TODO Auto-generated method stub
 		String pathInfo = request.getPathInfo();
 		
-		if (pathInfo.matches("/\\d+")) {		
+		if (StringUtils.isNotEmpty(pathInfo) && pathInfo.matches("/\\d+")) {		
 			request.setAttribute("pageTitle", "Listen to Music");			
 			request.setAttribute("contentPage", "/WEB-INF/views/common/play-music.jsp");
 			request.getRequestDispatcher("/WEB-INF/views/layout-main.jsp").forward(request, response);

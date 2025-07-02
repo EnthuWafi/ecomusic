@@ -48,6 +48,21 @@ public class Music{
 		this.visibility = visibility;
 	}
 
+	public Music(int artistId, String title, int genreId, int moodId, String description, String audioFileUrl, String imageUrl,
+			boolean premiumContent, VisibilityType visibility) {
+		super();
+		this.artistId = artistId;
+		this.title = title;
+		this.genreId = genreId;
+		this.moodId = moodId;
+		this.description = description;
+		this.audioFileUrl = audioFileUrl;
+		this.imageUrl = imageUrl;
+		this.premiumContent = premiumContent;
+		this.visibility = visibility;
+	}
+	
+	
 
 	public Music(int artistId, String title, int genreId, int moodId, String description, String audioFileUrl, String imageUrl,
 			boolean premiumContent) {

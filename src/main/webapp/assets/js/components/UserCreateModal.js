@@ -72,6 +72,7 @@ const UserCreateModal = ({
     type: "text",
     autoComplete: "off",
     className: "form-control",
+    placeholder: "First Name",
     value: formData.firstName,
     onChange: e => handleChange("firstName", e.target.value)
   })), /*#__PURE__*/React.createElement("div", {
@@ -82,6 +83,7 @@ const UserCreateModal = ({
     type: "text",
     autoComplete: "off",
     className: "form-control",
+    placeholder: "Last Name",
     value: formData.lastName,
     onChange: e => handleChange("lastName", e.target.value)
   })), /*#__PURE__*/React.createElement("div", {
@@ -90,9 +92,9 @@ const UserCreateModal = ({
     className: "form-label"
   }, "Username"), /*#__PURE__*/React.createElement("input", {
     type: "text",
-    autoComplete: "new-username" // prevent autofill
-    ,
+    autoComplete: "new-username",
     className: "form-control",
+    placeholder: "Username",
     value: formData.username,
     onChange: e => handleChange("username", e.target.value)
   })), /*#__PURE__*/React.createElement("div", {
@@ -103,6 +105,7 @@ const UserCreateModal = ({
     type: "email",
     autoComplete: "off",
     className: "form-control",
+    placeholder: "Email",
     value: formData.email,
     onChange: e => handleChange("email", e.target.value)
   })), /*#__PURE__*/React.createElement("div", {
@@ -111,8 +114,7 @@ const UserCreateModal = ({
     className: "form-label"
   }, "Password"), /*#__PURE__*/React.createElement("input", {
     type: "password",
-    autoComplete: "new-password" // prevent browser autofill
-    ,
+    autoComplete: "new-password",
     className: "form-control",
     value: formData.password,
     onChange: e => handleChange("password", e.target.value)
@@ -122,6 +124,7 @@ const UserCreateModal = ({
     className: "form-label"
   }, "Bio"), /*#__PURE__*/React.createElement("textarea", {
     className: "form-control",
+    placeholder: "Biodata",
     value: formData.bio,
     onChange: e => handleChange("bio", e.target.value)
   })), /*#__PURE__*/React.createElement("div", {

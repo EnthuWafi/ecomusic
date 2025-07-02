@@ -53,22 +53,31 @@ public class UserImageStreamServlet extends HttpServlet {
 		String pathInfo = request.getPathInfo(); 
 		int userId = CommonUtil.extractIdFromPath(pathInfo);
 
+		String requestedSize = request.getParameter("size"); 
+		
 		if (userId == -1) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid user ID.");
 			return;
 		}
+		
+		boolean isThumbnailRequest = "thumb".equalsIgnoreCase(requestedSize);
 
 		UserDTO user = userService.getUserDTOById(userId);
 
-		String imageUrl = user.getImageUrl();
-		if (imageUrl != null && imageUrl.startsWith("http")) {
-		    response.sendRedirect(imageUrl);
-		    return;
+		if (user == null) {
+			response.sendRedirect(request.getContextPath() + "/assets/images/default.jpg");
+	        return;
 		}
-
 		
 		String basePath = getServletContext().getAttribute("userImageFilePath").toString();
-		File imageFile = new File(basePath + imageUrl);
+		
+		File imageFile = null;
+		if (isThumbnailRequest) {
+			imageFile = new File(basePath + "thumb_" + user.getImageUrl());
+		}
+		else {
+			imageFile = new File(basePath + user.getImageUrl());
+		}
 
 		if (!imageFile.exists()) {
 			response.sendRedirect(request.getContextPath() + "/assets/images/default.jpg");
@@ -89,7 +98,7 @@ public class UserImageStreamServlet extends HttpServlet {
         response.setContentType(mimeType);
         response.setContentLengthLong(range.getContentLength());
 
-        if (range.getStart() > 0 || range.getEnd() < range.getTotalLength() - 1) {
+        if (rangeHeader != null && rangeHeader.startsWith("bytes=")) {
             response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
             response.setHeader("Content-Range", "bytes " + range.getStart() + "-" + range.getEnd() + "/" + range.getTotalLength());
         }

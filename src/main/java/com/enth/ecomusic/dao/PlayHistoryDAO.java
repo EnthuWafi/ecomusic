@@ -110,7 +110,7 @@ public class PlayHistoryDAO {
 	}
 
 	public int countPlaysByMusicId(int musicId) {
-		// TODO Auto-generated method stub
+	
 		String sql = "SELECT COUNT(*) FROM PlayHistory WHERE music_id = ?";
 
 		Integer result = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt, musicId);
@@ -155,5 +155,6 @@ public class PlayHistoryDAO {
 
 		return DAOUtil.executeQuery(query, this::mapToPlayHistory, params.toArray());
 	}
+
 
 }

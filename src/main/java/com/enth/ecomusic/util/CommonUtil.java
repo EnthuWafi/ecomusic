@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -23,6 +24,14 @@ import jakarta.servlet.http.HttpSession;
 public class CommonUtil {
 
 	private CommonUtil() {}
+	
+	public static int parseIntLimitParam(String raw, int def, int max) {
+	    if (StringUtils.isNumeric(raw)) {
+	        int val = Integer.parseInt(raw);
+	        return Math.min(val, max);
+	    }
+	    return def;
+	}
 	
 	public static Date toDate(LocalDateTime dateTime) {
 		return Date.from(dateTime.atZone(ZoneId.systemDefault()).toInstant());

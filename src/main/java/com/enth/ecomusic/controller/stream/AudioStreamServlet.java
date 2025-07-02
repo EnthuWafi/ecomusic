@@ -98,7 +98,8 @@ public class AudioStreamServlet extends HttpServlet {
         response.setContentType(mimeType);
         response.setContentLengthLong(range.getContentLength());
 
-        if (range.getStart() > 0 || range.getEnd() < range.getTotalLength() - 1) {
+
+        if (rangeHeader != null && rangeHeader.startsWith("bytes=")) {
             response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
             response.setHeader("Content-Range", "bytes " + range.getStart() + "-" + range.getEnd() + "/" + range.getTotalLength());
         }

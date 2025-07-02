@@ -8,26 +8,55 @@ export const AdminUserList = ({
   const [users, setUsers] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const [totalUsers, setTotalUsers] = React.useState(0);
+  const [usersPerPage] = React.useState(10); // You can make this configurable
+
   const [editUser, setEditUser] = React.useState(null);
   const [pendingRoleChange, setPendingRoleChange] = React.useState(null);
   const [showAddModal, setShowAddModal] = React.useState(false);
+
+  // Calculate pagination values
+  const totalPages = Math.ceil(totalUsers / usersPerPage);
+  const offset = (currentPage - 1) * usersPerPage;
+  const fetchUsers = async (page = 1) => {
+    try {
+      setLoading(true);
+      const pageOffset = (page - 1) * usersPerPage;
+      const userRes = await fetch(`${baseUrl}/api/user?limit=${usersPerPage}&offset=${pageOffset}`);
+      const userJson = await userRes.json();
+      setUsers(userJson.data.results);
+      setTotalUsers(userJson.data.total || userJson.data.results.length);
+    } catch (err) {
+      console.error("Error loading users:", err);
+      setError("Failed to load users.");
+    } finally {
+      setLoading(false);
+    }
+  };
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        const [kpiRes, userRes] = await Promise.all([fetch(`${baseUrl}/api/report/kpis?type=user`), fetch(`${baseUrl}/api/user?limit=5&offset=0`)]);
+        const kpiRes = await fetch(`${baseUrl}/api/report/kpis?type=user`);
         const kpiJson = await kpiRes.json();
-        const userJson = await userRes.json();
         setKpiData(kpiJson.data.results);
-        setUsers(userJson.data.results);
       } catch (err) {
-        console.error("Error loading user dashboard:", err);
-        setError("Failed to load data.");
-      } finally {
-        setLoading(false);
+        console.error("Error loading KPI data:", err);
+        setError("Failed to load KPI data.");
       }
     };
     fetchData();
   }, [baseUrl]);
+  React.useEffect(() => {
+    fetchUsers(currentPage);
+  }, [baseUrl, currentPage, usersPerPage]);
+  const handlePageChange = page => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
   const handleDelete = async userId => {
     if (!confirm("Are you sure you want to delete this user?")) return;
     try {
@@ -35,7 +64,9 @@ export const AdminUserList = ({
         method: "DELETE"
       });
       if (!res.ok) throw new Error("Delete failed");
-      setUsers(users.filter(user => user.userId !== userId));
+
+      // Refresh the current page after deletion
+      await fetchUsers(currentPage);
       toastr.success("User deleted.");
     } catch (err) {
       console.error("Error deleting user:", err);
@@ -74,6 +105,90 @@ export const AdminUserList = ({
       toastr.error("Role change failed.");
     }
     setPendingRoleChange(null);
+  };
+  const renderPagination = () => {
+    if (totalPages <= 1) return null;
+    const pages = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    // Previous button
+    pages.push(/*#__PURE__*/React.createElement("li", {
+      key: "prev",
+      className: `page-item ${currentPage === 1 ? 'disabled' : ''}`
+    }, /*#__PURE__*/React.createElement("button", {
+      className: "page-link",
+      onClick: () => handlePageChange(currentPage - 1),
+      disabled: currentPage === 1
+    }, "Previous")));
+
+    // First page + ellipsis
+    if (startPage > 1) {
+      pages.push(/*#__PURE__*/React.createElement("li", {
+        key: 1,
+        className: "page-item"
+      }, /*#__PURE__*/React.createElement("button", {
+        className: "page-link",
+        onClick: () => handlePageChange(1)
+      }, "1")));
+      if (startPage > 2) {
+        pages.push(/*#__PURE__*/React.createElement("li", {
+          key: "ellipsis1",
+          className: "page-item disabled"
+        }, /*#__PURE__*/React.createElement("span", {
+          className: "page-link"
+        }, "...")));
+      }
+    }
+
+    // Page numbers
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(/*#__PURE__*/React.createElement("li", {
+        key: i,
+        className: `page-item ${currentPage === i ? 'active' : ''}`
+      }, /*#__PURE__*/React.createElement("button", {
+        className: "page-link",
+        onClick: () => handlePageChange(i)
+      }, i)));
+    }
+
+    // Last page + ellipsis
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        pages.push(/*#__PURE__*/React.createElement("li", {
+          key: "ellipsis2",
+          className: "page-item disabled"
+        }, /*#__PURE__*/React.createElement("span", {
+          className: "page-link"
+        }, "...")));
+      }
+      pages.push(/*#__PURE__*/React.createElement("li", {
+        key: totalPages,
+        className: "page-item"
+      }, /*#__PURE__*/React.createElement("button", {
+        className: "page-link",
+        onClick: () => handlePageChange(totalPages)
+      }, totalPages)));
+    }
+
+    // Next button
+    pages.push(/*#__PURE__*/React.createElement("li", {
+      key: "next",
+      className: `page-item ${currentPage === totalPages ? 'disabled' : ''}`
+    }, /*#__PURE__*/React.createElement("button", {
+      className: "page-link",
+      onClick: () => handlePageChange(currentPage + 1),
+      disabled: currentPage === totalPages
+    }, "Next")));
+    return /*#__PURE__*/React.createElement("nav", {
+      "aria-label": "User pagination"
+    }, /*#__PURE__*/React.createElement("ul", {
+      className: "pagination justify-content-center mb-0"
+    }, pages));
   };
   if (loading) {
     return /*#__PURE__*/React.createElement("div", {
@@ -118,16 +233,20 @@ export const AdminUserList = ({
     className: "card shadow-sm"
   }, /*#__PURE__*/React.createElement("div", {
     className: "card-body"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "d-flex justify-content-between align-items-center mb-3"
   }, /*#__PURE__*/React.createElement("h5", {
-    className: "card-title"
+    className: "card-title mb-0"
   }, "Users"), /*#__PURE__*/React.createElement("div", {
-    className: "mb-3 text-end"
-  }, /*#__PURE__*/React.createElement("button", {
+    className: "d-flex align-items-center gap-3"
+  }, /*#__PURE__*/React.createElement("small", {
+    className: "text-muted"
+  }, "Showing ", offset + 1, "-", Math.min(offset + usersPerPage, totalUsers), " of ", totalUsers, " users"), /*#__PURE__*/React.createElement("button", {
     className: "btn btn-success",
     onClick: () => setShowAddModal(true)
   }, /*#__PURE__*/React.createElement("i", {
     className: "bi bi-person-plus"
-  }), " Add Admin")), /*#__PURE__*/React.createElement("div", {
+  }), " Add Admin"))), /*#__PURE__*/React.createElement("div", {
     className: "table-responsive"
   }, /*#__PURE__*/React.createElement("table", {
     className: "table table-hover"
@@ -163,7 +282,9 @@ export const AdminUserList = ({
   }, "Edit"), /*#__PURE__*/React.createElement("button", {
     className: "btn btn-sm btn-danger",
     onClick: () => handleDelete(user.userId)
-  }, "Delete"))))))))), pendingRoleChange && /*#__PURE__*/React.createElement("div", {
+  }, "Delete"))))))), /*#__PURE__*/React.createElement("div", {
+    className: "d-flex justify-content-center mt-3"
+  }, renderPagination()))), pendingRoleChange && /*#__PURE__*/React.createElement("div", {
     className: "modal show d-block",
     tabIndex: "-1"
   }, /*#__PURE__*/React.createElement("div", {
@@ -192,7 +313,7 @@ export const AdminUserList = ({
     onClose: () => setShowAddModal(false),
     onCreated: () => {
       setShowAddModal(false);
-      location.reload();
+      fetchUsers(currentPage); // Refresh current page instead of reloading
     },
     baseUrl: baseUrl
   }), editUser && /*#__PURE__*/React.createElement(UserEditModal, {
@@ -200,7 +321,7 @@ export const AdminUserList = ({
     onClose: () => setEditUser(null),
     onSave: () => {
       setEditUser(null);
-      location.reload();
+      fetchUsers(currentPage); // Refresh current page instead of reloading
     },
     baseUrl: baseUrl
   }));

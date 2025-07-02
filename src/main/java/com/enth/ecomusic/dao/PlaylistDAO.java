@@ -2,6 +2,8 @@ package com.enth.ecomusic.dao;
 
 import com.enth.ecomusic.model.entity.Playlist;
 import com.enth.ecomusic.model.enums.VisibilityType;
+import com.enth.ecomusic.model.mapper.ResultSetMapper;
+import com.enth.ecomusic.util.DAOUtil;
 import com.enth.ecomusic.util.DBConnection;
 
 import java.sql.*;
@@ -101,5 +103,15 @@ public class PlaylistDAO {
             visibility 
         );
     }
+
+	public int countByArtist(int userId, int currentUserId) {
+		String sql = """
+				SELECT COUNT(*) FROM Playlists WHERE user_id = ? AND (visibility = 'public' OR user_id = ?)
+				""";
+
+		Integer result = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt, userId, currentUserId);
+
+		return result != null ? result : 0;
+	}
 }
 

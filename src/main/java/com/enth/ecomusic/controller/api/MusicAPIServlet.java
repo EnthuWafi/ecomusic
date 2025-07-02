@@ -17,6 +17,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 import com.enth.ecomusic.model.dto.MusicDTO;
+import com.enth.ecomusic.model.dto.MusicDetailDTO;
 import com.enth.ecomusic.model.dto.MusicSearchDTO;
 import com.enth.ecomusic.model.dto.UserDTO;
 import com.enth.ecomusic.model.entity.Music;
@@ -24,6 +25,7 @@ import com.enth.ecomusic.model.enums.VisibilityType;
 import com.enth.ecomusic.model.mapper.MusicMapper;
 import com.enth.ecomusic.service.MusicService;
 import com.enth.ecomusic.util.AppContext;
+import com.enth.ecomusic.util.CommonUtil;
 import com.enth.ecomusic.util.MultipartUtil;
 import com.enth.ecomusic.util.ResponseUtil;
 
@@ -85,23 +87,13 @@ public class MusicAPIServlet extends HttpServlet {
 		}
 	}
 
-	private void handleFetchListMusic(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-
+	private void handleFetchListMusic(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String sortStr = StringUtils.defaultString(request.getParameter("sort"));
-		String limitStr = StringUtils.defaultString(request.getParameter("limit"));
-		String offsetStr = StringUtils.defaultString(request.getParameter("offset"));
+		int limit = CommonUtil.parseIntLimitParam(request.getParameter("limit"), 5, 50);
+		int offset = CommonUtil.parseIntLimitParam(request.getParameter("offset"), 0, Integer.MAX_VALUE);
 
-		int limit = StringUtils.isNumeric(limitStr) ? Integer.parseInt(limitStr) : 5;
-		int offset = StringUtils.isNumeric(offsetStr) ? Integer.parseInt(offsetStr) : 0;
-		
-		
-		List<MusicDTO> musicList;
-		if ("top".equalsIgnoreCase(sortStr)) {
-			musicList = musicService.getTopPlayedMusicDTO(offset, limit);
-		} else {
-			musicList = musicService.getAllMusicDTO(offset, limit);
-		}
+		List<MusicDTO> musicList = "top".equalsIgnoreCase(sortStr) ? musicService.getTopPlayedMusicDTO(offset, limit)
+				: musicService.getAllMusicDTO(offset, limit);
 
 		Map<String, Object> data = new HashMap<>();
 		data.put("limit", limit);
@@ -111,47 +103,33 @@ public class MusicAPIServlet extends HttpServlet {
 		ResponseUtil.sendJson(response, data);
 	}
 
-	private void handleFetchSearch(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		String query = request.getParameter("q");
-		String limitStr = StringUtils.defaultString(request.getParameter("limit")).trim();
+	private void handleFetchSearch(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		String query = StringUtils.trimToEmpty(request.getParameter("q")).replaceAll("\\s+", " ")
+				.replaceAll("[&|*!~{}]", "");
 
-		String cleanQuery = query != null ? query.trim().replaceAll("\\s+", " ").replaceAll("[&|*!~{}]", "") : null;
-		if (StringUtils.isBlank(cleanQuery)) {
+		if (StringUtils.isBlank(query)) {
 			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "q cannot be empty");
 			return;
 		}
 
-		int limit = 8;
-		if (StringUtils.isNumeric(limitStr)) {
-			limit = Integer.parseInt(limitStr);
-			if (limit > 20) {
-				limit = 20;
-			}
-		}
+		int limit = CommonUtil.parseIntLimitParam(request.getParameter("limit"), 8, 20);
+		List<MusicSearchDTO> results = musicService.getRelevantMusicSearchDTO(query, limit);
 
-		List<MusicSearchDTO> musicSearchList = musicService.getRelevantMusicSearchDTO(cleanQuery, limit);
 		Map<String, Object> data = new HashMap<>();
-		data.put("q", cleanQuery);
-		data.put("results", musicSearchList);
+		data.put("q", query);
+		data.put("results", results);
 
 		ResponseUtil.sendJson(response, data);
-
 	}
 
 	private void handleFetchMusic(int musicId, HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-
-		HttpSession session = request.getSession();
-		UserDTO currentUser = (UserDTO) session.getAttribute("user");
+			throws IOException {
+		UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
+		MusicDetailDTO music = musicService.getMusicDetailDTOById(musicId, currentUser);
 
 		Map<String, Object> data = new HashMap<>();
-		MusicDTO music = musicService.getMusicDTOById(musicId, currentUser);
 		data.put("results", music);
-
 		ResponseUtil.sendJson(response, data);
-		
 	}
 
 	/**
@@ -204,8 +182,7 @@ public class MusicAPIServlet extends HttpServlet {
 				return;
 			}
 
-			Music music = new Music(currentUser.getUserId(), title, genreId, moodId, desc, null, null, isPremium);
-			music.setVisibility(visibility);
+			Music music = new Music(currentUser.getUserId(), title, genreId, moodId, desc, null, null, isPremium, visibility);
 
 			boolean success = musicService.uploadMusic(music, audioPart, imagePart, currentUser);
 
@@ -379,4 +356,5 @@ public class MusicAPIServlet extends HttpServlet {
 		}
 
 	}
+	
 }

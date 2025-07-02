@@ -2,6 +2,7 @@ package com.enth.ecomusic.controller.api;
 
 import com.enth.ecomusic.model.dto.PlaylistDTO;
 import com.enth.ecomusic.model.dto.UserDTO;
+import com.enth.ecomusic.model.entity.PlaylistMusic;
 import com.enth.ecomusic.service.PlaylistService;
 import com.enth.ecomusic.util.AppContext;
 import com.enth.ecomusic.util.ResponseUtil;
@@ -103,7 +104,7 @@ public class PlaylistAPIServlet extends HttpServlet {
 		
 		
 		UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
-		List<PlaylistDTO> playlists = playlistService.getUserPlaylistWithMusicByUserId(userId, currentUser);
+		List<PlaylistDTO> playlists = playlistService.getUserPlaylistByUserId(userId, currentUser);
 	
 		Map<String, Object> data = new HashMap<>();
 		data.put("userId", userId);
@@ -139,7 +140,7 @@ public class PlaylistAPIServlet extends HttpServlet {
 		
 		UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
 	
-		String fetchMusic = request.getParameter("fetch");
+		String fetchMusic = request.getParameter("music");
 		
 		PlaylistDTO playlist;
 		if (StringUtils.isBlank(fetchMusic)) {
@@ -181,7 +182,8 @@ public class PlaylistAPIServlet extends HttpServlet {
 		try {
 			if (pathParts.length == 2 && "music".equals(pathParts[1])) {
 				// /{id}/music
-				addPlaylistMusic(pathParts[0], request, response);
+				int playlistId = Integer.parseInt(pathParts[0]);
+				addPlaylistMusic(playlistId, request, response);
 
 			} else {
 				ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid API path");
@@ -197,10 +199,41 @@ public class PlaylistAPIServlet extends HttpServlet {
 
 	}
 
-	private void addPlaylistMusic(String playlistIdStr, HttpServletRequest request, HttpServletResponse response)
+	private void addPlaylistMusic(int playlistId, HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException, NumberFormatException {
-		// TODO Auto-generated method stub
-		int playlistId = Integer.parseInt(playlistIdStr);
+		
+		String jsonBody;
+        try {
+            // Read the entire request body as a String using UTF-8 encoding
+            jsonBody = IOUtils.toString(request.getReader()); 
+        } catch (IOException e) {
+            ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Failed to read request body: " + e.getMessage());
+            return;
+        }
+
+        Map<String, Object> requestBody;
+        int musicId;
+        try {
+            requestBody = JsonUtil.fromJson(jsonBody, new TypeToken<Map<String, Object>>() {});
+            
+            musicId = Integer.parseInt(requestBody.get("musicId").toString());
+            
+            UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
+            PlaylistMusic playlistMusic = new PlaylistMusic();
+            playlistMusic.setPlaylistId(playlistId);
+            playlistMusic.setMusicId(musicId);
+            
+    		if (playlistService.addSongToPlaylist(playlistMusic, currentUser)) {
+    			ResponseUtil.sendJson(response, "Successfully added song to playlist " + playlistId);
+    		} else {
+    			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Cannot add song to playlist music");
+    		}
+            
+
+        } catch (Exception e) {
+            ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid JSON body or 'position' format: " + e.getMessage());
+            return;
+        }
 
 	}
 
@@ -257,19 +290,21 @@ public class PlaylistAPIServlet extends HttpServlet {
                 return;
             }
             newPosition = (posObj instanceof Number) ? ((Number) posObj).intValue() : Integer.parseInt(posObj.toString());
+            
+            UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
+
+    		if (playlistService.updatePlaylistSongPosition(playlistId, musicId, newPosition, currentUser)) {
+    			ResponseUtil.sendJson(response, "Successfully updated playlist song position to " + newPosition);
+    		} else {
+    			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Cannot update playlist music");
+    		}
 
         } catch (Exception e) {
             ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid JSON body or 'position' format: " + e.getMessage());
             return;
         }
         
-        UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
-
-		if (playlistService.updatePlaylistSongPosition(playlistId, musicId, newPosition, currentUser)) {
-			ResponseUtil.sendJson(response, "Successfully updated playlist song position to " + newPosition);
-		} else {
-			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Cannot update playlist music");
-		}
+        
 
 	}
 

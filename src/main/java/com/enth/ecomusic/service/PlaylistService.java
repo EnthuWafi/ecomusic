@@ -73,6 +73,18 @@ public class PlaylistService {
 		}
 		return playlistDTOList;
 	}
+	
+	// Method to get all playlists for a user with associated music
+	public List<PlaylistDTO> getUserPlaylistByUserId(int userId, UserDTO currentUser) {
+		List<Playlist> playlists = playlistDAO.getPlaylistsByUserId(userId);
+		List<PlaylistDTO> playlistDTOList = new ArrayList<>();
+		for (Playlist playlist : playlists) {
+			if (canAccessPublicPlaylist(playlist, currentUser)) {
+				playlistDTOList.add(PlaylistMapper.INSTANCE.toDTO(playlist));
+			}	
+		}
+		return playlistDTOList;
+	}
 
 	/**
 	 * Adds a new, empty playlist for a user.
@@ -303,5 +315,9 @@ public class PlaylistService {
                user != null &&
                (playlist.getUserId() == user.getUserId() || user.hasRole(RoleType.ADMIN));
     }
+
+	public int getPlaylistCountByArtist(int userId, int currentUserId) {
+		return playlistDAO.countByArtist(userId, currentUserId);
+	}
 
 }

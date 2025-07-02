@@ -1,4 +1,4 @@
-const PlaylistSidebar = ({ userId, baseUrl }) => {
+export const PlaylistSidebar = ({ userId, baseUrl }) => {
 	const [playlists, setPlaylists] = React.useState([]);
 	const [loading, setLoading] = React.useState(true);
 	const [error, setError] = React.useState(null);
@@ -46,3 +46,5 @@ const PlaylistSidebar = ({ userId, baseUrl }) => {
 		</div>
 	);
 };
+
+export default PlaylistSidebar;

@@ -2,40 +2,66 @@ import KpiCard from "./KpiCard.js";
 import UserEditModal from "./UserEditModal.js";
 import UserCreateModal from "./UserCreateModal.js";
 
-
 export const AdminUserList = ({ baseUrl }) => {
 	const [kpiData, setKpiData] = React.useState(null);
 	const [users, setUsers] = React.useState([]);
 	const [loading, setLoading] = React.useState(true);
 	const [error, setError] = React.useState(null);
 
+	// Pagination state
+	const [currentPage, setCurrentPage] = React.useState(1);
+	const [totalUsers, setTotalUsers] = React.useState(0);
+	const [usersPerPage] = React.useState(10); // You can make this configurable
+
 	const [editUser, setEditUser] = React.useState(null);
 	const [pendingRoleChange, setPendingRoleChange] = React.useState(null);
 	const [showAddModal, setShowAddModal] = React.useState(false);
 
+	// Calculate pagination values
+	const totalPages = Math.ceil(totalUsers / usersPerPage);
+	const offset = (currentPage - 1) * usersPerPage;
+
+	const fetchUsers = async (page = 1) => {
+		try {
+			setLoading(true);
+			const pageOffset = (page - 1) * usersPerPage;
+			const userRes = await fetch(`${baseUrl}/api/user?limit=${usersPerPage}&offset=${pageOffset}`);
+			const userJson = await userRes.json();
+			
+			setUsers(userJson.data.results);
+			setTotalUsers(userJson.data.total || userJson.data.results.length);
+		} catch (err) {
+			console.error("Error loading users:", err);
+			setError("Failed to load users.");
+		} finally {
+			setLoading(false);
+		}
+	};
+
 	React.useEffect(() => {
 		const fetchData = async () => {
 			try {
-				const [kpiRes, userRes] = await Promise.all([
-					fetch(`${baseUrl}/api/report/kpis?type=user`),
-					fetch(`${baseUrl}/api/user?limit=5&offset=0`)
-				]);
-
+				const kpiRes = await fetch(`${baseUrl}/api/report/kpis?type=user`);
 				const kpiJson = await kpiRes.json();
-				const userJson = await userRes.json();
-
 				setKpiData(kpiJson.data.results);
-				setUsers(userJson.data.results);
 			} catch (err) {
-				console.error("Error loading user dashboard:", err);
-				setError("Failed to load data.");
-			} finally {
-				setLoading(false);
+				console.error("Error loading KPI data:", err);
+				setError("Failed to load KPI data.");
 			}
 		};
 
 		fetchData();
 	}, [baseUrl]);
+
+	React.useEffect(() => {
+		fetchUsers(currentPage);
+	}, [baseUrl, currentPage, usersPerPage]);
+
+	const handlePageChange = (page) => {
+		if (page >= 1 && page <= totalPages) {
+			setCurrentPage(page);
+		}
+	};
 
 	const handleDelete = async (userId) => {
 		if (!confirm("Are you sure you want to delete this user?")) return;
@@ -44,7 +70,9 @@ export const AdminUserList = ({ baseUrl }) => {
 				method: "DELETE"
 			});
 			if (!res.ok) throw new Error("Delete failed");
-			setUsers(users.filter((user) => user.userId !== userId));
+			
+			// Refresh the current page after deletion
+			await fetchUsers(currentPage);
 			toastr.success("User deleted.");
 		} catch (err) {
 			console.error("Error deleting user:", err);
@@ -79,6 +107,99 @@ export const AdminUserList = ({ baseUrl }) => {
 		setPendingRoleChange(null);
 	};
 
+	const renderPagination = () => {
+		if (totalPages <= 1) return null;
+
+		const pages = [];
+		const maxVisiblePages = 5;
+		
+		let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+		let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+		
+		if (endPage - startPage + 1 < maxVisiblePages) {
+			startPage = Math.max(1, endPage - maxVisiblePages + 1);
+		}
+
+		// Previous button
+		pages.push(
+			<li key="prev" className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+				<button 
+					className="page-link" 
+					onClick={() => handlePageChange(currentPage - 1)}
+					disabled={currentPage === 1}
+				>
+					Previous
+				</button>
+			</li>
+		);
+
+		// First page + ellipsis
+		if (startPage > 1) {
+			pages.push(
+				<li key={1} className="page-item">
+					<button className="page-link" onClick={() => handlePageChange(1)}>1</button>
+				</li>
+			);
+			if (startPage > 2) {
+				pages.push(
+					<li key="ellipsis1" className="page-item disabled">
+						<span className="page-link">...</span>
+					</li>
+				);
+			}
+		}
+
+		// Page numbers
+		for (let i = startPage; i <= endPage; i++) {
+			pages.push(
+				<li key={i} className={`page-item ${currentPage === i ? 'active' : ''}`}>
+					<button className="page-link" onClick={() => handlePageChange(i)}>
+						{i}
+					</button>
+				</li>
+			);
+		}
+
+		// Last page + ellipsis
+		if (endPage < totalPages) {
+			if (endPage < totalPages - 1) {
+				pages.push(
+					<li key="ellipsis2" className="page-item disabled">
+						<span className="page-link">...</span>
+					</li>
+				);
+			}
+			pages.push(
+				<li key={totalPages} className="page-item">
+					<button className="page-link" onClick={() => handlePageChange(totalPages)}>
+						{totalPages}
+					</button>
+				</li>
+			);
+		}
+
+		// Next button
+		pages.push(
+			<li key="next" className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+				<button 
+					className="page-link" 
+					onClick={() => handlePageChange(currentPage + 1)}
+					disabled={currentPage === totalPages}
+				>
+					Next
+				</button>
+			</li>
+		);
+
+		return (
+			<nav aria-label="User pagination">
+				<ul className="pagination justify-content-center mb-0">
+					{pages}
+				</ul>
+			</nav>
+		);
+	};
+
 	if (loading) {
 		return (
 			<div className="text-center my-5">
@@ -108,16 +229,20 @@ export const AdminUserList = ({ baseUrl }) => {
 				</div>
 			)}
 
-
-
 			<div className="card shadow-sm">
 				<div className="card-body">
-					<h5 className="card-title">Users</h5>
-					<div className="mb-3 text-end">
-						<button className="btn btn-success" onClick={() => setShowAddModal(true)}>
-							<i className="bi bi-person-plus"></i> Add Admin
-						</button>
+					<div className="d-flex justify-content-between align-items-center mb-3">
+						<h5 className="card-title mb-0">Users</h5>
+						<div className="d-flex align-items-center gap-3">
+							<small className="text-muted">
+								Showing {offset + 1}-{Math.min(offset + usersPerPage, totalUsers)} of {totalUsers} users
+							</small>
+							<button className="btn btn-success" onClick={() => setShowAddModal(true)}>
+								<i className="bi bi-person-plus"></i> Add Admin
+							</button>
+						</div>
 					</div>
+					
 					<div className="table-responsive">
 						<table className="table table-hover">
 							<thead>
@@ -176,6 +301,11 @@ export const AdminUserList = ({ baseUrl }) => {
 							</tbody>
 						</table>
 					</div>
+
+					{/* Pagination */}
+					<div className="d-flex justify-content-center mt-3">
+						{renderPagination()}
+					</div>
 				</div>
 			</div>
 
@@ -206,7 +336,7 @@ export const AdminUserList = ({ baseUrl }) => {
 					onClose={() => setShowAddModal(false)}
 					onCreated={() => {
 						setShowAddModal(false);
-						location.reload();
+						fetchUsers(currentPage); // Refresh current page instead of reloading
 					}}
 					baseUrl={baseUrl}
 				/>
@@ -218,7 +348,7 @@ export const AdminUserList = ({ baseUrl }) => {
 					onClose={() => setEditUser(null)}
 					onSave={() => {
 						setEditUser(null);
-						location.reload();
+						fetchUsers(currentPage); // Refresh current page instead of reloading
 					}}
 					baseUrl={baseUrl}
 				/>

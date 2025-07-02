@@ -7,6 +7,8 @@
 <meta charset="UTF-8">
 <meta name="app-base-url" content="${pageContext.request.contextPath}">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml"
+	href="${pageContext.request.contextPath}/assets/images/logo.svg">
 <title>${applicationScope.websiteName}-${pageTitle}</title>
 <!-- Bootstrap CSS -->
 <link rel="stylesheet"
@@ -42,11 +44,16 @@
 
 	<script>
 		window.toastr.options.positionClass = 'toast-bottom-right';
-	  	window.baseUrl = document.querySelector('meta[name="app-base-url"]').getAttribute('content');
+		window.baseUrl = document.querySelector('meta[name="app-base-url"]')
+				.getAttribute('content');
 	</script>
 	<c:set var="user" value="${sessionScope.user}" />
 	<!-- Top Navbar -->
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3 fixed-top">
+		<button id="toggleSidebarBtn"
+			class="btn btn-outline-dark text-white">
+			<i class="bi bi-list"></i>
+		</button>
 		<a class="navbar-brand d-flex align-items-center"
 			href="${pageContext.request.contextPath}/home"> <img
 			src="${pageContext.request.contextPath}/assets/images/logo.svg"
@@ -95,7 +102,8 @@
 							<li><a class="dropdown-item"
 								href="${pageContext.request.contextPath}/admin/subscription">Subscriptions</a></li>
 							<li><a class="dropdown-item"
-								href="${pageContext.request.contextPath}/admin/subscription-plan">Subscription Plans</a></li>
+								href="${pageContext.request.contextPath}/admin/subscription-plan">Subscription
+									Plans</a></li>
 						</ul></li>
 
 				</c:if>
@@ -105,26 +113,34 @@
 			<div class="d-lg-block" id="search-bar-root"></div>
 
 			<!-- RIGHT CTA / USER -->
-			<ul class="navbar-nav ms-auto">
+			<ul
+				class="navbar-nav ms-auto rounded-pill
+    ${not empty user && user.premium ? 'bg-warning' : 'bg-dark'}">
 				<c:choose>
 					<c:when test="${not empty user}">
 						<!-- User Dropdown -->
-						<li class="nav-item px-2 dropdown"><a
-							class="nav-link dropdown-toggle d-flex align-items-center"
-							href="#" id="userDropdown" role="button"
-							data-bs-toggle="dropdown" aria-expanded="false"> <img
+						<li class="nav-item px-2 dropdown d-flex align-items-center">
+
+							<!-- Username & image wrapped in a link to user's channel --> <a
+							href="${pageContext.request.contextPath}/channel/${user.userId}"
+							class="nav-link d-flex align-items-center me-1"> <img
 								src="${pageContext.request.contextPath}/stream/image/user/${user.userId}"
 								alt="Profile" width="24" height="24" class="rounded-circle me-1">
 								${user.username}
+						</a> <!-- Separate dropdown toggle button --> <a
+							class="nav-link dropdown-toggle dropdown-toggle-split text-white"
+							href="#" id="userDropdown" role="button"
+							data-bs-toggle="dropdown" aria-expanded="false"
+							style="padding-left: 0;"> <span class="visually-hidden">Toggle
+									Dropdown</span>
 						</a>
+
 							<ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end"
 								aria-labelledby="userDropdown">
 								<c:if test="${!user.admin}">
 									<li><a class="dropdown-item"
-										href="${pageContext.request.contextPath}/user/profile">Profile</a>
-									</li>
+										href="${pageContext.request.contextPath}/user/profile">Profile</a></li>
 								</c:if>
-
 								<c:if test="${!(user.admin or user.superAdmin)}">
 									<li><a class="dropdown-item"
 										href="${pageContext.request.contextPath}/become-artist">Become
@@ -133,21 +149,21 @@
 										href="${pageContext.request.contextPath}/choose-plan">Go
 											Premium</a></li>
 								</c:if>
-
 								<li><hr class="dropdown-divider" /></li>
 								<li><a class="dropdown-item"
 									href="${pageContext.request.contextPath}/logout">Logout</a></li>
-							</ul></li>
+							</ul>
+						</li>
 					</c:when>
 
 					<c:otherwise>
 						<li class="nav-item px-2"><a class="btn btn-outline-light"
-							href="${pageContext.request.contextPath}/become-artist">
-								Become an Artist </a></li>
+							href="${pageContext.request.contextPath}/become-artist">Become
+								an Artist</a></li>
 						<li class="nav-item px-2"><a
 							class="btn btn-warning text-dark"
-							href="${pageContext.request.contextPath}/choose-plan"> Go
-								Premium </a></li>
+							href="${pageContext.request.contextPath}/choose-plan">Go
+								Premium</a></li>
 						<li class="nav-item px-2"><a class="nav-link"
 							href="${pageContext.request.contextPath}/login">Login</a></li>
 						<li class="nav-item px-2"><a class="nav-link"
@@ -161,16 +177,20 @@
 	<div class="container-fluid mt-5">
 		<div class="row">
 			<!-- Sidebar -->
-			<nav class="col-md-2 d-none d-lg-block bg-dark sidebar px-3 pt-4">
+			<nav
+				class="col-sm-1 col-md-2 d-none d-lg-block bg-dark sidebar px-3 pt-4"
+				id="sidebar">
 				<c:if
 					test="${not empty user and not (user.admin or user.superAdmin)}">
 
 					<h6 class="text-uppercase">Your Library</h6>
 					<ul class="nav flex-column mb-3">
 						<li class="nav-item"><a class="nav-link text-white px-0"
-							href="#">Play History</a></li>
+							href="${pageContext.request.contextPath}/user/play-history">Play
+								History</a></li>
 						<li class="nav-item"><a class="nav-link text-white px-0"
-							href="#">Liked Songs</a></li>
+							href="${pageContext.request.contextPath}/user/liked">Liked
+								Songs</a></li>
 					</ul>
 					<div id="playlist-sidebar-root"></div>
 				</c:if>
@@ -197,7 +217,8 @@
 				</c:if>
 			</nav>
 			<!-- Main Content -->
-			<main class="col-sm-12 col-md-10  mx-auto px-4 pt-4 text-white" id="main-content">
+			<main class="col-xs-12 col-sm-11 col-md-10 mt-4 px-4 pt-4 text-white"
+				id="main-content">
 				<c:import url="${contentPage}" />
 			</main>
 		</div>
@@ -205,10 +226,10 @@
 
 	<c:if
 		test="${empty user or (not empty user and not (user.admin or user.superAdmin))}">
-		<script
-			src="${pageContext.request.contextPath}/assets/js/components/SearchBar.js"></script>
 
-		<script>	
+		<script type="module">
+			import { SearchBar } from "${pageContext.request.contextPath}/assets/js/components/SearchBar.js";
+
 			const searchContainer = document.getElementById('search-bar-root');
 			const searchRoot = ReactDOM.createRoot(searchContainer);
 			searchRoot.render(React.createElement(SearchBar, {
@@ -219,10 +240,8 @@
 
 	<c:if test="${not empty user and not (user.admin or user.superAdmin)}">
 
-		<script
-			src="${pageContext.request.contextPath}/assets/js/components/PlaylistSidebar.js"></script>
-
-		<script>
+		<script type="module">
+		import { PlaylistSidebar } from "${pageContext.request.contextPath}/assets/js/components/PlaylistSidebar.js";
 		const userId = ${(not empty user) ? user.userId : 'null'};
 	
 		const containerPlaylist = document.getElementById('playlist-sidebar-root');
@@ -237,27 +256,36 @@
 
 	<c:if test="${not empty flashMessages}">
 		<script>
-		
-		<c:forEach var="msg" items="${flashMessages}">
+			<c:forEach var="msg" items="${flashMessages}">
 
 			window.toastr["${msg.type}"]("${msg.message}");
 
-		</c:forEach>
+			</c:forEach>
 		</script>
 	</c:if>
 
 	<script>
-	$(document).ready(function () {
-	    const path = window.location.pathname;
+		$(document).ready(function() {
+			const path = window.location.pathname;
 
-	    $('.nav-link').each(function () {
-	        const href = $(this).attr('href');
+			// Highlight active nav link
+			$('.nav-link').each(function() {
+				const href = $(this).attr('href');
+				if (path === href || path.startsWith(href)) {
+					$(this).addClass('active');
+				}
+			});
 
-	        if (path === href || path.startsWith(href)) {
-	            $(this).addClass('active');
-	        }
-	    });
-	});
+			const $sidebar = $('#sidebar');
+			const $mainContent = $('#main-content');
+			const $toggleBtn = $('#toggleSidebarBtn');
+
+			$toggleBtn.click(function(e) {
+				e.preventDefault();
+				$sidebar.toggleClass('collapsed');
+				$mainContent.toggleClass('expanded');
+			});
+		});
 	</script>
 
 </body>

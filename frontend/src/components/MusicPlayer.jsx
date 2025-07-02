@@ -1,5 +1,6 @@
+import { PlaylistChooseModal } from "./PlaylistChooseModal.js";
 
-export const MusicPlayer = ({ baseURL, musicId }) => {
+export const MusicPlayer = ({ baseUrl, musicId, isAdmin = false, userId }) => {
 	const [musicData, setMusicData] = React.useState(null);
 	const [isLoading, setIsLoading] = React.useState(false);
 	const [isPlaying, setIsPlaying] = React.useState(false);
@@ -9,7 +10,8 @@ export const MusicPlayer = ({ baseURL, musicId }) => {
 	const [isLiked, setIsLiked] = React.useState(false);
 	const [hasRecordedPlay, setHasRecordedPlay] = React.useState(false);
 	const [listeningTime, setListeningTime] = React.useState(0);
-	
+	const [showPlaylistModal, setShowPlaylistModal] = React.useState(false);
+
 	const hasAccessRef = React.useRef(false);
 	const wavesurferRef = React.useRef(null);
 	const containerRef = React.useRef(null);
@@ -25,7 +27,7 @@ export const MusicPlayer = ({ baseURL, musicId }) => {
 	React.useEffect(() => {
 		isLikedRef.current = isLiked;
 	}, [isLiked]);
-	
+
 	React.useEffect(() => {
 		currentTimeRef.current = currentTime;
 	}, [currentTime]);
@@ -57,7 +59,9 @@ export const MusicPlayer = ({ baseURL, musicId }) => {
 				height: 60,
 				autoplay: false,
 				mediaControls: false,
-				normalize: true
+				normalize: true,
+				interact: true,
+				dragToSeek: true
 			});
 
 			// Event listeners
@@ -94,17 +98,17 @@ export const MusicPlayer = ({ baseURL, musicId }) => {
 			}
 		};
 	}, []);
-	
+
 	React.useEffect(() => {
 		let animationFrameId;
 
 		const updateProgressBar = () => {
-		  if (progressBarRef.current && wavesurferRef.current && durationRef.current > 0) {
-		    const current = wavesurferRef.current.getCurrentTime();
-		    const percent = (current / durationRef.current) * 100;
-		    progressBarRef.current.style.width = `${percent}%`;
-		  }
-		  animationFrameId = requestAnimationFrame(updateProgressBar);
+			if (progressBarRef.current && wavesurferRef.current && durationRef.current > 0) {
+				const current = wavesurferRef.current.getCurrentTime();
+				const percent = (current / durationRef.current) * 100;
+				progressBarRef.current.style.width = `${percent}%`;
+			}
+			animationFrameId = requestAnimationFrame(updateProgressBar);
 		};
 
 		animationFrameId = requestAnimationFrame(updateProgressBar);
@@ -122,7 +126,7 @@ export const MusicPlayer = ({ baseURL, musicId }) => {
 	// Load music data and audio
 	React.useEffect(() => {
 		const loadMusic = async () => {
-			if (!baseURL || !musicId) return;
+			if (!baseUrl || !musicId) return;
 
 			setIsLoading(true);
 			// Reset tracking state for new music
@@ -132,14 +136,14 @@ export const MusicPlayer = ({ baseURL, musicId }) => {
 			listeningTimeRef.current = 0;
 
 			try {
-				const response = await fetch(`${baseURL}/api/music/${musicId}`);
+				const response = await fetch(`${baseUrl}/api/music/${musicId}`);
 				const data = await response.json();
 
 				if (data.success) {
 					setMusicData(data.data.results);
 
 					if (wavesurferRef.current) {
-						const audioUrl = `${baseURL}/stream/audio/${musicId}`;
+						const audioUrl = `${baseUrl}/stream/audio/${musicId}`;
 						try {
 							await wavesurferRef.current.load(audioUrl);
 							hasAccessRef.current = true;
@@ -158,15 +162,15 @@ export const MusicPlayer = ({ baseURL, musicId }) => {
 		};
 
 		loadMusic();
-	}, [baseURL, musicId]);
+	}, [baseUrl, musicId]);
 
 	// Check if music is liked
 	React.useEffect(() => {
 		const checkIfLiked = async () => {
-			if (!baseURL || !musicId) return;
+			if (!baseUrl || !musicId) return;
 
 			try {
-				const response = await fetch(`${baseURL}/api/like/${musicId}`);
+				const response = await fetch(`${baseUrl}/api/like/${musicId}`);
 				if (response.ok) {
 					const data = await response.json();
 					setIsLiked(data.data === true);
@@ -179,7 +183,7 @@ export const MusicPlayer = ({ baseURL, musicId }) => {
 		};
 
 		checkIfLiked();
-	}, [baseURL, musicId]);
+	}, [baseUrl, musicId]);
 
 	const startTrackingTime = () => {
 		// Don't start if already tracking or play already recorded
@@ -223,12 +227,12 @@ export const MusicPlayer = ({ baseURL, musicId }) => {
 				const durationMs = listeningTimeRef.current * 1000;
 				const wasSkipped = listeningTimeRef.current < (durationRef.current * 0.8);
 
-				if (navigator.sendBeacon && baseURL && musicId) {
+				if (navigator.sendBeacon && baseUrl && musicId) {
 					const data = JSON.stringify({
 						listenDuration: durationMs,
 						wasSkipped: wasSkipped
 					});
-					navigator.sendBeacon(`${baseURL}/api/play/${musicId}`, data);
+					navigator.sendBeacon(`${baseUrl}/api/play/${musicId}`, data);
 				}
 			}
 		};
@@ -243,7 +247,7 @@ export const MusicPlayer = ({ baseURL, musicId }) => {
 				intervalRef.current = null;
 			}
 		};
-	}, [baseURL, musicId]);
+	}, [baseUrl, musicId]);
 
 	// Record play function
 	const sendPlayRecord = async () => {
@@ -269,7 +273,7 @@ export const MusicPlayer = ({ baseURL, musicId }) => {
 		const wasSkipped = listeningTimeRef.current < (durationRef.current * 0.8);
 
 		try {
-			const response = await fetch(`${baseURL}/api/play/${musicId}`, {
+			const response = await fetch(`${baseUrl}/api/play/${musicId}`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
@@ -292,10 +296,10 @@ export const MusicPlayer = ({ baseURL, musicId }) => {
 
 	// Toggle like
 	const toggleLike = async () => {
-		
+
 		try {
 			const method = isLiked ? 'DELETE' : 'POST';
-			const response = await fetch(`${baseURL}/api/like/${musicId}`, { method });
+			const response = await fetch(`${baseUrl}/api/like/${musicId}`, { method });
 
 			if (!response.ok) {
 				const error = await response.json();
@@ -309,7 +313,7 @@ export const MusicPlayer = ({ baseURL, musicId }) => {
 			if (musicData) {
 				setMusicData({
 					...musicData,
-					likeCount: isLiked ? musicData.likeCount - 1 : musicData.likeCount + 1
+					likeCount: isLiked ? musicData.music.likeCount - 1 : musicData.music.likeCount + 1
 				});
 			}
 
@@ -344,27 +348,64 @@ export const MusicPlayer = ({ baseURL, musicId }) => {
 		return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 	};
 
-	// Seek to position
-	const handleSeek = (e) => {
-		if (wavesurferRef.current && duration > 0) {
-			const rect = e.currentTarget.getBoundingClientRect();
-			const clickX = e.clientX - rect.left;
-			const width = rect.width;
-			const seekTime = (clickX / width) * duration;
-			wavesurferRef.current.seekTo(seekTime / duration);
+	// Handle playlist selection
+	const handlePlaylistSelected = (playlistId) => {
+		setShowPlaylistModal(false);
+		// You can add success notification here if needed
+		if (window.toastr) {
+			window.toastr.success('Added to playlist successfully!');
 		}
 	};
 
 	return (
-		<div className="container mt-5">
+		<>
 			<div className="row justify-content-center">
-				<div className="col-md-8">
+				<div className="col-md-12">
 					<div className="card shadow-lg">
 						<div className="card-header bg-primary">
 						</div>
 
 						<div className="card-body">
-				
+
+							{/* Music Info */}
+							{musicData && (
+								<div className="row mb-4">
+									<div className="col-md-3">
+										<img
+											src={`${baseUrl}/stream/image/music/${musicId}`}
+											alt={musicData.music.title}
+											className="img-fluid rounded shadow-sm"
+											style={{ aspectRatio: '1:1', objectFit: 'cover' }}
+										/>
+									</div>
+									<div className="col-md-9">
+										<h3 className="mb-2">{musicData.music.title}</h3>
+										<pre><p className="text-muted mb-2">{musicData.music.description}</p></pre>
+										<div className="d-flex flex-wrap gap-2 mb-3">
+											<span className="badge bg-secondary">{musicData.music.genreName}</span>
+											<span className="badge bg-info">{musicData.music.moodName}</span>
+											{musicData.music.premiumContent && (
+												<span className="badge bg-warning">Premium</span>
+											)}
+										</div>
+										<div className="d-flex align-items-center gap-3 text-muted small">
+											<span>
+												<i className="bi bi-heart-fill text-danger me-1"></i>
+												{musicData.music.likeCount} likes
+											</span>
+											<span>
+												<i className="bi bi-play-fill text-primary me-1"></i>
+												{musicData.music.totalPlayCount} plays
+											</span>
+											<span>
+												<i className="bi bi-clock me-1"></i>
+												{new Date(musicData.music.uploadDate).toLocaleDateString()}
+											</span>
+										</div>
+									</div>
+								</div>
+							)}
+
 							{/* Loading State */}
 							{isLoading && (
 								<div className="text-center mb-4">
@@ -375,54 +416,10 @@ export const MusicPlayer = ({ baseURL, musicId }) => {
 								</div>
 							)}
 
-							{/* Music Info */}
-							{musicData && (
-								<div className="row mb-4">
-									<div className="col-md-3">
-										<img
-											src={`${baseURL}/stream/image/music/${musicId}`}
-											alt={musicData.title}
-											className="img-fluid rounded shadow-sm"
-											style={{ aspectRatio: '1:1', objectFit: 'cover' }}
-										/>
-									</div>
-									<div className="col-md-9">
-										<h3 className="mb-2">{musicData.title}</h3>
-										<p className="text-muted mb-2"><pre>{musicData.description}</pre></p>
-										<div className="d-flex flex-wrap gap-2 mb-3">
-											<span className="badge bg-secondary">{musicData.genreName}</span>
-											<span className="badge bg-info">{musicData.moodName}</span>
-											{musicData.premiumContent && (
-												<span className="badge bg-warning">Premium</span>
-											)}
-										</div>
-										<div className="d-flex align-items-center gap-3 text-muted small">
-											<span>
-												<i className="bi bi-heart-fill text-danger me-1"></i>
-												{musicData.likeCount} likes
-											</span>
-											<span>
-												<i className="bi bi-play-fill text-primary me-1"></i>
-												{musicData.totalPlayCount} plays
-											</span>
-											<span>
-												<i className="bi bi-clock me-1"></i>
-												{new Date(musicData.uploadDate).toLocaleDateString()}
-											</span>
-										</div>
-									</div>
-								</div>
-							)}
-
 							{/* Waveform Container */}
 							<div className="mb-4">
 								<div
 									ref={containerRef}
-									className="border rounded p-2"
-									style={{
-										cursor: musicData ? 'pointer' : 'default',
-									}}
-									onClick={musicData ? handleSeek : undefined}
 								>
 									{!musicData && !isLoading && (
 										<span className="text-muted">Waveform will appear here</span>
@@ -464,6 +461,18 @@ export const MusicPlayer = ({ baseURL, musicId }) => {
 												Like
 											</button>
 
+											{/* Add to Playlist Button - Only shown for non-admin users */}
+											{!isAdmin && (
+												<button
+													className="btn btn-outline-success"
+													onClick={() => setShowPlaylistModal(true)}
+													disabled={!musicData}
+												>
+													<i className="bi bi-plus-lg me-2"></i>
+													Add to Playlist
+												</button>
+											)}
+
 											{/* Volume Control */}
 											<div className="d-flex align-items-center gap-2">
 												<i className="bi bi-volume-down text-muted"></i>
@@ -494,6 +503,42 @@ export const MusicPlayer = ({ baseURL, musicId }) => {
 					</div>
 				</div>
 			</div>
-		</div>
+			{/* Artist Info Card */}
+			{musicData && (
+				<div className="row justify-content-center mt-3">
+					<div className="col-md-12">
+						<div
+							className="card shadow-sm p-3 d-flex flex-row align-items-center gap-3"
+							style={{ cursor: 'pointer' }}
+							onClick={() => window.location.href = `${baseUrl}/channel/${musicData.music.artistId}`}
+						>
+							<img
+								src={`${baseUrl}/stream/image/user/${musicData.music.artistId}`}
+								alt={musicData.artistUsername}
+								className="rounded-circle"
+								style={{ width: '64px', height: '64px', objectFit: 'cover' }}
+							/>
+							<div>
+								<h5 className="mb-0">{musicData.artistUsername}</h5>
+								<p className="text-muted mb-0 small">View Artist Channel</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			)}
+
+			{/* Playlist Choose Modal */}
+			{showPlaylistModal && (
+				<PlaylistChooseModal
+					baseUrl={baseUrl}
+					musicId={musicId}
+					userId={userId}
+					onClose={() => setShowPlaylistModal(false)}
+					onPlaylistSelected={handlePlaylistSelected}
+				/>
+			)}
+		</>
 	);
 };
+
+export default MusicPlayer;

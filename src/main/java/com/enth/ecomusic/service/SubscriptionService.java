@@ -20,11 +20,13 @@ public class SubscriptionService {
 	private final SubscriptionDAO subscriptionDAO;
 	private final SubscriptionPlanDAO subscriptionPlanDAO;
 	private final UserService userService;
+	private final MusicService musicService;
 
-	public SubscriptionService(UserService userService) {
+	public SubscriptionService(UserService userService, MusicService musicService) {
 		this.subscriptionDAO = new SubscriptionDAO();
 		this.subscriptionPlanDAO = new SubscriptionPlanDAO();
 		this.userService = userService;
+		this.musicService = musicService;
 	}
 
 	// CREATE
@@ -77,6 +79,10 @@ public class SubscriptionService {
 	        switch (plan.getPlanType()) {
 	            case CREATOR:
 	                userUpdated = userService.updateUserSetArtist(sub.getUserId(), false, transaction.getConnection());
+	                if (userUpdated) {
+	                	//turn all music private
+						musicService.updateAllMusicSetPrivateByArtistId(sub.getUserId(), transaction.getConnection());
+					}
 	                break;
 	            case LISTENER:
 	                userUpdated = userService.updateUserSetPremium(sub.getUserId(), false, transaction.getConnection());

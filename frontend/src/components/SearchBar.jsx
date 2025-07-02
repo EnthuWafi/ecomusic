@@ -1,4 +1,5 @@
-const SearchBar = ({ baseUrl }) => {
+
+export const SearchBar = ({ baseUrl }) => {
   const [searchTerm, setSearchTerm] = React.useState('');
   const [suggestions, setSuggestions] = React.useState([]);
   const [showDropdown, setShowDropdown] = React.useState(false);
@@ -57,3 +58,5 @@ const SearchBar = ({ baseUrl }) => {
     </div>
   );
 };
+
+export default SearchBar;

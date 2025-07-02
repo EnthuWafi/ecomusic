@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Connection;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -215,6 +216,9 @@ public class MusicService {
 	    }
 	}
 
+	public boolean updateAllMusicSetPrivateByArtistId(int artistId, Connection conn) {
+		return musicDAO.updateAllMusicSetPrivateByArtistId(artistId, conn);
+	}
 	
 	public MusicDTO getMusicDTOById(int musicId, UserDTO currentUser) {
 		Music music = this.getMusicById(musicId);
@@ -381,6 +385,33 @@ public class MusicService {
 			MusicDTO dto = MusicMapper.INSTANCE.toDTO(music);
 			return dto;
 		}).collect(Collectors.toList());
+	}
+	
+	
+	public List<MusicDetailDTO> getTopPlayedMusicDetailDTO(int offset,int limit) {
+		List<Music> musicList = musicDAO.getTopPlayedMusic(offset,limit);
+		return musicList.stream()
+				.map(music -> {
+			setGenreMood(music);
+			MusicDetailDTO dto = MusicMapper.INSTANCE.toDetailDTO(music);
+			return dto;
+		}).collect(Collectors.toList());
+	}
+
+	public List<MusicDetailDTO> getAllMusicDetailDTO(int offset, int limit) {
+		List<Music> musicList = musicDAO.getAllPublicMusicWithOffsetLimit(offset, limit);
+		return musicList.stream()
+				.map(music -> {
+			setGenreMood(music);
+			User user = userService.getUserById(music.getArtistId());
+			music.setArtist(user);
+			MusicDetailDTO dto = MusicMapper.INSTANCE.toDetailDTO(music);
+			return dto;
+		}).collect(Collectors.toList());
+	}
+
+	public int getTotalPlayCountByArtist(int userId) {
+		return musicDAO.countPlaysByArtistId(userId);
 	}
 	
 }

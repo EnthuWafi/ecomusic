@@ -1,4 +1,4 @@
-const SearchBar = ({
+export const SearchBar = ({
   baseUrl
 }) => {
   const [searchTerm, setSearchTerm] = React.useState('');
@@ -49,3 +49,4 @@ const SearchBar = ({
     onClick: () => window.location.href = `${baseUrl}/music/search?q=${song.title}`
   }, song.title)))));
 };
+export default SearchBar;

@@ -1,10 +1,36 @@
 /* Enable Bootstrap Dark Mode via HTML:
    <html data-bs-theme="dark"> 
 */
+/* Collapse sidebar */
+#sidebar.collapsed {
+    width: 0;
+}
+
+/* Hide content inside sidebar when collapsed */
+#sidebar.collapsed * {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Restore content opacity */
+#sidebar:not(.collapsed) * {
+    opacity: 1;
+}
+
+/* Prevent content wrapping when sidebar shrinks */
+#main-content {
+    flex-grow: 1;
+}
+/* Hide toggle on mobile (optional) */
+@media ( max-width : 991.98px) {
+	#toggleSidebarBtn {
+		display: none;
+	}
+}
 
 /* — Brand & Navbar — */
 .navbar-brand span {
-  color: #9B59B6; /* Purple brand accent */
+	color: #9B59B6; /* Purple brand accent */
 }
 
 /* — Sidebar — */
@@ -12,44 +38,48 @@
 	background-color: #1c1e26;
 	min-height: 100vh;
 }
+
 .sidebar .nav-link:hover {
-  color: #9B59B6;
+	color: #9B59B6;
 }
 
 /* — Cards — */
 .card {
-  background-color: #1d1e26;
-  border: none;
-  border-radius: 0.5rem;
+	background-color: #1d1e26;
+	border: none;
+	border-radius: 0.5rem;
 }
+
 .card-body {
-  padding: 0.75rem;
-  color: #f8f9fa;
+	padding: 0.75rem;
+	color: #f8f9fa;
 }
 
 /* — Player Widget — */
 .player-card {
-  background-color: #1d1e26;
-  padding: 1.5rem;
-  border-radius: 1rem;
+	background-color: #1d1e26;
+	padding: 1.5rem;
+	border-radius: 1rem;
 }
+
 .waveform .bar {
-  width: 4px;
-  background-color: #9B59B6; 
-  border-radius: 2px;
+	width: 4px;
+	background-color: #9B59B6;
+	border-radius: 2px;
 }
 
 /* — Progress Bars — */
 .progress {
-  height: 4px;
-  border-radius: 0;
-  background-color: #2a2c35;
+	height: 4px;
+	border-radius: 0;
+	background-color: #2a2c35;
 }
+
 .progress .progress-bar {
-  background-color: #9B59B6;
+	background-color: #9B59B6;
 }
 
 /* — Utilities — */
 body {
-  background-color: #0f1015 !important;
+	background-color: #0f1015 !important;
 }

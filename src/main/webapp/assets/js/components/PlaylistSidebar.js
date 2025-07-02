@@ -1,4 +1,4 @@
-const PlaylistSidebar = ({
+export const PlaylistSidebar = ({
   userId,
   baseUrl
 }) => {
@@ -47,3 +47,4 @@ const PlaylistSidebar = ({
     href: `${baseUrl}/user/playlist/${playlist.playlistId}`
   }, playlist.name)))));
 };
+export default PlaylistSidebar;

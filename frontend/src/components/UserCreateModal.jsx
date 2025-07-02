@@ -61,6 +61,7 @@ const UserCreateModal = ({ onClose, onCreated, baseUrl }) => {
 								type="text"
 								autoComplete="off"
 								className="form-control"
+								placeholder="First Name"
 								value={formData.firstName}
 								onChange={(e) => handleChange("firstName", e.target.value)}
 							/>
@@ -72,6 +73,7 @@ const UserCreateModal = ({ onClose, onCreated, baseUrl }) => {
 								type="text"
 								autoComplete="off"
 								className="form-control"
+								placeholder="Last Name"
 								value={formData.lastName}
 								onChange={(e) => handleChange("lastName", e.target.value)}
 							/>
@@ -81,8 +83,9 @@ const UserCreateModal = ({ onClose, onCreated, baseUrl }) => {
 							<label className="form-label">Username</label>
 							<input
 								type="text"
-								autoComplete="new-username" // prevent autofill
+								autoComplete="new-username"
 								className="form-control"
+								placeholder="Username"
 								value={formData.username}
 								onChange={(e) => handleChange("username", e.target.value)}
 							/>
@@ -94,6 +97,7 @@ const UserCreateModal = ({ onClose, onCreated, baseUrl }) => {
 								type="email"
 								autoComplete="off"
 								className="form-control"
+								placeholder="Email"
 								value={formData.email}
 								onChange={(e) => handleChange("email", e.target.value)}
 							/>
@@ -103,7 +107,7 @@ const UserCreateModal = ({ onClose, onCreated, baseUrl }) => {
 							<label className="form-label">Password</label>
 							<input
 								type="password"
-								autoComplete="new-password" // prevent browser autofill
+								autoComplete="new-password"
 								className="form-control"
 								value={formData.password}
 								onChange={(e) => handleChange("password", e.target.value)}
@@ -114,6 +118,7 @@ const UserCreateModal = ({ onClose, onCreated, baseUrl }) => {
 							<label className="form-label">Bio</label>
 							<textarea
 								className="form-control"
+								placeholder="Biodata"
 								value={formData.bio}
 								onChange={(e) => handleChange("bio", e.target.value)}
 							></textarea>

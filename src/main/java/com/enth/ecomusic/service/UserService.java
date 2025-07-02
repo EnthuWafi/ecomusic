@@ -3,6 +3,7 @@ package com.enth.ecomusic.service;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.util.List;
@@ -130,6 +131,17 @@ public class UserService {
 				}
 
 				String imageDir = AppConfig.get("userImageFilePath");
+				
+				String oldImageFileName = existingUser.getImageUrl();
+				
+				if (oldImageFileName != null && !oldImageFileName.isEmpty()) {
+					Path oldImagePath = Paths.get(imageDir, oldImageFileName);
+					Path oldThumbPath = Paths.get(imageDir, "thumb_" + oldImageFileName);
+
+					if (Files.exists(oldImagePath)) Files.delete(oldImagePath);
+					if (Files.exists(oldThumbPath)) Files.delete(oldThumbPath);
+				}
+				
 				String imgExt = FileTypeUtil.getImageExtension(contentType);
 				String imageFileName = UUID.randomUUID().toString() + imgExt;
 				String imagePath = imageDir + File.separator + imageFileName;
