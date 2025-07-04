@@ -1,120 +1,81 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+    pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
-<div class="create-playlist-container">
-	<div class="create-playlist-header">
-		<h1>Create New Playlist</h1>
-		<p>Build your perfect music collection</p>
-	</div>
+<div class="container my-5">
+  <div class="mb-4 text-center">
+    <h1>Create New Playlist</h1>
+    <p class="text-muted">Build your perfect music collection</p>
+  </div>
 
-	<div class="create-playlist-content">
-		<form id="createPlaylistForm"
-			action="${pageContext.request.contextPath}/user/playlist/create"
-			method="post" class="playlist-form">
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <form id="createPlaylistForm"
+            action="${pageContext.request.contextPath}/user/playlist/create"
+            method="post">
 
-			<!-- Playlist Name -->
-			<div class="form-group">
-				<label for="playlistName" class="form-label"> <i
-					class="fas fa-music"></i> Playlist Name *
-				</label> <input type="text" id="playlistName" name="name"
-					class="form-control" placeholder="Enter playlist name..." required
-					maxlength="100"> <small class="form-text">Give your
-					playlist a memorable name</small>
-			</div>
+        <!-- Playlist Name -->
+        <div class="mb-3">
+          <label for="playlistName" class="form-label">
+            <i class="bi bi-music-note-list me-1"></i>Playlist Name *
+          </label>
+          <input type="text"
+                 id="playlistName"
+                 name="name"
+                 class="form-control"
+                 placeholder="Enter playlist name..."
+                 required maxlength="100">
+          <div class="form-text">Give your playlist a memorable name.</div>
+        </div>
 
-			<!-- Visibility -->
-			<div class="form-group">
-				<label class="form-label"> <i class="fas fa-eye"></i>
-					Privacy Settings
-				</label>
-				<div class="visibility-options">
-					<div class="radio-option">
-						<input type="radio" id="visibilityPublic" name="visibility"
-							value="public" checked> <label for="visibilityPublic"
-							class="radio-label">
-							<div class="radio-content">
-								<i class="fas fa-globe"></i>
-								<div>
-									<strong>Public</strong>
-									<p>Anyone can find and listen to this playlist</p>
-								</div>
-							</div>
-						</label>
-					</div>
+        <fieldset class="mb-4">
+          <legend class="form-label">
+            <i class="bi bi-eye-fill me-1"></i>Privacy Settings
+          </legend>
+          <div class="d-flex gap-3">
+            <div class="form-check">
+              <input class="form-check-input"
+                     type="radio"
+                     name="visibility"
+                     id="visibilityPublic"
+                     value="public"
+                     checked>
+              <label class="form-check-label" for="visibilityPublic">
+                <i class="bi bi-globe2 me-1"></i>
+                <strong>Public</strong>
+                <small class="d-block text-muted">Anyone can find and listen</small>
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input"
+                     type="radio"
+                     name="visibility"
+                     id="visibilityPrivate"
+                     value="private">
+              <label class="form-check-label" for="visibilityPrivate">
+                <i class="bi bi-lock-fill me-1"></i>
+                <strong>Private</strong>
+                <small class="d-block text-muted">Only you can access</small>
+              </label>
+            </div>
+          </div>
+        </fieldset>
 
-					<div class="radio-option">
-						<input type="radio" id="visibilityPrivate" name="visibility"
-							value="private"> <label for="visibilityPrivate"
-							class="radio-label">
-							<div class="radio-content">
-								<i class="fas fa-lock"></i>
-								<div>
-									<strong>Private</strong>
-									<p>Only you can access this playlist</p>
-								</div>
-							</div>
-						</label>
-					</div>
-				</div>
-			</div>
+        <!-- Form Actions -->
+        <div class="d-flex justify-content-end">
+          <button type="button"
+                  class="btn btn-outline-secondary me-2"
+                  onclick="window.history.back()">
+            <i class="bi bi-arrow-left me-1"></i>Cancel
+          </button>
 
-			<!-- Form Actions -->
-			<div class="form-actions">
-				<button type="button" class="btn btn-secondary"
-					onclick="window.history.back()">
-					<i class="fas fa-arrow-left"></i> Cancel
-				</button>
-
-				<button type="submit" class="btn btn-primary" id="createBtn">
-					<i class="fas fa-plus"></i> Create Playlist
-				</button>
-			</div>
-		</form>
-
-	</div>
+          <button type="submit"
+                  class="btn btn-success"
+                  id="createBtn">
+            <i class="bi bi-plus-lg me-1"></i>Create Playlist
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
-
-
-<script>
-document.getElementById('createPlaylistForm').addEventListener('submit', function(e) {
-    const playlistName = document.getElementById('playlistName').value.trim();
-    
-    if (!playlistName) {
-        e.preventDefault();
-        alert('Please enter a playlist name');
-        return;
-    }
-    
-    if (playlistName.length < 1 || playlistName.length > 100) {
-        e.preventDefault();
-        alert('Playlist name must be between 1 and 100 characters');
-        return;
-    }
-    
-    // Disable submit button to prevent double submission
-    const createBtn = document.getElementById('createBtn');
-    createBtn.disabled = true;
-    createBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
-});
-
-
-// Auto-focus on playlist name when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('playlistName').focus();
-});
-
-// Character counter for playlist name
-document.getElementById('playlistName').addEventListener('input', function() {
-    const maxLength = 100;
-    const currentLength = this.value.length;
-    const remaining = maxLength - currentLength;
-    
-    // You can add a character counter display here if needed
-    if (remaining < 20) {
-        this.style.borderColor = remaining < 0 ? '#dc3545' : '#ffc107';
-    } else {
-        this.style.borderColor = '#28a745';
-    }
-});
-</script>

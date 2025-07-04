@@ -35,9 +35,18 @@ public class PlayHistoryService {
 		return playHistoryDAO.logPlay(playHistory);
 	}
 
-	public List<PlayHistory> getRecentPlays(int userId, int limit) {
-	    List<PlayHistory> recentPlays = playHistoryDAO.getRecentPlaysByUserId(userId, limit);
-	    return recentPlays;
+	public List<PlayHistoryDTO> getRecentPlays(int userId, int offset, int limit, UserDTO currentUser) {
+	    List<PlayHistory> recentPlays = playHistoryDAO.getRecentPlaysByUserId(userId, offset, limit, currentUser.getUserId());
+	    return recentPlays.stream().map(play -> {
+	    	loadMusic(play);
+	    	return PlayHistoryMapper.INSTANCE.toDTO(play);
+	    			}).collect(Collectors.toList());
+	}
+
+	private void loadMusic(PlayHistory play) {
+		if (play != null) {
+			play.setMusic(musicService.getMusicById(play.getMusicId()));
+		}
 	}
 
 	public boolean clearPlayHistoryForUser(int userId) {
@@ -50,6 +59,8 @@ public class PlayHistoryService {
 	    if (user.isAdmin() || user.isSuperAdmin()) return false; // Admins can't
 	    return true; // Regular users can
 	}
+	
+	
 
 
 }

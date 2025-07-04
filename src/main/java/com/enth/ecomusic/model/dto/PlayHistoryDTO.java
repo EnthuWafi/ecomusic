@@ -1,6 +1,10 @@
 package com.enth.ecomusic.model.dto;
 
 import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
+import com.enth.ecomusic.util.CommonUtil;
 
 public class PlayHistoryDTO {
 
@@ -40,9 +44,19 @@ public class PlayHistoryDTO {
 	public LocalDateTime getPlayedAt() {
 		return playedAt;
 	}
+	
+	public Date getPlayedAtDate() {
+		return CommonUtil.toDate(playedAt);
+	}
 
 	public long getListenDuration() {
 		return listenDuration;
+	}
+	
+	public String getListenDurationString() {
+		return String.format("%d min, %d sec", 
+			    TimeUnit.MILLISECONDS.toSeconds(listenDuration)/60,
+			    TimeUnit.MILLISECONDS.toSeconds(listenDuration) % 60 );
 	}
 
 	public boolean isWasSkipped() {

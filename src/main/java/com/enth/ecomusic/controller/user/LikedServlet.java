@@ -9,35 +9,30 @@ import java.io.IOException;
 import java.util.List;
 
 import com.enth.ecomusic.model.dto.LikeDTO;
-import com.enth.ecomusic.model.dto.PlaylistCountDTO;
-import com.enth.ecomusic.model.dto.PlaylistDTO;
+import com.enth.ecomusic.model.dto.PlayHistoryDTO;
 import com.enth.ecomusic.model.dto.UserDTO;
 import com.enth.ecomusic.service.LikeService;
-import com.enth.ecomusic.service.PlaylistService;
 import com.enth.ecomusic.util.AppContext;
 
 /**
- * Servlet implementation class LibraryServlet
+ * Servlet implementation class LikedServlet
  */
-@WebServlet("/user/library")
-public class LibraryServlet extends HttpServlet {
+@WebServlet("/user/liked")
+public class LikedServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	
-	private PlaylistService playlistService;
+    
 	private LikeService likeService;
-	
 	@Override
 	public void init() throws ServletException {
 		// TODO Auto-generated method stub
 		super.init();
 		AppContext ctx = (AppContext) this.getServletContext().getAttribute("appContext");
-		this.playlistService = ctx.getPlaylistService();
 		this.likeService = ctx.getLikeService();
 	}
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public LibraryServlet() {
+    public LikedServlet() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -46,29 +41,22 @@ public class LibraryServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		UserDTO user = (UserDTO) request.getSession().getAttribute("user");
 		
-		UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
-		
-		if (currentUser == null ) {
+		if (user == null ) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;
 		}
 		
-		
-		List<PlaylistCountDTO> playlists = playlistService.getUserPlaylistCountByUserId(currentUser.getUserId(), currentUser);
-		int likeCount = likeService.getCountLikedSongByUserId(currentUser.getUserId());
-		
-		int limit = 3;
+		int limit = 10;
 		int offset = 0;
 		
-		List<LikeDTO> likeList = likeService.getLikedSongsForUser(currentUser.getUserId(), offset, limit, currentUser.getUserId());
+		List<LikeDTO> likeList = likeService.getLikedSongsForUser(user.getUserId(), offset, limit, user.getUserId());
 		
-        request.setAttribute("pageTitle", "Library");
-        request.setAttribute("playlists", playlists);
-        request.setAttribute("likeCount", likeCount);
-        request.setAttribute("likes", likeList);
-        request.setAttribute("contentPage", "/WEB-INF/views/user/library.jsp");
-        request.getRequestDispatcher("/WEB-INF/views/layout-main.jsp").forward(request, response);
+		request.setAttribute("likeList", likeList);
+		request.setAttribute("pageTitle", "Play History");
+		request.setAttribute("contentPage", "/WEB-INF/views/user/liked.jsp");
+		request.getRequestDispatcher("/WEB-INF/views/layout-main.jsp").forward(request, response);
 	}
 
 

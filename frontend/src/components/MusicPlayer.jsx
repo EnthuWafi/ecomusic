@@ -97,7 +97,7 @@ export const MusicPlayer = ({ baseUrl, musicId, isAdmin = false, userId }) => {
 				wavesurferRef.current.destroy();
 			}
 		};
-	}, []);
+	}, [musicId]);
 
 	React.useEffect(() => {
 		let animationFrameId;
@@ -129,7 +129,9 @@ export const MusicPlayer = ({ baseUrl, musicId, isAdmin = false, userId }) => {
 			if (!baseUrl || !musicId) return;
 
 			setIsLoading(true);
-			// Reset tracking state for new music
+			setIsPlaying(false);
+			setCurrentTime(0);
+			setDuration(0);
 			setHasRecordedPlay(false);
 			setListeningTime(0);
 			hasRecordedPlayRef.current = false;
@@ -313,7 +315,10 @@ export const MusicPlayer = ({ baseUrl, musicId, isAdmin = false, userId }) => {
 			if (musicData) {
 				setMusicData({
 					...musicData,
-					likeCount: isLiked ? musicData.music.likeCount - 1 : musicData.music.likeCount + 1
+					music: {
+						...musicData.music,
+						likeCount: isLiked ? musicData.music.likeCount - 1 : musicData.music.likeCount + 1
+						}
 				});
 			}
 
@@ -349,7 +354,7 @@ export const MusicPlayer = ({ baseUrl, musicId, isAdmin = false, userId }) => {
 	};
 
 	// Handle playlist selection
-	const handlePlaylistSelected = (playlistId) => {
+	const handlePlaylistSelected = () => {
 		setShowPlaylistModal(false);
 		// You can add success notification here if needed
 		if (window.toastr) {

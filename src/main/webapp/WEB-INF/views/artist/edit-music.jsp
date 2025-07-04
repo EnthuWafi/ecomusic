@@ -74,25 +74,15 @@
 <!-- script -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const musicDTOJson = '${musicDTOJson}';
-
-        let musicDTO = null;
-        if (musicDTOJson && musicDTOJson !== 'null' && musicDTOJson.trim() !== '') {
-            try {
-                musicDTO = JSON.parse(musicDTOJson);
-            } catch (e) {
-                console.error("Error parsing musicDTO JSON:", e);
-            }
-        }
+        const musicDTO = ${musicDTOJson};
 
         if (musicDTO) {
-            // Autofill Music Title
             const titleInput = document.getElementById('title');
             if (titleInput && musicDTO.title) {
                 titleInput.value = musicDTO.title;
             }
 
-            // Autofill Genre
+
             const genreSelect = document.getElementById('genre');
             if (genreSelect && musicDTO.genreId) {
                 // Ensure the option exists before setting value
@@ -130,10 +120,9 @@
             
             const visibilitySelect = document.getElementById('visibility');
             if (visibilitySelect && musicDTO.visibility) {
-                // Ensure the option exists before setting value
-                const visibilityOption = moodSelect.querySelector(`option[value="${musicDTO.visibility.value}"]`);
+                const visibilityOption = moodSelect.querySelector(`option[value="${musicDTO.visibility}"]`);
                 if (visibilityOption) {
-                	visibilitySelect.value = musicDTO.moodId;
+                	visibilitySelect.value = musicDTO.visibility.toLowerCase();
                 } else {
                     console.warn(`Visibility Type ${musicDTO.visibility.value} not found in visibilityList options.`);
                 }

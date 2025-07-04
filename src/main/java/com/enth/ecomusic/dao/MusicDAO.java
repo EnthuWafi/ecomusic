@@ -437,4 +437,102 @@ public class MusicDAO {
 
 		return result != null ? result : 0;
 	}
+
+	public int countMusicByGenreAndMood(List<Integer> genreIds, List<Integer> moodIds) {
+		String genreInClause = genreIds.isEmpty() ? "null"
+				: genreIds.stream().map(g -> "?").collect(Collectors.joining(", "));
+		String moodInClause = moodIds.isEmpty() ? "null"
+				: moodIds.stream().map(g -> "?").collect(Collectors.joining(", "));
+
+		String sql = """
+				SELECT COUNT(*) FROM Music m
+				WHERE (? IS NULL OR m.genre_id IN (%s))
+				AND (? IS NULL OR m.mood_id IN (%s))
+				AND m.visibility = 'public'
+				""";
+
+		sql = sql.formatted(genreInClause, moodInClause);
+
+		List<Object> params = new ArrayList<>();
+
+		params.add(genreIds.isEmpty() ? null : 1);
+		params.addAll(genreIds);
+
+		params.add(moodIds.isEmpty() ? null : 1);
+		params.addAll(moodIds);
+
+		Integer result = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt, params.toArray());
+
+		return (result != null) ? result : 0;
+	}
+
+	public List<MusicDetailDTO> getRelevantPaginatedMusicWithDetailByGenreAndMood(List<Integer> genreIds,
+			List<Integer> moodIds, int page, int pageSize) {
+		String genreInClause = genreIds.isEmpty() ? ""
+				: genreIds.stream().map(g -> "?").collect(Collectors.joining(", "));
+		String moodInClause = moodIds.isEmpty() ? "" : moodIds.stream().map(m -> "?").collect(Collectors.joining(", "));
+
+		StringBuilder queryBuilder = new StringBuilder("""
+				    WITH RankedData AS (
+				        SELECT
+				            m.music_id, m.artist_id, m.title, m.audio_file_url,
+				            m.image_url, m.premium_content, m.genre_id, m.mood_id, m.updated_at, m.upload_date,
+				            u.username AS artist_username, u.image_url AS artist_image_url,
+				            m.like_count_cache, m.total_plays_cache, m.visibility,
+				            g.name AS genre_name, mo.name AS mood_name,
+				            (
+				                m.like_count_cache * ? +
+				                m.total_plays_cache * ? +
+				                (SYSDATE - m.upload_date) * ?
+				            ) AS relevance_score
+				        FROM Music m
+				        JOIN Users u ON m.artist_id = u.user_id
+				        JOIN genres g ON m.genre_id = g.genre_id
+				        JOIN moods mo ON m.mood_id = mo.mood_id
+				        WHERE m.visibility = 'public'
+				""");
+
+		if (!genreIds.isEmpty()) {
+			queryBuilder.append(" AND m.genre_id IN (").append(genreInClause).append(")\n");
+		}
+
+		if (!moodIds.isEmpty()) {
+			queryBuilder.append(" AND m.mood_id IN (").append(moodInClause).append(")\n");
+		}
+
+		queryBuilder.append(")\n");
+		queryBuilder.append("""
+				    SELECT r.*, ROW_NUMBER() OVER (ORDER BY r.relevance_score DESC) AS rnum
+				    FROM RankedData r
+				""");
+
+		// Build parameters in exact order
+		List<Object> params = new ArrayList<>();
+		params.add(LIKE_COUNT_WEIGHT);
+		params.add(TOTAL_PLAYS_WEIGHT);
+		params.add(FRESHNESS_WEIGHT);
+
+
+		params.addAll(genreIds);
+		params.addAll(moodIds);
+
+		return DAOUtil.executePaginatedQuery(queryBuilder.toString(), ResultSetMapper::mapToMusicDetailDTO, page,
+				pageSize, params.toArray());
+	}
+
+	public int countPremiumMusic() {
+		String sql = "SELECT COUNT(*) FROM Music WHERE premium_content = 1";
+
+		Integer count = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt);
+
+		return count != null ? count : 0;
+	}
+	
+	public int countNonPremiumMusic() {
+		String sql = "SELECT COUNT(*) FROM Music WHERE premium_content = 0";
+
+		Integer count = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt);
+
+		return count != null ? count : 0;
+	}
 }

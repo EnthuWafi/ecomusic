@@ -30,3 +30,4 @@ src/main/webapp/WEB-INF/classes/config.properties
 plantuml.jar
 
 /frontend/node_modules/
+scrapbook

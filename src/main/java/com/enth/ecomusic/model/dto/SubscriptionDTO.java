@@ -14,11 +14,14 @@ public class SubscriptionDTO {
     private LocalDateTime createdAt;
     private int subscriptionPlanId;
 
+    private UserDTO user;
     private SubscriptionPlanDTO subscriptionPlan;
+
+    
 
 	public SubscriptionDTO(int subscriptionId, int userId, LocalDate startDate, LocalDate endDate, double amountPaid,
 			String paymentStatus, String paymentGatewayRef, LocalDateTime createdAt, int subscriptionPlanId,
-			SubscriptionPlanDTO subscriptionPlan) {
+			UserDTO user, SubscriptionPlanDTO subscriptionPlan) {
 		super();
 		this.subscriptionId = subscriptionId;
 		this.userId = userId;
@@ -29,6 +32,7 @@ public class SubscriptionDTO {
 		this.paymentGatewayRef = paymentGatewayRef;
 		this.createdAt = createdAt;
 		this.subscriptionPlanId = subscriptionPlanId;
+		this.user = user;
 		this.subscriptionPlan = subscriptionPlan;
 	}
 
@@ -71,6 +75,11 @@ public class SubscriptionDTO {
 	public SubscriptionPlanDTO getSubscriptionPlan() {
 		return subscriptionPlan;
 	}
+
+	public UserDTO getUser() {
+		return user;
+	}
     
+	
     
 }

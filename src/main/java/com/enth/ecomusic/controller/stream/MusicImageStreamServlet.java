@@ -62,8 +62,8 @@ public class MusicImageStreamServlet extends HttpServlet {
 		String requestedSize = request.getParameter("size"); 
 
 		if (musicId == -1) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid music ID.");
-			return;
+			response.sendRedirect(request.getContextPath() + "/assets/images/default-music.jpg");
+	        return;
 		}
 		
 		boolean isThumbnailRequest = "thumb".equalsIgnoreCase(requestedSize);

@@ -270,6 +270,14 @@ public class MusicService {
 	public int getPublicMusicCount() {
 		return musicDAO.countPublicMusic();
 	}
+	
+	public int getPremiumMusicCount() {
+		return musicDAO.countPremiumMusic();
+	}
+	
+	public int getNonPremiumMusicCount() {
+		return musicDAO.countNonPremiumMusic();
+	}
 
 	public int getMusicCountByArtist(int artistId, int currentUserId) {
 		return musicDAO.countVisibleMusicByArtist(artistId, currentUserId);
@@ -283,6 +291,17 @@ public class MusicService {
 
 	public int getMusicCountLikeKeyword(String keyword, List<Integer> genreIdList, List<Integer> moodIdList) {
 		return musicDAO.countMusicByKeyword(keyword, genreIdList, moodIdList);
+	}
+	
+	public int getMusicCountByGenreAndMood(List<Integer> genreIdList, List<Integer> moodIdList) {
+		return musicDAO.countMusicByGenreAndMood(genreIdList, moodIdList);
+	}
+	
+	public List<MusicDetailDTO> getPaginatedMusicDetailDTOByGenreAndMood(List<Integer> genreIds,
+			List<Integer> moodIds, int page, int pageSize) {
+		List<MusicDetailDTO> musicList = musicDAO.getRelevantPaginatedMusicWithDetailByGenreAndMood(genreIds, moodIds, page, pageSize);
+
+		return musicList;
 	}
 	
 	private void setGenreMood(Music music) {

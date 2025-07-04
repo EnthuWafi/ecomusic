@@ -7,10 +7,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import org.apache.tomcat.jakartaee.commons.lang3.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
-import com.enth.ecomusic.service.MusicService;
-import com.enth.ecomusic.util.AppContext;
 
 /**
  * Servlet implementation class MusicServlet
@@ -18,15 +16,11 @@ import com.enth.ecomusic.util.AppContext;
 @WebServlet("/music/play/*")
 public class PlayMusicServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-	private MusicService musicService;
 
 	@Override
 	public void init() throws ServletException {
 		// TODO Auto-generated method stub
 		super.init();
-		AppContext ctx = (AppContext) this.getServletContext().getAttribute("appContext");
-		this.musicService = ctx.getMusicService();
 	}
     /**
      * @see HttpServlet#HttpServlet()

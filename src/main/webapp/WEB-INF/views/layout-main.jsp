@@ -50,8 +50,7 @@
 	<c:set var="user" value="${sessionScope.user}" />
 	<!-- Top Navbar -->
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3 fixed-top">
-		<button id="toggleSidebarBtn"
-			class="btn btn-outline-dark text-white">
+		<button id="toggleSidebarBtn" class="btn btn-outline-dark text-white">
 			<i class="bi bi-list"></i>
 		</button>
 		<a class="navbar-brand d-flex align-items-center"
@@ -119,41 +118,48 @@
 				<c:choose>
 					<c:when test="${not empty user}">
 						<!-- User Dropdown -->
-						<li class="nav-item px-2 dropdown d-flex align-items-center">
-
-							<!-- Username & image wrapped in a link to user's channel --> <a
-							href="${pageContext.request.contextPath}/channel/${user.userId}"
-							class="nav-link d-flex align-items-center me-1"> <img
-								src="${pageContext.request.contextPath}/stream/image/user/${user.userId}"
-								alt="Profile" width="24" height="24" class="rounded-circle me-1">
-								${user.username}
-						</a> <!-- Separate dropdown toggle button --> <a
-							class="nav-link dropdown-toggle dropdown-toggle-split text-white"
+						<li class="nav-item dropdown d-flex align-items-center px-2">
+							<!-- Dropdown Toggle --> <a
+							class="nav-link dropdown-toggle d-flex align-items-center text-white"
 							href="#" id="userDropdown" role="button"
-							data-bs-toggle="dropdown" aria-expanded="false"
-							style="padding-left: 0;"> <span class="visually-hidden">Toggle
-									Dropdown</span>
-						</a>
-
+							data-bs-toggle="dropdown" aria-expanded="false"> <img
+								src="${pageContext.request.contextPath}/stream/image/user/${user.userId}"
+								alt="Profile" width="28" height="28" class="rounded-circle me-2">
+								<span>${user.username}</span>
+						</a> <!-- Dropdown Menu -->
 							<ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end"
 								aria-labelledby="userDropdown">
-								<c:if test="${!user.admin}">
-									<li><a class="dropdown-item"
-										href="${pageContext.request.contextPath}/user/profile">Profile</a></li>
-								</c:if>
+								<!-- Profile link (only for non-admins) -->
 								<c:if test="${!(user.admin or user.superAdmin)}">
 									<li><a class="dropdown-item"
-										href="${pageContext.request.contextPath}/become-artist">Become
-											an Artist</a></li>
+										href="${pageContext.request.contextPath}/channel/${user.userId}">
+											My Channel </a></li>
 									<li><a class="dropdown-item"
-										href="${pageContext.request.contextPath}/choose-plan">Go
-											Premium</a></li>
+										href="${pageContext.request.contextPath}/user/profile">
+											Profile Settings </a></li>
+									<li><a class="dropdown-item"
+										href="${pageContext.request.contextPath}/user/subscription">
+											Subscriptions </a></li>
 								</c:if>
+
+								<!-- Artist / Premium options -->
+								<c:if test="${!(user.admin or user.superAdmin)}">
+									<li><a class="dropdown-item"
+										href="${pageContext.request.contextPath}/become-artist">
+											Become an Artist </a></li>
+									<li><a class="dropdown-item"
+										href="${pageContext.request.contextPath}/choose-plan"> Go
+											Premium </a></li>
+								</c:if>
+
 								<li><hr class="dropdown-divider" /></li>
+
+								<!-- Logout -->
 								<li><a class="dropdown-item"
-									href="${pageContext.request.contextPath}/logout">Logout</a></li>
+									href="${pageContext.request.contextPath}/logout"> Logout </a></li>
 							</ul>
 						</li>
+
 					</c:when>
 
 					<c:otherwise>
@@ -271,7 +277,7 @@
 			// Highlight active nav link
 			$('.nav-link').each(function() {
 				const href = $(this).attr('href');
-				if (path === href || path.startsWith(href)) {
+				if (path === href) {
 					$(this).addClass('active');
 				}
 			});

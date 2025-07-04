@@ -49,13 +49,13 @@
 	</div>
 
 	<!-- Profile Navigation Tabs -->
-	<div class="section-tabs">
+		<div class="section-tabs">
 		<ul class="nav nav-tabs" id="profileTabs" role="tablist">
 			<li class="nav-item" role="presentation"><a class="nav-link"
 				type="button" role="tab"
 				href="${pageContext.request.contextPath}/channel/${artist.userId}">All</a></li>
-			<li class="nav-item" role="presentation"><a class="nav-link"
-				id="tracks-tab" type="button" role="tab"
+			<li class="nav-item" role="presentation"><a
+				class="nav-link" id="tracks-tab" type="button" role="tab"
 				href="${pageContext.request.contextPath}/channel/${artist.userId}/music">Tracks</a></li>
 			<li class="nav-item" role="presentation"><a class="nav-link"
 				id="playlists-tab" type="button" role="tab"
@@ -67,12 +67,9 @@
 	<div class="tab-content" id="profileTabContent">
 		<div class="tab-pane fade show active" id="all" role="tabpanel">
 			<div class="row">
-				<div class="col-md-8">
+				<div class="col-md-12">
 					<div class="d-flex justify-content-between align-items-center mb-3">
 						<h5 class="mb-3">Recent</h5>
-						<a
-							href="${pageContext.request.contextPath}/channel/${artist.userId}/music"
-							class="text-muted small">View all</a>
 
 					</div>
 
@@ -85,7 +82,7 @@
 										<i class="bi bi-play-fill"></i>
 									</button>
 									<img
-										src="${pageContext.request.contextPath}/stream/image/music/${music.musicId}"
+										src="${pageContext.request.contextPath}/stream/image/music/${music.musicId}?size=thumb"
 										alt="Track" class="track-thumbnail">
 									<div class="track-details">
 										<div class="track-name">
@@ -103,52 +100,28 @@
 						</c:otherwise>
 					</c:choose>
 
-				</div>
+					<!-- Pagination controls -->
+					<nav>
+						<ul class="pagination justify-content-center pt-4 text-dark">
 
-				<div class="col-md-4">
-					<!-- Fans Section -->
-					<div class="fans-section">
-						<div
-							class="d-flex justify-content-between align-items-center mb-3">
-							<h6 class="mb-0">FANS</h6>
-							<a href="#" class="text-muted small">View all</a>
-						</div>
-						<div class="mb-3">
-							<span class="badge bg-secondary">Top</span>
-						</div>
-						<p class="small text-muted mb-3">Fans who have played this
-							track the most:</p>
+							<c:if test="${currentPage > 1}">
+								<li class="page-item"><a class="page-link"
+									href="?page=${currentPage - 1}">Previous</a></li>
+							</c:if>
 
-						<div class="fan-item">
-							<div class="fan-info">
-								<span class="me-2">1</span> <img
-									src="https://via.placeholder.com/30x30/333/fff?text=E"
-									alt="Fan" class="avatar" style="width: 30px; height: 30px;">
-								<span>Electric</span>
-							</div>
-							<span class="fan-plays">78 plays</span>
-						</div>
-					</div>
+							<c:forEach var="i" begin="1" end="${totalPages}">
+								<li class="page-item"><a class="page-link"
+									href="?page=${i}">${i}</a></li>
+							</c:forEach>
 
-					<!-- Likes Section -->
-					<div class="fans-section mt-4">
-						<div
-							class="d-flex justify-content-between align-items-center mb-3">
-							<h6 class="mb-0">3 LIKES</h6>
-							<a href="#" class="text-muted small">View all</a>
-						</div>
+							<c:if test="${currentPage < totalPages}">
+								<li class="page-item"><a class="page-link"
+									href="?page=${currentPage + 1}">Next</a></li>
+							</c:if>
 
-						<div class="fan-item">
-							<div class="fan-info">
-								<img src="https://via.placeholder.com/30x30/4a90e2/fff?text=C"
-									alt="Fan" class="avatar" style="width: 30px; height: 30px;">
-								<div>
-									<div class="small">Christine Vo 2</div>
-									<div class="small text-muted">BRE@TH//LESS</div>
-								</div>
-							</div>
-						</div>
-					</div>
+						</ul>
+					</nav>
+
 				</div>
 			</div>
 		</div>

@@ -1,6 +1,9 @@
 package com.enth.ecomusic.model.dto;
 
 import java.time.LocalDateTime;
+import java.util.Date;
+
+import com.enth.ecomusic.util.CommonUtil;
 
 public class LikeDTO {
 	
@@ -24,6 +27,10 @@ public class LikeDTO {
 	public LocalDateTime getLikedAt() {
 		return likedAt;
 	}
+	public Date getLikedAtDate() {
+		return CommonUtil.toDate(likedAt);
+	}
+	
 	public MusicDTO getMusic() {
 		return music;
 	}

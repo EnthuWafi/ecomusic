@@ -1,8 +1,10 @@
 package com.enth.ecomusic.model.dto;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 import com.enth.ecomusic.model.enums.VisibilityType;
+import com.enth.ecomusic.util.CommonUtil;
 import com.enth.ecomusic.util.NumberFormatUtil;
 
 public class MusicDTO{
@@ -130,9 +132,16 @@ public class MusicDTO{
 		return uploadDate;
 	}
 
+	public Date getUploadDateDate() {
+		return CommonUtil.toDate(uploadDate);
+	}
 
 	public LocalDateTime getUpdatedAt() {
 		return updatedAt;
+	}
+	
+	public Date getUpdatedAtDate() {
+		return CommonUtil.toDate(updatedAt);
 	}
 	
 	public String getTotalPlayCountString() {

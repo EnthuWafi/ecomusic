@@ -91,7 +91,7 @@ export const MusicPlayer = ({
         wavesurferRef.current.destroy();
       }
     };
-  }, []);
+  }, [musicId]);
   React.useEffect(() => {
     let animationFrameId;
     const updateProgressBar = () => {
@@ -118,7 +118,9 @@ export const MusicPlayer = ({
     const loadMusic = async () => {
       if (!baseUrl || !musicId) return;
       setIsLoading(true);
-      // Reset tracking state for new music
+      setIsPlaying(false);
+      setCurrentTime(0);
+      setDuration(0);
       setHasRecordedPlay(false);
       setListeningTime(0);
       hasRecordedPlayRef.current = false;
@@ -284,7 +286,10 @@ export const MusicPlayer = ({
       if (musicData) {
         setMusicData({
           ...musicData,
-          likeCount: isLiked ? musicData.music.likeCount - 1 : musicData.music.likeCount + 1
+          music: {
+            ...musicData.music,
+            likeCount: isLiked ? musicData.music.likeCount - 1 : musicData.music.likeCount + 1
+          }
         });
       }
     } catch (error) {
@@ -319,7 +324,7 @@ export const MusicPlayer = ({
   };
 
   // Handle playlist selection
-  const handlePlaylistSelected = playlistId => {
+  const handlePlaylistSelected = () => {
     setShowPlaylistModal(false);
     // You can add success notification here if needed
     if (window.toastr) {

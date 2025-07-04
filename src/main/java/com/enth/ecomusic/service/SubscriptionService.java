@@ -5,6 +5,7 @@ import com.enth.ecomusic.dao.SubscriptionPlanDAO;
 import com.enth.ecomusic.model.dto.SubscriptionDTO;
 import com.enth.ecomusic.model.dto.SubscriptionPlanDTO;
 import com.enth.ecomusic.model.entity.SubscriptionPlan;
+import com.enth.ecomusic.model.entity.User;
 import com.enth.ecomusic.model.entity.UserSubscription;
 import com.enth.ecomusic.model.enums.PlanType;
 import com.enth.ecomusic.model.mapper.SubscriptionMapper;
@@ -141,6 +142,7 @@ public class SubscriptionService {
 		List<SubscriptionDTO> subsDTO = new ArrayList<>();
 		for (UserSubscription sub : subs) {
 			attachPlanIfAvailable(sub);
+			attachUserIfAvailable(sub);
 			subsDTO.add(SubscriptionMapper.INSTANCE.toDTO(sub));
 		}
 		return subsDTO;
@@ -152,6 +154,14 @@ public class SubscriptionService {
 			sub.setSubscriptionPlan(plan);
 		}
 	}
+	
+	private void attachUserIfAvailable(UserSubscription sub) {
+		if (sub != null && sub.getSubscriptionPlanId() > 0) {
+			User user = userService.getUserById(sub.getUserId());
+			sub.setUser(user);
+		}
+	}
+	
 	
 	public UserSubscription getLatestSubscriptionByUserAndPlan(int userId, PlanType planType) {
         return subscriptionDAO.getLatestSubscriptionByUserIdAndPlanType(userId, planType);

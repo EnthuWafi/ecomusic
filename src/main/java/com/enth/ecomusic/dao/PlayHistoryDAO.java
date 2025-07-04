@@ -110,7 +110,7 @@ public class PlayHistoryDAO {
 	}
 
 	public int countPlaysByMusicId(int musicId) {
-	
+
 		String sql = "SELECT COUNT(*) FROM PlayHistory WHERE music_id = ?";
 
 		Integer result = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt, musicId);
@@ -133,28 +133,34 @@ public class PlayHistoryDAO {
 		}
 	}
 
-	public List<PlayHistory> getRecentPlaysByUserId(int userId, int limit) {
+	public List<PlayHistory> getRecentPlaysByUserId(int userId, int offset, int limit, int currentUserId) {
 		String query = """
 				SELECT * FROM (
-				    SELECT *
+				    SELECT inner_query.*, ROW_NUMBER() OVER (ORDER BY inner_query.played_at DESC) AS rn
 				    FROM (
-				        SELECT p.*, ROW_NUMBER() OVER (PARTITION BY p.music_id ORDER BY p.played_at DESC) AS rnum
-				        FROM PlayHistory p
-				        JOIN Music m ON m.music_id = p.music_id
-				        WHERE p.user_id = ? AND m.visibility = 'public'
-				    )
-				    WHERE rnum = 1
-				    ORDER BY played_at DESC
-					)
-				WHERE ROWNUM <= ?
+				        SELECT p.*
+				        FROM (
+				            SELECT p.*, ROW_NUMBER() OVER (PARTITION BY p.music_id ORDER BY p.played_at DESC) AS rnum
+				            FROM PlayHistory p
+				            JOIN Music m ON m.music_id = p.music_id
+				            WHERE p.user_id = ? AND (m.visibility = 'public' OR p.user_id = ?)
+				        ) p
+				        WHERE p.rnum = 1
+				    ) inner_query
+				)
+				WHERE rn > ? AND rn <= ?
 				""";
 
-		List<Object> params = new ArrayList<>();
-		params.add(userId);
-		params.add(limit);
+		int start = offset;
+	    int end = offset + limit;
+
+	    List<Object> params = new ArrayList<>();
+	    params.add(userId);
+	    params.add(currentUserId);
+	    params.add(start);
+	    params.add(end);
 
 		return DAOUtil.executeQuery(query, this::mapToPlayHistory, params.toArray());
 	}
-
 
 }

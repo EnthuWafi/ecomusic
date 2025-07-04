@@ -16,6 +16,7 @@ import com.enth.ecomusic.model.mapper.PlaylistMapper;
 import com.enth.ecomusic.service.PlaylistService;
 import com.enth.ecomusic.util.AppContext;
 import com.enth.ecomusic.util.CommonUtil;
+import com.enth.ecomusic.util.JsonUtil;
 import com.enth.ecomusic.util.ToastrType;
 
 /**
@@ -50,23 +51,23 @@ public class PlaylistServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		String pathInfo = request.getPathInfo(); // can be null or like / or /123 or /123/edit or /create
+		String pathInfo = request.getPathInfo();
 		if (pathInfo == null || pathInfo.equals("/") || pathInfo.isEmpty()) {
 			viewPlaylistList(request, response);
 			return;
 		}
 
-		String[] pathParts = pathInfo.split("/");
+		String[] pathParts = pathInfo.substring(1).split("/");
 		try {
-			if (pathParts.length == 2 && "create".equals(pathParts[1])) {
+			if (pathParts.length == 1 && "create".equals(pathParts[0])) {
 				createPlaylist(request, response);
 
-			} else if (pathParts.length == 2) {
-				int playlistId = Integer.parseInt(pathParts[1]);
+			} else if (pathParts.length == 1) {
+				int playlistId = Integer.parseInt(pathParts[0]);
 				viewPlaylist(request, response, playlistId);
 
-			} else if (pathParts.length == 3 && "edit".equals(pathParts[2])) {
-				int playlistId = Integer.parseInt(pathParts[1]);
+			} else if (pathParts.length == 2 && "edit".equals(pathParts[1])) {
+				int playlistId = Integer.parseInt(pathParts[0]);
 				editPlaylist(request, response, playlistId);
 
 			} else {
@@ -105,6 +106,7 @@ public class PlaylistServlet extends HttpServlet {
 		PlaylistDTO playlist = playlistService.getPlaylistWithMusicByPlaylistId(playlistId, currentUser);
 
 		request.setAttribute("playlist", playlist);
+		request.setAttribute("playlistJSON", JsonUtil.toJson(playlist));
 		request.setAttribute("pageTitle", "Edit Playlist");
 		request.setAttribute("contentPage", "/WEB-INF/views/user/playlist-view.jsp");
 		request.getRequestDispatcher("/WEB-INF/views/layout-main.jsp").forward(request, response);

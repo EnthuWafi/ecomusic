@@ -22,13 +22,6 @@ public class LikeService {
 
     }
     
-    /**
-     * Records a user's like for a specific song.
-     * This operation checks if the like already exists before adding to prevent duplicates.
-     *
-     * @param like The Like object containing userId and musicId.
-     * @return true if the like was added successfully (or already existed), false if an error occurred.
-     */
     public boolean likeSong(Like like, UserDTO currentUser) {
     	if (!canLikeSong(currentUser)) {
     		return false;
@@ -43,13 +36,6 @@ public class LikeService {
      
     }
 
-    /**
-     * Removes a user's like from a specific song.
-     *
-     * @param userId The ID of the user.
-     * @param musicId The ID of the song.
-     * @return true if the like was successfully removed (or didn't exist), false if an error occurred.
-     */
     public boolean unlikeSong(int userId, int musicId, UserDTO currentUser) {
     	if (!canUnlikeSong(userId, currentUser)) {
     		return false;
@@ -57,26 +43,12 @@ public class LikeService {
     	return likeDAO.removeLike(userId, musicId);
     }
 
-    /**
-     * Checks if a user has liked a specific song.
-     *
-     * @param userId The ID of the user.
-     * @param musicId The ID of the song.
-     * @return true if the song is liked by the user, false otherwise.
-     */
     public boolean isSongLikedByUser(int userId, int musicId) {
     	return likeDAO.isSongLikedByUser(userId, musicId);
     }
 
-    /**
-     * Retrieves a list of all songs liked by a specific user.
-     *
-     * @param userId The ID of the user.
-     * @return A list of Like objects representing liked songs, or an empty list if none found.
-     * Returns null if an error occurs.
-     */
-    public List<LikeDTO> getLikedSongsForUser(int userId) {
-    	List<Like> likeList = likeDAO.getLikedSongsByUserId(userId);
+    public List<LikeDTO> getLikedSongsForUser(int userId, int offset, int limit, int currentUserId) {
+    	List<Like> likeList = likeDAO.getLikedSongsByUserId(userId, offset, limit, currentUserId);
     	List<LikeDTO> likeDTOList = new ArrayList<>();
     	for (Like like : likeList) {
     		like.setMusic(musicService.getMusicById(like.getMusicId()));

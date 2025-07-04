@@ -29,7 +29,6 @@ export const AdminUserList = ({ baseUrl }) => {
 			const userJson = await userRes.json();
 			
 			setUsers(userJson.data.results);
-			setTotalUsers(userJson.data.total || userJson.data.results.length);
 		} catch (err) {
 			console.error("Error loading users:", err);
 			setError("Failed to load users.");
@@ -44,6 +43,7 @@ export const AdminUserList = ({ baseUrl }) => {
 				const kpiRes = await fetch(`${baseUrl}/api/report/kpis?type=user`);
 				const kpiJson = await kpiRes.json();
 				setKpiData(kpiJson.data.results);
+				setTotalUsers(kpiJson.data.results.totalUserCount);
 			} catch (err) {
 				console.error("Error loading KPI data:", err);
 				setError("Failed to load KPI data.");

@@ -63,6 +63,7 @@ public class SubscriptionCheckoutServlet extends HttpServlet {
 	    // Validate user object
 	    if (user.getUserId() == 0 || user.getEmail() == null || user.getEmail().isBlank()) {
 	        CommonUtil.addMessage(session, ToastrType.ERROR, "User session is invalid. Please log in again.");
+	        session.removeAttribute("user");
 	        response.sendRedirect(request.getContextPath() + "/login");
 	        return;
 	    }

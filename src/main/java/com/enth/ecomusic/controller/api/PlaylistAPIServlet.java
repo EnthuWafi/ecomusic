@@ -216,7 +216,8 @@ public class PlaylistAPIServlet extends HttpServlet {
         try {
             requestBody = JsonUtil.fromJson(jsonBody, new TypeToken<Map<String, Object>>() {});
             
-            musicId = Integer.parseInt(requestBody.get("musicId").toString());
+            double musicIdDouble = Double.parseDouble(requestBody.get("musicId").toString());
+            musicId = (int) musicIdDouble;
             
             UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
             PlaylistMusic playlistMusic = new PlaylistMusic();
@@ -347,7 +348,7 @@ public class PlaylistAPIServlet extends HttpServlet {
 			HttpServletResponse response) throws ServletException, IOException, NumberFormatException  {
 		// TODO Auto-generated method stub
 		int playlistId = Integer.parseInt(playlistIdStr);
-		int musicId = Integer.parseInt(playlistIdStr);
+		int musicId = Integer.parseInt(musicIdStr);
 		
 		HttpSession session = request.getSession();
 		UserDTO currentUser = (UserDTO) session.getAttribute("user");

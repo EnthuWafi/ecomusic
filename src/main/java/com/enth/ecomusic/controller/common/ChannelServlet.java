@@ -101,22 +101,39 @@ public class ChannelServlet extends HttpServlet {
 			response.sendRedirect(request.getContextPath());
 			return;
 		}
+		
+
+        int page = 1;
+        int pageSize = 10;
+
+        if (request.getParameter("page") != null) {
+            page = Integer.parseInt(request.getParameter("page"));
+        }
 
 		int currentUserId = 0;
 		if (currentUser != null) {
 			currentUserId = currentUser.getUserId();
 		}
 		
-		List<PlaylistDTO> playlistList = playlistService.getUserPlaylistByUserId(user.getUserId(), currentUser);
+		List<PlaylistDTO> playlistList = playlistService.getPaginatedPlaylistByUserId(user.getUserId(), page, pageSize, currentUser);
 		int musicCount = musicService.getMusicCountByArtist(user.getUserId(), currentUserId);
 		int totalPlayCount = musicService.getTotalPlayCountByArtist(user.getUserId());
 		int playlistCount = playlistService.getPlaylistCountByArtist(user.getUserId(), currentUserId);
+		
+		int totalRecords = playlistCount; 
+        int totalPages = (int) Math.ceil(totalRecords / (double) pageSize);
 
-		request.setAttribute("pageTitle", user.getUsername() + "'s Channel");
+		request.setAttribute("pageTitle", user.getUsername() + "'s Channel Playlist");
 
 		request.setAttribute("artist", user);
 		request.setAttribute("musicCount", musicCount);
 		request.setAttribute("playsCount", totalPlayCount);
+		request.setAttribute("playlistList", playlistList);
+		request.setAttribute("playlistCount", playlistCount);
+		
+		request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
+
 
 		request.setAttribute("contentPage", "/WEB-INF/views/common/channel-playlist.jsp");
 		request.getRequestDispatcher("/WEB-INF/views/layout-main.jsp").forward(request, response);
@@ -140,24 +157,42 @@ public class ChannelServlet extends HttpServlet {
 			response.sendRedirect(request.getContextPath());
 			return;
 		}
+		
+
+        int page = 1;
+        int pageSize = 10;
+
+        if (request.getParameter("page") != null) {
+            page = Integer.parseInt(request.getParameter("page"));
+        }
+
+        
 
 		int currentUserId = 0;
 		if (currentUser != null) {
 			currentUserId = currentUser.getUserId();
 		}
 		
-		List<MusicDTO> recentMusic = musicService.getPaginatedMusicDTOByArtistId(currentUserId, user.getUserId(), 1, 5);
+		
+		List<MusicDTO> recentMusic = musicService.getPaginatedMusicDTOByArtistId(currentUserId, user.getUserId(), page, pageSize);
 		int musicCount = musicService.getMusicCountByArtist(user.getUserId(), currentUserId);
 		int totalPlayCount = musicService.getTotalPlayCountByArtist(user.getUserId());
 		int playlistCount = playlistService.getPlaylistCountByArtist(user.getUserId(), currentUserId);
 
-		request.setAttribute("pageTitle", user.getUsername() + "'s Channel");
+		int totalRecords = musicCount; 
+        int totalPages = (int) Math.ceil(totalRecords / (double) pageSize);
+
+		
+		request.setAttribute("pageTitle", user.getUsername() + "'s Channel Music");
 
 		request.setAttribute("artist", user);
 		request.setAttribute("musicCount", musicCount);
 		request.setAttribute("playsCount", totalPlayCount);
 		request.setAttribute("musicList", recentMusic);
 		request.setAttribute("playlistCount", playlistCount);
+		
+		request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
 
 		request.setAttribute("contentPage", "/WEB-INF/views/common/channel-music.jsp");
 		request.getRequestDispatcher("/WEB-INF/views/layout-main.jsp").forward(request, response);

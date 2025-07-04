@@ -102,7 +102,7 @@ public class PlaylistMusicDAO {
             stmt.setInt(2, playlistId);
             stmt.setInt(3, startPosition);
             stmt.setInt(4, endPosition);
-            return stmt.executeUpdate() > 0;
+            return stmt.executeUpdate() >= 0;
         } catch (SQLException e) {
             System.err.println("Error shifting playlist: " + e.getMessage());
             return false;
@@ -136,6 +136,16 @@ public class PlaylistMusicDAO {
     	return new PlaylistMusic(rs.getInt("playlist_id"), rs.getInt("music_id"), 
     			rs.getTimestamp("added_at").toLocalDateTime(), rs.getInt("position"));  
     }
+
+	public int countPlaylistMusicByPlaylistId(int playlistId) {
+		String sql = """
+				SELECT COUNT(*) FROM PlaylistMusic WHERE playlist_id = ?
+				""";
+
+		Integer result = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt, playlistId);
+
+		return result != null ? result : 0;
+	}
 
 
 }

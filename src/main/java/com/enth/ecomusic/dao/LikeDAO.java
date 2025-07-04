@@ -47,14 +47,29 @@ public class LikeDAO {
         }
     }
 
-    public List<Like> getLikedSongsByUserId(int userId) {
+    public List<Like> getLikedSongsByUserId(int userId, int offset, int limit, int currentUserId) {
         List<Like> likedList = new ArrayList<>();
-        String sql = "SELECT * FROM Likes WHERE user_id = ?";
+        String sql = """
+				SELECT * FROM (
+		            SELECT l.*, ROW_NUMBER() OVER (ORDER BY l.liked_at DESC) AS rnum
+		            FROM Likes l
+		            JOIN Music m ON m.music_id = l.music_id
+		            WHERE l.user_id = ? AND (m.visibility = 'public' OR l.user_id = ?)
+        		)
+				WHERE rnum > ? AND rnum <= ?
+				""";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
+        	int start = offset;
+    	    int end = offset + limit;
+        	
             stmt.setInt(1, userId);
+            stmt.setInt(2, currentUserId);
+            stmt.setInt(3, start);
+            stmt.setInt(4, end);
+            
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     likedList.add(new Like(

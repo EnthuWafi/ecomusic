@@ -26,6 +26,12 @@ export const SearchBar = ({
     }, 300);
     return () => clearTimeout(timeoutId);
   }, [searchTerm, baseUrl]);
+  React.useEffect(() => {
+    const evt = new CustomEvent('globalSearchTerm', {
+      detail: searchTerm
+    });
+    window.dispatchEvent(evt);
+  }, [searchTerm]);
   return /*#__PURE__*/React.createElement("div", {
     className: "position-relative"
   }, /*#__PURE__*/React.createElement("form", {

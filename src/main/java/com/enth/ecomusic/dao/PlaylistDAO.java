@@ -59,6 +59,16 @@ public class PlaylistDAO {
         }
         return playlists;
     }
+    
+    public List<Playlist> getPaginatedPlaylistByUserId(int userId, int page, int pageSize) {
+    	String query = """
+    			SELECT p.*, ROW_NUMBER() OVER (ORDER BY p.created_at DESC) AS rnum
+			    FROM Playlists p
+			    WHERE p.user_id = ?
+    			""";
+    	
+    	return DAOUtil.executePaginatedQuery(query, this::mapResultSetToPlaylist, page, pageSize, userId);
+    }
 
     // UPDATE
     public boolean updatePlaylist(Playlist playlist) {

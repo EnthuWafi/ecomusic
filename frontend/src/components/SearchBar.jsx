@@ -28,6 +28,13 @@ export const SearchBar = ({ baseUrl }) => {
 
     return () => clearTimeout(timeoutId);
   }, [searchTerm, baseUrl]);
+  
+  React.useEffect(() => {
+    const evt = new CustomEvent('globalSearchTerm', {
+      detail: searchTerm
+    });
+    window.dispatchEvent(evt);
+  }, [searchTerm]);
 
   return (
     <div className="position-relative">

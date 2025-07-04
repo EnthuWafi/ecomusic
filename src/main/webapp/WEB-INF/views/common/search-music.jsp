@@ -2,14 +2,69 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+
 
 <div class="container mt-4">
+
+	<form id="filter-search" method="get" class="mb-4">
+
+		<c:if test="${not empty param.q}">
+			<input type="hidden" name="q" value="${param.q}">
+		</c:if>
+		<div class="row">
+			<div class="col-md-6">
+				<div class="card shadow-sm">
+					<div class="card-header fw-bold">Genre</div>
+					<div class="card-body">
+						<div class="row row-cols-2 ms-2">
+							<c:forEach var="genre" items="${genreList}">
+								<div class="form-check">
+									<input class="form-check-input genre-filter" type="checkbox"
+										name="genre" value="${genre.genreId}"
+										id="genre${genre.genreId}" /> <label class="form-check-label"
+										for="genre${genre.genreId}"> ${genre.name} </label>
+								</div>
+							</c:forEach>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-6">
+				<div class="card shadow-sm">
+					<div class="card-header fw-bold">Mood</div>
+					<div class="card-body">
+						<div class="row row-cols-2 ms-2">
+							<c:forEach var="mood" items="${moodList}">
+
+								<div class="form-check">
+									<input class="form-check-input mood-filter" type="checkbox"
+										name="mood" value="${mood.moodId}" id="mood${mood.moodId}" />
+									<label class="form-check-label" for="mood${mood.moodId}">
+										${mood.name} </label>
+								</div>
+							</c:forEach>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Filter Button -->
+		<div class="text-end mt-3">
+			<button type="submit" class="btn btn-primary">
+				<i class="bi bi-funnel me-1"></i> Filter
+			</button>
+		</div>
+	</form>
+
+
+
 	<div class="d-flex justify-content-between align-items-center mb-3">
 		<h2 class="mb-0">Search Result</h2>
-
 	</div>
 
-	<!-- (2) List of tracks -->
 	<div class="list-group">
 		<c:forEach var="musicDTO" items="${musicList}">
 			<div
@@ -26,9 +81,7 @@
 					</a>
 				</div>
 
-				<!-- Center: title + genre/mood + likes/views -->
 				<div class="flex-fill">
-					<!-- Title + Premium badge -->
 					<div class="d-flex justify-content-between align-items-start">
 						<h5 class="mb-1">
 							<a
@@ -41,15 +94,13 @@
 						</c:if>
 					</div>
 
-					<!-- Genre • Mood -->
 					<small class="text-muted d-block mb-1">
 						${musicDTO.music.genreName} • ${musicDTO.music.moodName} </small>
 
-					<!-- Likes & Views -->
 					<div class="text-muted">
-						<i class="bi bi-hand-thumbs-up me-1"></i> ${musicDTO.music.likeCount} <span
-							class="mx-2">|</span> <i class="bi bi-eye me-1"></i>
-						${musicDTO.music.totalPlayCount}
+						<i class="bi bi-hand-thumbs-up me-1"></i>
+						${musicDTO.music.likeCount} <span class="mx-2">|</span> <i
+							class="bi bi-eye me-1"></i> ${musicDTO.music.totalPlayCount}
 					</div>
 				</div>
 
@@ -63,7 +114,7 @@
 		</c:if>
 	</div>
 
-	<!-- (3) Pagination controls -->
+	<!-- Pagination controls -->
 	<nav aria-label="Music pagination" class="mt-4">
 		<ul class="pagination justify-content-center">
 			<c:if test="${currentPage > 1}">
@@ -83,3 +134,46 @@
 		</ul>
 	</nav>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+	
+  	const params = new URLSearchParams(window.location.search);
+
+	const applyCheckedFromParams = (name) => {
+	  const values = params.getAll(name);
+	  document.querySelectorAll(`input[name="\${name}"]`).forEach(input => {
+	    input.checked = values.includes(input.value.toString());
+	  });
+	};
+	
+	applyCheckedFromParams("genre");
+	applyCheckedFromParams("mood");
+
+    window.latestSearchTerm = '';
+
+    window.addEventListener('globalSearchTerm', e => {
+        window.latestSearchTerm = e.detail;
+      });
+    
+    const form = document.querySelector('#filter-search');
+    if (form) {
+		form.addEventListener('submit', (e) => {
+		
+	 	 if (window.latestSearchTerm && window.latestSearchTerm.trim().length > 0) {
+	 		const existing = form.querySelector('input[name="q"]');
+	     	if (existing) {
+		       existing.remove();
+		     }
+		  	
+		    const qInput = document.createElement('input');
+		    qInput.type = 'hidden';
+		    qInput.name = 'q';
+		    qInput.value = window.latestSearchTerm.trim();
+		    form.appendChild(qInput);
+	 	 }
+	});
+  }
+
+    
+});
+</script>

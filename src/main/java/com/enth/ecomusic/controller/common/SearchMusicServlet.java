@@ -12,6 +12,8 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.enth.ecomusic.model.dto.MusicDetailDTO;
+import com.enth.ecomusic.model.entity.Genre;
+import com.enth.ecomusic.model.entity.Mood;
 import com.enth.ecomusic.service.GenreCacheService;
 import com.enth.ecomusic.service.MoodCacheService;
 import com.enth.ecomusic.service.MusicService;
@@ -95,15 +97,20 @@ public class SearchMusicServlet extends HttpServlet {
             musicList = musicService.getPaginatedMusicDetailDTOLikeKeyword(cleanQuery, genreIdList, moodIdList, page, pageSize);
             totalRecords = musicService.getMusicCountLikeKeyword(cleanQuery, genreIdList, moodIdList); 
         } else {
-            response.sendRedirect(request.getContextPath() + "/music");
-            return;
+        	musicList = musicService.getPaginatedMusicDetailDTOByGenreAndMood(genreIdList, moodIdList, page, pageSize);
+            totalRecords = musicService.getMusicCountByGenreAndMood(genreIdList, moodIdList); 
         }
         
         int totalPages = (int) Math.ceil(totalRecords / (double) pageSize);
 
+        List<Genre> genreList = genreCacheService.getAll();
+        List<Mood> moodList = moodCacheService.getAll();
+        
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
 
+        request.setAttribute("genreList", genreList);
+        request.setAttribute("moodList", moodList);
         
         request.setAttribute("musicList", musicList);
         request.setAttribute("searchQuery", query);

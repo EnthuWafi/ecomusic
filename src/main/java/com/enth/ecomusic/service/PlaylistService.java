@@ -2,6 +2,7 @@ package com.enth.ecomusic.service;
 
 import com.enth.ecomusic.dao.PlaylistDAO;
 import com.enth.ecomusic.dao.PlaylistMusicDAO;
+import com.enth.ecomusic.model.dto.PlaylistCountDTO;
 import com.enth.ecomusic.model.dto.PlaylistDTO;
 import com.enth.ecomusic.model.dto.PlaylistMusicDTO;
 import com.enth.ecomusic.model.dto.UserDTO;
@@ -16,6 +17,8 @@ import com.enth.ecomusic.model.transaction.TransactionTemplate;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class PlaylistService {
@@ -47,6 +50,27 @@ public class PlaylistService {
 
 		playlist.setMusicList(playlistMusicList);
 	}
+	private void loadOneMusicForPlaylist(Playlist playlist) {
+		List<PlaylistMusic> playlistMusicList = playlistMusicDAO
+			.getPlaylistMusicListByPlaylistId(playlist.getPlaylistId());
+
+		for (PlaylistMusic pm : playlistMusicList) {
+			Music music = musicService.getMusicById(pm.getMusicId());		
+			if (music != null) {
+				User user = userService.getUserById(music.getArtistId());
+				music.setArtist(user);
+				pm.setMusic(music);
+				
+				// You only need the first valid one
+				playlist.setMusicList(Arrays.asList(pm));
+				return;
+			}
+		}
+
+		// In case no valid music found, set an empty list
+		playlist.setMusicList(Collections.emptyList());
+	}
+
 
 	// Method to get a playlist with music by playlistId
 	public PlaylistDTO getPlaylistWithMusicByPlaylistId(int playlistId, UserDTO currentUser) {
@@ -80,6 +104,32 @@ public class PlaylistService {
 		List<PlaylistDTO> playlistDTOList = new ArrayList<>();
 		for (Playlist playlist : playlists) {
 			if (canAccessPublicPlaylist(playlist, currentUser)) {
+				loadOneMusicForPlaylist(playlist);
+				playlistDTOList.add(PlaylistMapper.INSTANCE.toDTO(playlist));
+			}	
+		}
+		return playlistDTOList;
+	}
+	
+	public List<PlaylistCountDTO> getUserPlaylistCountByUserId(int userId, UserDTO currentUser) {
+		List<Playlist> playlists = playlistDAO.getPlaylistsByUserId(userId);
+		List<PlaylistCountDTO> playlistDTOList = new ArrayList<>();
+		for (Playlist playlist : playlists) {
+			if (canAccessPublicPlaylist(playlist, currentUser)) {
+				loadOneMusicForPlaylist(playlist);
+				int count = playlistMusicDAO.countPlaylistMusicByPlaylistId(playlist.getPlaylistId());
+				playlistDTOList.add(PlaylistMapper.INSTANCE.toDTO(playlist, count));
+			}	
+		}
+		return playlistDTOList;
+	}
+	
+	public List<PlaylistDTO> getPaginatedPlaylistByUserId(int userId, int page, int pageSize, UserDTO currentUser) {
+		List<Playlist> playlists = playlistDAO.getPaginatedPlaylistByUserId(userId, page, pageSize);
+		List<PlaylistDTO> playlistDTOList = new ArrayList<>();
+		for (Playlist playlist : playlists) {
+			if (canAccessPublicPlaylist(playlist, currentUser)) {
+				loadOneMusicForPlaylist(playlist);
 				playlistDTOList.add(PlaylistMapper.INSTANCE.toDTO(playlist));
 			}	
 		}
@@ -182,7 +232,7 @@ public class PlaylistService {
 			int end = Integer.MAX_VALUE;
 			int shift = -1;
 			if (!playlistMusicDAO.shiftPositions(playlistId, start, end, shift, transaction.getConnection())) {
-				throw new SQLException("Failed to playlist after song removal.");
+				throw new SQLException("Failed to shift playlist after song removal.");
 			}
 			transaction.commit();
 			return true;

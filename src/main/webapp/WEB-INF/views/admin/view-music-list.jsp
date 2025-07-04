@@ -1,29 +1,11 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<div id="music-list-root" class="container justify-content-center"></div>
 
-<h2>All Music</h2>
-<a class="button" href="${pageContext.request.contextPath}/music/add">Add
-	New Music</a>
+<script type="module">
+  import { AdminMusicList } from "${pageContext.request.contextPath}/assets/js/components/AdminMusicList.js";
 
-<table border="1">
-	<tr>
-		<th>Title</th>
-		<th>Genre</th>
-		<th>Description</th>
-		<th>Audio URL</th>
-		<th>Upload Date</th>
-		<th>Premium Content</th>
-	</tr>
-
-	<c:forEach var="music" items="${musicList}">
-		<tr>
-			<td>${music.title}</td>
-			<td>${music.genre}</td>
-			<td>${music.description}</td>
-			<td>${music.audioFileUrl}</td>
-			<td><fmt:formatDate value="${music.uploadDate}" pattern="yyyy-MM-dd" /></td>
-			<td>${music.premiumContent ? 'Yes' : 'No'}</td>
-		</tr>
-	</c:forEach>
-
-</table>
+  const container = document.getElementById('music-list-root');
+  const root = ReactDOM.createRoot(container);
+  root.render(React.createElement(AdminMusicList, { baseUrl: window.baseUrl }));
+</script>
