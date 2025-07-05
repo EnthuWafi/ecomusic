@@ -432,5 +432,35 @@ public class MusicService {
 	public int getTotalPlayCountByArtist(int userId) {
 		return musicDAO.countPlaysByArtistId(userId);
 	}
+
+	public List<MusicDTO> getTopLikedMusicDTO(int offset, int limit) {
+		List<Music> musicList = musicDAO.getTopLikedMusic(offset,limit);
+		return musicList.stream()
+				.map(music -> {
+			setGenreMood(music);
+			MusicDTO dto = MusicMapper.INSTANCE.toDTO(music);
+			return dto;
+		}).collect(Collectors.toList());
+	}
+
+	public List<MusicDTO> getTopPlayedMusicDTOByUserId(int userId, UserDTO currentUser, int offset, int limit) {
+		List<Music> musicList = musicDAO.getTopPlayedMusicByUserId(userId, currentUser.getUserId(), offset,limit);
+		return musicList.stream()
+				.map(music -> {
+			setGenreMood(music);
+			MusicDTO dto = MusicMapper.INSTANCE.toDTO(music);
+			return dto;
+		}).collect(Collectors.toList());
+	}
+
+	public List<MusicDTO> getTopLikedMusicDTOByUserId(int userId, UserDTO currentUser, int offset, int limit) {
+		List<Music> musicList = musicDAO.getTopLikedMusicByUserId(userId, currentUser.getUserId(), offset,limit);
+		return musicList.stream()
+				.map(music -> {
+			setGenreMood(music);
+			MusicDTO dto = MusicMapper.INSTANCE.toDTO(music);
+			return dto;
+		}).collect(Collectors.toList());
+	}
 	
 }

@@ -46,9 +46,9 @@
           
           <!-- Likes & Views -->
           <div class="text-muted">
-            <i class="bi bi-hand-thumbs-up me-1"></i> ${music.likeCount}
+            <i class="bi bi-hand-thumbs-up me-1"></i> ${music.likeCountString}
             <span class="mx-2">|</span>
-            <i class="bi bi-eye me-1"></i> ${music.totalPlayCount}
+            <i class="bi bi-eye me-1"></i> ${music.totalPlayCountString}
           </div>
         </div>
 

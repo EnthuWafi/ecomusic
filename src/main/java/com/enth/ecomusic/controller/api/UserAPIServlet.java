@@ -10,6 +10,8 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,10 +20,12 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.EmailValidator;
 
+import com.enth.ecomusic.model.dto.ChartDTO;
 import com.enth.ecomusic.model.dto.UserDTO;
 import com.enth.ecomusic.model.entity.Role;
 import com.enth.ecomusic.model.entity.User;
 import com.enth.ecomusic.model.enums.RoleType;
+import com.enth.ecomusic.service.ReportService;
 import com.enth.ecomusic.service.UserService;
 import com.enth.ecomusic.util.AppContext;
 import com.enth.ecomusic.util.CommonUtil;
@@ -43,6 +47,7 @@ public class UserAPIServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	private UserService userService;
+	private ReportService reportService;
 
 	@Override
 	public void init() throws ServletException {
@@ -50,6 +55,7 @@ public class UserAPIServlet extends HttpServlet {
 		super.init();
 		AppContext ctx = (AppContext) getServletContext().getAttribute("appContext");
 		this.userService = ctx.getUserService();
+		this.reportService = ctx.getReportService();
 	}
 
 	/**
@@ -81,12 +87,59 @@ public class UserAPIServlet extends HttpServlet {
 			else if (pathParts.length == 1) {
 				int userId = Integer.parseInt(pathParts[0]);
 				handleFetchUser(userId, request, response);
-			}else {
+			} else if (pathParts.length == 2 && "chart".equals(pathParts[1])) {
+				int userId = Integer.parseInt(pathParts[0]);
+				handleFetchUserChart(userId, request, response);
+			} else {
 				ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid API path");
 			}
 		} catch (NumberFormatException e) {
 			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "IDs must be numeric");
 		}
+	}
+
+	private void handleFetchUserChart(int userId, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException  {
+		String typeStr = StringUtils.defaultIfBlank(request.getParameter("type"), "plays");
+		String dateTypeStr = StringUtils.defaultIfBlank(request.getParameter("dateType"), "daily");
+		String startStr = request.getParameter("start");
+		String endStr = request.getParameter("end");
+
+		LocalDate start = null;
+		LocalDate end = null;
+
+		try {
+			if (StringUtils.isNotBlank(startStr)) {
+				start = LocalDate.parse(startStr);
+			}
+			if (StringUtils.isNotBlank(endStr)) {
+				end = LocalDate.parse(endStr);
+			}
+		} catch (DateTimeParseException e) {
+			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST,
+					"Invalid date format. Use yyyy-MM-dd.");
+			return;
+		}
+
+		ChartDTO chartDTO;
+
+		switch (typeStr.toLowerCase()) {
+		case "plays":
+			chartDTO = reportService.getArtistUserPlayChartDTO(start, end, dateTypeStr, userId);
+			break;
+		default:
+			ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Unsupported chart type: " + typeStr);
+			return;
+		}
+
+		Map<String, Object> data = new HashMap<>();
+		data.put("type", typeStr);
+		data.put("dateType", dateTypeStr);
+		data.put("start", startStr);
+		data.put("end", endStr);
+		data.put("results", chartDTO);
+
+		ResponseUtil.sendJson(response, data);
+		
 	}
 
 	private void handleFetchRole(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException  {

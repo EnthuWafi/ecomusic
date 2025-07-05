@@ -8,14 +8,18 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 
+import com.enth.ecomusic.model.dto.PlayHistoryDTO;
 import com.enth.ecomusic.model.dto.UserDTO;
 import com.enth.ecomusic.model.entity.PlayHistory;
 import com.enth.ecomusic.service.PlayHistoryService;
 import com.enth.ecomusic.util.AppContext;
+import com.enth.ecomusic.util.CommonUtil;
 import com.enth.ecomusic.util.JsonUtil;
 import com.enth.ecomusic.util.ResponseUtil;
 import com.google.gson.reflect.TypeToken;
@@ -69,7 +73,25 @@ public class PlayAPIServlet extends HttpServlet {
 
 	private void handleRecentPlayHistory(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		ResponseUtil.sendJson(response, "Something here");
+		UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
+		
+		if (currentUser == null) {
+			ResponseUtil.sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "Not logged in ");
+			return;
+		}
+		
+		int limit = CommonUtil.parseIntLimitParam(request.getParameter("limit"), 5, 50);
+		int offset = CommonUtil.parseIntLimitParam(request.getParameter("offset"), 0, Integer.MAX_VALUE);
+		
+		List<PlayHistoryDTO> playList = playHistoryService.getRecentPlays(currentUser.getUserId(), offset, limit, currentUser);
+		
+		Map<String, Object> data = new HashMap<>();
+		data.put("limit", limit);
+		data.put("offset", offset);
+		data.put("results", playList);
+
+		ResponseUtil.sendJson(response, data);
+		
 	}
 
 	/**

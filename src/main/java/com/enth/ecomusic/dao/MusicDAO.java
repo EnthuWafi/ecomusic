@@ -415,6 +415,25 @@ public class MusicDAO {
 
 		return DAOUtil.executeQuery(query, this::mapResultSetToMusic, params.toArray());
 	}
+	
+	public List<Music> getTopLikedMusic(int offset, int limit) {
+		String query = """
+				SELECT *
+				FROM (
+				    SELECT m.*, ROW_NUMBER() OVER (ORDER BY m.like_count_cache DESC) AS rnum
+				    FROM Music m
+				    WHERE m.visibility = 'public'
+				) sub
+				WHERE rnum BETWEEN ? AND ?
+
+				""";
+
+		List<Object> params = new ArrayList<>();
+		params.add(offset + 1);
+		params.add(offset + limit);
+
+		return DAOUtil.executeQuery(query, this::mapResultSetToMusic, params.toArray());
+	}
 
 	//Should be called when artist refuse to pay their due!
 	public boolean updateAllMusicSetPrivateByArtistId(int artistId, Connection conn) {
@@ -534,5 +553,47 @@ public class MusicDAO {
 		Integer count = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt);
 
 		return count != null ? count : 0;
+	}
+
+	public List<Music> getTopPlayedMusicByUserId(int userId, int currentUserId, int offset, int limit) {
+		String query = """
+				SELECT *
+				FROM (
+				    SELECT m.*, ROW_NUMBER() OVER (ORDER BY m.total_plays_cache DESC) AS rnum
+				    FROM Music m
+				    WHERE m.artist_id = ? AND (m.visibility = 'public' OR m.artist_id = ?)
+				) sub
+				WHERE rnum BETWEEN ? AND ?
+
+				""";
+
+		List<Object> params = new ArrayList<>();
+		params.add(userId);
+		params.add(currentUserId);
+		params.add(offset + 1);
+		params.add(offset + limit);
+
+		return DAOUtil.executeQuery(query, this::mapResultSetToMusic, params.toArray());
+	}
+	
+	public List<Music> getTopLikedMusicByUserId(int userId, int currentUserId, int offset, int limit) {
+		String query = """
+				SELECT *
+				FROM (
+				    SELECT m.*, ROW_NUMBER() OVER (ORDER BY m.like_count_cache DESC) AS rnum
+				    FROM Music m
+				    WHERE m.artist_id = ? AND (m.visibility = 'public' OR m.artist_id = ?)
+				) sub
+				WHERE rnum BETWEEN ? AND ?
+
+				""";
+
+		List<Object> params = new ArrayList<>();
+		params.add(userId);
+		params.add(currentUserId);
+		params.add(offset + 1);
+		params.add(offset + limit);
+
+		return DAOUtil.executeQuery(query, this::mapResultSetToMusic, params.toArray());
 	}
 }

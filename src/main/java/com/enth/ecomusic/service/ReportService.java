@@ -106,4 +106,8 @@ public class ReportService {
 		return reportDAO.getChartByDateGroup("Subscriptions", "created_at", "Revenue", "amount_paid", true, start, end, getDateFormat(dateType));
 	}
 	
+	public ChartDTO getArtistUserPlayChartDTO(LocalDate start, LocalDate end, String dateType, int userId) {
+		return reportDAO.getChartByArtistAndDate(userId, start, end, getDateFormat(dateType));
+	}
+	
 }

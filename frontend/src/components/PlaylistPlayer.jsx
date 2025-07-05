@@ -38,7 +38,7 @@ export const PlaylistPlayer = ({ baseUrl, playlistId, isAdmin = false, userId })
 
 	return (
 		<div className="container mt-4">
-			<h2 className="mb-4">{playlistData.name}</h2>
+			<h2 className="mb-4"><a class="text-decoration-none text-white" href={`${baseUrl}/user/playlist/${playlistId}`}>{playlistData.name}</a></h2>
 			<div className="row">
 				{/* Music Player Column */}
 				<div className="col-md-8">

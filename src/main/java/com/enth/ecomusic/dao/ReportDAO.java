@@ -53,5 +53,52 @@ public class ReportDAO {
 		ChartDatasetDTO dataset = new ChartDatasetDTO(label, values);
 		return new ChartDTO(labels, List.of(dataset));
 	}
+	
+	public ChartDTO getChartByArtistAndDate(
+	        int artistId,
+	        LocalDate start,
+	        LocalDate end,
+	        String dateFormat
+	) {
+
+	    String sql = """
+	        SELECT
+	            TO_CHAR(p.played_at, '%s') AS time_label,
+	            COUNT(*) AS value
+	        FROM
+	            PlayHistory p
+	        JOIN
+	            music m ON m.music_id = p.music_id
+	        WHERE
+	            m.artist_id = ?
+	            AND p.played_at BETWEEN ? AND ?
+	        GROUP BY
+	            TO_CHAR(p.played_at, '%s')
+	        ORDER BY
+	            time_label
+	        """.formatted(dateFormat, dateFormat);
+
+	    List<String> labels = new ArrayList<>();
+	    List<Integer> values = new ArrayList<>();
+
+	    try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+	        stmt.setInt(1, artistId);
+	        stmt.setDate(2, Date.valueOf(start));
+	        stmt.setDate(3, Date.valueOf(end));
+
+	        try (ResultSet rs = stmt.executeQuery()) {
+	            while (rs.next()) {
+	                labels.add(rs.getString("time_label"));
+	                values.add(rs.getInt("value"));
+	            }
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+
+	    ChartDatasetDTO dataset = new ChartDatasetDTO("Artist Plays", values);
+	    return new ChartDTO(labels, List.of(dataset));
+	}
+
 
 }

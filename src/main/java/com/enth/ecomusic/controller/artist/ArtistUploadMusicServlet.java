@@ -83,7 +83,6 @@ public class ArtistUploadMusicServlet extends HttpServlet {
 			throws ServletException, IOException {
 		HttpSession session = request.getSession();
 
-		// Read text fields via MultipartUtils (no more custom partToString / parseInt)
 		int genreId = MultipartUtil.getInt(request.getPart("genreId"), -1);
 		int moodId = MultipartUtil.getInt(request.getPart("moodId"), -1);
 		String title = MultipartUtil.getString(request.getPart("title"));

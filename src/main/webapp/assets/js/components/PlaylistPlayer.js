@@ -44,7 +44,10 @@ export const PlaylistPlayer = ({
     className: "container mt-4"
   }, /*#__PURE__*/React.createElement("h2", {
     className: "mb-4"
-  }, playlistData.name), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("a", {
+    class: "text-decoration-none text-white",
+    href: `${baseUrl}/user/playlist/${playlistId}`
+  }, playlistData.name)), /*#__PURE__*/React.createElement("div", {
     className: "row"
   }, /*#__PURE__*/React.createElement("div", {
     className: "col-md-8"

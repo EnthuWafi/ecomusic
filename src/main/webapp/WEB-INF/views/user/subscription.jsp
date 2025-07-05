@@ -34,17 +34,17 @@
 							<c:out value="${sub.subscriptionPlan.billingCycle}" />
 						</p>
 						<p class="mb-1">
-							<strong>Price:</strong> RM
+							<strong>Price:</strong>
 							<fmt:formatNumber value="${sub.subscriptionPlan.price}"
-								type="currency" />
+								type="currency" currencyCode="MYR" />
 						</p>
 						<p class="mb-1">
 							<strong>Start Date:</strong>
 							<fmt:formatDate value="${sub.startDateDate}" type="date" />
 						</p>
 						<p class="mb-0">
-							<strong>Amount Paid:</strong> RM
-							<fmt:formatNumber value="${sub.amountPaid}" type="currency" />
+							<strong>Amount Paid:</strong>
+							<fmt:formatNumber value="${sub.amountPaid}" type="currency" currencyCode="MYR"/>
 						</p>
 					</div>
 					<div class="card-footer text-right">

@@ -11,19 +11,24 @@
       <i class="bi bi-plus-lg me-1"></i>Create Playlist
     </a>
   </div>
-
-  <div class="mb-5">
-    <div class="col-sm-6 col-md-4 col-lg-3">
-      <div class="card text-white h-100" role="button"
-           onclick="location.href='${pageContext.request.contextPath}/user/play-history'">
-        <div class="card-body d-flex align-items-center">
-          <div>
-            <h5 class="card-title mb-1">View Play History Here</h5>
-          </div>
+  
+<div class="mb-5 d-flex justify-content-center">
+  <div class="col-12">
+    <div class="card bg-gradient-primary text-white shadow h-100 border-0 rounded-4"
+         role="button"
+         style="cursor: pointer; transition: transform 0.2s ease-in-out;"
+         onclick="location.href='${pageContext.request.contextPath}/user/play-history'">
+      <div class="card-body d-flex flex-column justify-content-center text-center p-4">
+        <div class="mb-2">
+          <i class="bi bi-clock-history fs-2"></i> <!-- Bootstrap Icons (optional) -->
         </div>
+        <h5 class="card-title fw-bold mb-2">Play History</h5>
+        <p class="card-text text-white-50">View your entire listening history here.</p>
       </div>
     </div>
   </div>
+</div>
+
 
   <c:if test="${not empty likes}">
     <div class="mb-5">
@@ -34,7 +39,9 @@
       <ul class="list-group">
         <c:forEach var="like" items="${likes}" varStatus="st">
           <c:if test="${st.index < 5}">
-            <li class="list-group-item  list-group-item-action d-flex align-items-center pe-auto" onclick="location.href='${pageContext.request.contextPath}/music/play/${like.music.musicId}'">
+            <li class="list-group-item list-group-item-action d-flex align-items-center pe-auto" 
+            onclick="location.href='${pageContext.request.contextPath}/music/play/${like.music.musicId}'"
+            style="cursor: pointer;">
               <img src="${pageContext.request.contextPath}/stream/image/music/${like.music.musicId}?size=thumb" alt="${like.music.title}"
                    class="rounded me-3" style="width:48px; height:48px; object-fit:cover;">
               <div class="flex-grow-1">
@@ -75,7 +82,9 @@
           <c:forEach var="pl" items="${playlists}" varStatus="st">
             <c:if test="${st.index < 6}">
               <div class="col-6 col-md-4 col-lg-3">
-                <div class="card h-100 shadow-sm pe-auto" onclick="location.href='${pageContext.request.contextPath}/user/playlist/${pl.playlistId}'">
+                <div class="card h-100 shadow-sm pe-auto" 
+                onclick="location.href='${pageContext.request.contextPath}/user/playlist/${pl.playlistId}'"
+                style="cursor: pointer;">
                   <div class="position-relative">
                     <c:choose>
                       <c:when test="${not empty pl.musicList and not empty pl.musicList[0].music.imageUrl}">
