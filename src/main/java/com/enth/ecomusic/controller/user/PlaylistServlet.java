@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
+import com.enth.ecomusic.model.dto.PlaylistCountDTO;
 import com.enth.ecomusic.model.dto.PlaylistDTO;
 import com.enth.ecomusic.model.dto.UserDTO;
 import com.enth.ecomusic.model.entity.Playlist;
@@ -116,7 +117,7 @@ public class PlaylistServlet extends HttpServlet {
 	private void viewPlaylistList(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
-		List<PlaylistDTO> playlistList = playlistService.getUserPlaylistWithMusicByUserId(currentUser.getUserId(), currentUser);
+		List<PlaylistCountDTO> playlistList = playlistService.getUserPlaylistCountByUserId(currentUser.getUserId(), currentUser);
 
 		request.setAttribute("playlists", playlistList);
 		request.setAttribute("pageTitle", "All Playlist");
@@ -138,22 +139,19 @@ public class PlaylistServlet extends HttpServlet {
 			return;
 		}
 
-		String[] pathParts = pathInfo.split("/");
+		String[] pathParts = pathInfo.substring(1).split("/");
 
 		try {
-			if (pathParts.length == 2 && "create".equals(pathParts[1])) {
+			if (pathParts.length == 1 && "create".equals(pathParts[0])) {
 				createPlaylistPost(request, response);
 
-			} else if (pathParts.length == 3 && "edit".equals(pathParts[2])) {
-				int playlistId = Integer.parseInt(pathParts[1]);
+			} else if (pathParts.length == 2 && "edit".equals(pathParts[1])) {
+				int playlistId = Integer.parseInt(pathParts[0]);
 				editPlaylistPost(request, response, playlistId);
 
-			} else if (pathParts.length == 3 && "delete".equals(pathParts[2])) {
-				int playlistId = Integer.parseInt(pathParts[1]);
-				deletePlaylistPost(request, response, playlistId);
-
-			} else {
-				response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			}
+			else {
+				response.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid API path");
 			}
 		} catch (NumberFormatException e) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid playlist ID");
@@ -224,22 +222,6 @@ public class PlaylistServlet extends HttpServlet {
 			CommonUtil.addMessage(request.getSession(), ToastrType.ERROR, "Playlist failed to be modified");
 			response.sendRedirect(request.getContextPath() + "/user/playlist/" + playlistId);
 		}
-	}
-
-	private void deletePlaylistPost(HttpServletRequest request, HttpServletResponse response, int playlistId)
-			throws ServletException, IOException {
-		UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
-		
-		if (playlistService.removePlaylist(playlistId, currentUser)) {
-			CommonUtil.addMessage(request.getSession(), ToastrType.SUCCESS, "Playlist removed successfully");
-			response.sendRedirect(request.getContextPath() + "/user/playlist");
-		} else {
-			CommonUtil.addMessage(request.getSession(), ToastrType.ERROR, "Playlist failed to be removed");
-			response.sendRedirect(request.getContextPath() + "/user/playlist/" + playlistId);
-		}
-		
-		
-
 	}
 
 	

@@ -2,6 +2,8 @@ package com.enth.ecomusic.dao;
 
 import com.enth.ecomusic.model.entity.SubscriptionPlan;
 import com.enth.ecomusic.model.enums.PlanType;
+import com.enth.ecomusic.model.mapper.ResultSetMapper;
+import com.enth.ecomusic.util.DAOUtil;
 import com.enth.ecomusic.util.DBConnection;
 import com.enth.ecomusic.util.JsonUtil;
 import com.google.gson.reflect.TypeToken;
@@ -33,6 +35,34 @@ public class SubscriptionPlanDAO {
             return false;
         }
     }
+    
+    public boolean updateSubscriptionPlan(SubscriptionPlan plan) {
+        String sql = "UPDATE SubscriptionPlans SET " +
+                     "name = ?, " +
+                     "stripe_price_id = ?, " +
+                     "billing_cycle = ?, " +
+                     "price = ?, " +
+                     "description = ?, " +
+                     "features = ?, " +
+                     "plan_type = ? " +
+                     "WHERE subscription_plan_id = ?";  
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, plan.getName());
+            stmt.setString(2, plan.getStripePriceId());
+            stmt.setString(3, plan.getBillingCycle());
+            stmt.setDouble(4, plan.getPrice());
+            stmt.setString(5, plan.getDescription());
+            stmt.setString(6, plan.getFeaturesJson());
+            stmt.setString(7, plan.getPlanType().getValue());
+            stmt.setInt(8, plan.getSubscriptionPlanId());
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Error updating subscription plan: " + e.getMessage());
+            return false;
+        }
+    }
+
     
     public boolean deleteSubscriptionPlan(int subscriptionPlanId) {
     	String sql = "DELETE FROM SubscriptionPlans WHERE subscription_plan_id = ?";
@@ -149,4 +179,27 @@ public class SubscriptionPlanDAO {
                 type
         );
     }
+
+	public int countAllSubscriptionPlan() {
+		String sql = "SELECT COUNT(*) FROM SubscriptionPlans";
+		
+		Integer count = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt);
+		
+		return count != null ? count : 0;	
+	}
+	public int countListenerSubscriptionPlan() {
+		String sql = "SELECT COUNT(*) FROM SubscriptionPlans WHERE plan_type = 'listener'";
+		
+		Integer count = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt);
+		
+		return count != null ? count : 0;	
+	}
+	
+	public int countCreatorSubscriptionPlan() {
+		String sql = "SELECT COUNT(*) FROM SubscriptionPlans WHERE plan_type = 'creator'";
+		
+		Integer count = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt);
+		
+		return count != null ? count : 0;	
+	}
 }

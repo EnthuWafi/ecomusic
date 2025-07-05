@@ -12,6 +12,7 @@ import com.enth.ecomusic.model.dto.PlayHistoryDTO;
 import com.enth.ecomusic.model.dto.UserDTO;
 import com.enth.ecomusic.service.PlayHistoryService;
 import com.enth.ecomusic.util.AppContext;
+import com.enth.ecomusic.util.NumberFormatUtil;
 
 /**
  * Servlet implementation class PlayHistoryServlet
@@ -52,9 +53,10 @@ public class PlayHistoryServlet extends HttpServlet {
 		int offset = 0;
 		
 		List<PlayHistoryDTO> playHistoryList = playService.getRecentPlays(user.getUserId(), offset, limit, user);
-		
+		String listeningTime = NumberFormatUtil.formatDuration(playService.sumListenDurationByUserId(user.getUserId()));
 		
 		request.setAttribute("playHistoryList", playHistoryList);
+		request.setAttribute("listeningTime", listeningTime);
 		request.setAttribute("pageTitle", "Play History");
 		request.setAttribute("contentPage", "/WEB-INF/views/user/play-history.jsp");
 		request.getRequestDispatcher("/WEB-INF/views/layout-main.jsp").forward(request, response);

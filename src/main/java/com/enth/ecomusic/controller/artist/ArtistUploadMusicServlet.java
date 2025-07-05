@@ -28,7 +28,10 @@ import com.enth.ecomusic.util.ToastrType;
 /**
  * Servlet implementation class ArtistUploadMusicServlet
  */
-@MultipartConfig
+@MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2, // 2MB in memory
+maxFileSize = 1024 * 1024 * 10, // 10MB per file
+maxRequestSize = 1024 * 1024 * 50 // 50MB total per request
+)
 @WebServlet("/artist/music/upload")
 public class ArtistUploadMusicServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;

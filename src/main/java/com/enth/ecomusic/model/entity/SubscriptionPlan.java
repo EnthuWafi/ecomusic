@@ -48,6 +48,13 @@ public class SubscriptionPlan{
 		this.features = features;
 		this.planType = planType;
 	}
+	
+	
+
+
+	public SubscriptionPlan() {
+		super();
+	}
 
 
 

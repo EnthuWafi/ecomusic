@@ -9,7 +9,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/svg+xml"
 	href="${pageContext.request.contextPath}/assets/images/logo.svg">
-<title>${applicationScope.websiteName}-${pageTitle}</title>
+<title>${applicationScope.websiteName} - ${pageTitle}</title>
 <!-- Bootstrap CSS -->
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/assets/css/bootstrap.min.css">

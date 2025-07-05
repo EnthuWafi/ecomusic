@@ -5,6 +5,7 @@
 
 <div class="container my-5">
 	<h2 class="mb-4">Your Play History</h2>
+	<p>You have wasted <span class="fw-bold"><c:out value="${listeningTime}"/></span> listening to music on this app!</p>
 	<c:choose>
 		<c:when test="${not empty playHistoryList}">
 			<div class="list-group">

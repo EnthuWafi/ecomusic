@@ -223,6 +223,7 @@ public class ChannelServlet extends HttpServlet {
 			currentUserId = currentUser.getUserId();
 		}
 
+		List<PlaylistDTO> playlistList = playlistService.getPaginatedPlaylistByUserId(user.getUserId(), 1, 5, currentUser);
 		List<MusicDTO> recentMusic = musicService.getPaginatedMusicDTOByArtistId(currentUserId, user.getUserId(), 1, 5);
 		int musicCount = musicService.getMusicCountByArtist(user.getUserId(), currentUserId);
 		int totalPlayCount = musicService.getTotalPlayCountByArtist(user.getUserId());
@@ -238,6 +239,7 @@ public class ChannelServlet extends HttpServlet {
 		request.setAttribute("musicCount", musicCount);
 		request.setAttribute("playsCount", totalPlayCount);
 		request.setAttribute("musicList", recentMusic);
+		request.setAttribute("playlistList", playlistList);
 		request.setAttribute("playlistCount", playlistCount);
 
 		request.setAttribute("contentPage", "/WEB-INF/views/common/channel.jsp");

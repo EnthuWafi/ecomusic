@@ -3,6 +3,7 @@ package com.enth.ecomusic.util;
 import java.util.Map.Entry;
 import java.util.NavigableMap;
 import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
 
 public class NumberFormatUtil {
 	
@@ -33,4 +34,26 @@ public class NumberFormatUtil {
 	  boolean hasDecimal = truncated < 100 && (truncated / 10d) != (truncated / 10);
 	  return hasDecimal ? (truncated / 10d) + suffix : (truncated / 10) + suffix;
 	}
+	
+	public static String formatDuration(long millis) {
+	    long hours = TimeUnit.MILLISECONDS.toHours(millis);
+	    long minutes = TimeUnit.MILLISECONDS.toMinutes(millis) % 60;
+	    long seconds = TimeUnit.MILLISECONDS.toSeconds(millis) % 60;
+
+	    StringBuilder result = new StringBuilder();
+	    if (hours > 0) {
+	        result.append(hours).append(" hr");
+	    }
+	    if (minutes > 0) {
+	        if (result.length() > 0) result.append(", ");
+	        result.append(minutes).append(" min");
+	    }
+	    if (seconds > 0 || result.length() == 0) { // always show at least seconds
+	        if (result.length() > 0) result.append(", ");
+	        result.append(seconds).append(" sec");
+	    }
+
+	    return result.toString();
+	}
+
 }

@@ -70,7 +70,6 @@ public class PlaylistAPIServlet extends HttpServlet {
 			if (pathParts.length == 1) {
 				// /{id}
 				handleFetchPlaylist(pathParts[0], request, response);
-
 			} else if (pathParts.length == 3 && "music".equals(pathParts[1])) {
 				// /{id}/music/{id}
 				handleFetchMusic(pathParts[0], pathParts[2], request, response);

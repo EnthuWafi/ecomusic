@@ -89,7 +89,7 @@ public class SubscriptionDAO {
     public List<UserSubscription> getSubscriptionsByUserId(int userId) {
         List<UserSubscription> list = new ArrayList<>();
         String sql = "SELECT * FROM Subscriptions WHERE user_id = ?";
-        try (Connection conn = DBConnection.getConnection();PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, userId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -152,7 +152,7 @@ public class SubscriptionDAO {
 	}
 	
 	public int countActiveSubscription() {
-		String sql = "SELECT COUNT(*) FROM Subscriptions WHERE end_date = null";
+		String sql = "SELECT COUNT(*) FROM Subscriptions WHERE end_date IS null";
 		
 		Integer count = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToInt);
 		
@@ -173,5 +173,19 @@ public class SubscriptionDAO {
 		Double amountPaid = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToDouble);
 		
 		return amountPaid != null ? amountPaid : 0;
+	}
+
+	public List<UserSubscription> getAllSubscriptions() {
+		List<UserSubscription> list = new ArrayList<>();
+        String sql = "SELECT * FROM Subscriptions";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                list.add(mapResultSetToSubscription(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
 	}
 }

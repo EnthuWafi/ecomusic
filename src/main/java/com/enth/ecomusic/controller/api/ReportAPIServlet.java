@@ -148,6 +148,12 @@ public class ReportAPIServlet extends HttpServlet {
 		
 		Object reportDTO;
 		switch (typeStr.toLowerCase()) {
+		case "subscription-plan":
+			reportDTO = reportService.getReportSubscriptionPlanKPIDTO();
+			break;
+		case "subscription":
+			reportDTO = reportService.getReportSubscriptionKPIDTO();
+			break;
 		case "music":
 			reportDTO = reportService.getReportMusicKPIDTO();
 			break;

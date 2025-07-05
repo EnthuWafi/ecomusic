@@ -2,8 +2,10 @@ package com.enth.ecomusic.model.dto;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 import com.enth.ecomusic.model.enums.RoleType;
+import com.enth.ecomusic.util.CommonUtil;
 
 public class UserDTO implements Serializable{
 	/**
@@ -108,12 +110,19 @@ public class UserDTO implements Serializable{
 		return createdAt;
 	}
 	
+	public Date getCreatedAtDate() {
+		return CommonUtil.toDate(createdAt);
+	}
 	
 
 	public LocalDateTime getUpdatedAt() {
 		return updatedAt;
 	}
 
+	public Date getUpdatedAtDate() {
+		return CommonUtil.toDate(updatedAt);
+	}
+	
 
 
 	//role checking

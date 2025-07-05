@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import com.enth.ecomusic.util.CommonUtil;
+import com.enth.ecomusic.util.NumberFormatUtil;
 
 public class PlayHistoryDTO {
 
@@ -54,9 +55,7 @@ public class PlayHistoryDTO {
 	}
 	
 	public String getListenDurationString() {
-		return String.format("%d min, %d sec", 
-			    TimeUnit.MILLISECONDS.toSeconds(listenDuration)/60,
-			    TimeUnit.MILLISECONDS.toSeconds(listenDuration) % 60 );
+		return NumberFormatUtil.formatDuration(listenDuration);
 	}
 
 	public boolean isWasSkipped() {

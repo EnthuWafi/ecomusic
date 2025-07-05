@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.validator.EmailValidator;
 
 import com.enth.ecomusic.model.dto.UserDTO;
 import com.enth.ecomusic.model.entity.Role;
@@ -23,9 +24,11 @@ import com.enth.ecomusic.model.entity.User;
 import com.enth.ecomusic.model.enums.RoleType;
 import com.enth.ecomusic.service.UserService;
 import com.enth.ecomusic.util.AppContext;
+import com.enth.ecomusic.util.CommonUtil;
 import com.enth.ecomusic.util.JsonUtil;
 import com.enth.ecomusic.util.MultipartUtil;
 import com.enth.ecomusic.util.ResponseUtil;
+import com.enth.ecomusic.util.ToastrType;
 import com.google.gson.reflect.TypeToken;
 
 /**
@@ -152,19 +155,50 @@ public class UserAPIServlet extends HttpServlet {
 
 			Part imagePart = request.getPart("image");
 
-			// === Convert Role ===
 			RoleType roleType = RoleType.fromString(roleTypeStr);
+			
+			// Empty field check
+		    if (StringUtils.isBlank(firstName) || StringUtils.isBlank(lastName) || StringUtils.isBlank(username)
+		            || StringUtils.isBlank(email) || StringUtils.isBlank(password)) {
+		    	ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "All fields are required.");
+		        return;
+		    }
 
-			// === Build User Entity ===
+		    // Validate email format
+		    if (!EmailValidator.getInstance().isValid(email)) {
+		    	ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid email format.");
+		        return;
+		    }
+
+		    // Validate name and username (simple alphanumeric + length check)
+		    if (!username.matches("^[a-zA-Z0-9_]{4,20}$")) {
+		    	ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Username must be 4-20 characters, alphanumeric or underscores only.");
+		        return;
+		    }
+
+		    if (!firstName.matches("^[a-zA-Z\\s]{1,50}$") || !lastName.matches("^[a-zA-Z\\s]{1,50}$")) {
+		    	ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "First and Last name must contain only letters.");
+		        return;
+		    }
+
+		    if (password.length() < 6) {
+		    	ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Password must be at least 6 characters long.");
+		        return;
+		    }
+		    if (roleType == null) {
+		    	ResponseUtil.sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Role type cannot be null.");
+		        return;
+		    }
+
 			User user = new User();
 			user.setFirstName(firstName);
 			user.setLastName(lastName);
 			user.setUsername(username);
 			user.setEmail(email);
 			user.setBio(bio);
-			user.setPassword(password); // will be hashed inside service
+			user.setPassword(password);
 
-			// === Call Service ===
+			
 			boolean success = userService.registerUserAccount(user, imagePart, roleType, currentUser);
 
 			if (success) {

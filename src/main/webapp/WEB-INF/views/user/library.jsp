@@ -12,27 +12,23 @@
     </a>
   </div>
 
-  <!-- Quick Access -->
-  <div class="row mb-5">
+  <div class="mb-5">
     <div class="col-sm-6 col-md-4 col-lg-3">
-      <div class="card text-white bg-danger h-100" role="button"
-           onclick="location.href='${pageContext.request.contextPath}/user/liked'">
+      <div class="card text-white h-100" role="button"
+           onclick="location.href='${pageContext.request.contextPath}/user/play-history'">
         <div class="card-body d-flex align-items-center">
-          <i class="bi bi-heart-fill display-4 me-3"></i>
           <div>
-            <h5 class="card-title mb-1">Liked Songs</h5>
-            <p class="card-text mb-0">${likeCount} songs</p>
+            <h5 class="card-title mb-1">View Play History Here</h5>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Recently Liked -->
   <c:if test="${not empty likes}">
     <div class="mb-5">
       <div class="d-flex justify-content-between align-items-baseline mb-3">
-        <h2 class="h5 mb-0">Recently Liked</h2>
+        <h2 class="h5 mb-0">Recently Liked (${likeCount} songs)</h2>
         <a href="${pageContext.request.contextPath}/user/liked" class="small">View All</a>
       </div>
       <ul class="list-group">
@@ -59,7 +55,7 @@
     <div class="d-flex justify-content-between align-items-baseline mb-3">
       <h2 class="h5 mb-0">Recently Created</h2>
       <c:if test="${not empty playlists}">
-        <a href="${pageContext.request.contextPath}/user/playlists" class="small">View All</a>
+        <a href="${pageContext.request.contextPath}/user/playlist" class="small">View All</a>
       </c:if>
     </div>
 

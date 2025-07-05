@@ -6,6 +6,8 @@ import com.enth.ecomusic.dao.ReportDAO;
 import com.enth.ecomusic.model.dto.ChartDTO;
 import com.enth.ecomusic.model.dto.ReportKPIDTO;
 import com.enth.ecomusic.model.dto.ReportMusicKPIDTO;
+import com.enth.ecomusic.model.dto.ReportSubscriptionKPIDTO;
+import com.enth.ecomusic.model.dto.ReportSubscriptionPlanKPIDTO;
 import com.enth.ecomusic.model.dto.ReportUserKPIDTO;
 
 public class ReportService {
@@ -59,6 +61,22 @@ public class ReportService {
 		int premiumCount = musicService.getPremiumMusicCount();
 		
 		return new ReportMusicKPIDTO(totalMusicCount, publicMusicCount, nonPremiumCount, premiumCount);
+	}
+	
+	public ReportSubscriptionKPIDTO getReportSubscriptionKPIDTO() {
+		int totalSubscriptionCount = subscriptionService.getAllSubscriptionCount();
+		int activeSubscriptionCount = subscriptionService.getActiveSubscriptionCount();
+		int cancelledSubscriptionCount = totalSubscriptionCount - activeSubscriptionCount;
+		double totalRevenueAmount = subscriptionService.getRevenueAmount();
+		
+		return new ReportSubscriptionKPIDTO(totalSubscriptionCount, activeSubscriptionCount, cancelledSubscriptionCount, totalRevenueAmount);
+	}
+	public ReportSubscriptionPlanKPIDTO getReportSubscriptionPlanKPIDTO() {
+		int totalPlan = subscriptionService.getAllSubscriptionPlanCount();
+		int creatorPlan = subscriptionService.getCreatorSubscriptionPlanCount();
+		int listenerPlan = subscriptionService.getListenerSubscriptionPlanCount();
+		
+		return new ReportSubscriptionPlanKPIDTO(totalPlan, listenerPlan, creatorPlan);
 	}
 	
 	private String getDateFormat(String dateType) {

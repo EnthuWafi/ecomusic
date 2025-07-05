@@ -78,7 +78,7 @@ public class SubscriptionCancelServlet extends HttpServlet {
 	        return;
 	    }
 	    
-	    SubscriptionDTO subscription = subscriptionService.getSubscriptionById(Integer.parseInt(subscriptionId));
+	    SubscriptionDTO subscription = subscriptionService.getSubscriptionById(Integer.parseInt(subscriptionId), user);
 	    
 	    if (subscription == null) {
 	        CommonUtil.addMessage(session, ToastrType.ERROR, "That subscription doesn't exist.");

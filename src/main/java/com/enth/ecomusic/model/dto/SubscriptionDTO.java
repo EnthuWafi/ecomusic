@@ -2,6 +2,9 @@ package com.enth.ecomusic.model.dto;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
+
+import com.enth.ecomusic.util.CommonUtil;
 
 public class SubscriptionDTO {
 	private int subscriptionId;
@@ -47,9 +50,17 @@ public class SubscriptionDTO {
 	public LocalDate getStartDate() {
 		return startDate;
 	}
+	
+	public Date getStartDateDate() {
+		return CommonUtil.toDate(startDate);
+	}
 
 	public LocalDate getEndDate() {
 		return endDate;
+	}
+	
+	public Date getEndDateDate() {
+		return CommonUtil.toDate(endDate);
 	}
 
 	public double getAmountPaid() {

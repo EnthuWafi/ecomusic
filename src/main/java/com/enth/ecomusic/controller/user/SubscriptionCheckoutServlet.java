@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
+import com.enth.ecomusic.model.dto.SubscriptionDTO;
 import com.enth.ecomusic.model.dto.SubscriptionPlanDTO;
 import com.enth.ecomusic.model.dto.UserDTO;
 import com.enth.ecomusic.model.entity.UserSubscription;
@@ -87,7 +88,7 @@ public class SubscriptionCheckoutServlet extends HttpServlet {
 	    
 	    String redirectStr = plan.getPlanType() == PlanType.CREATOR ? "/become-artist" : "/choose-plan";
 	    
-	    UserSubscription sub = subscriptionService.getLatestSubscriptionByUserAndPlan(user.getUserId(), plan.getPlanType());
+	    SubscriptionDTO sub = subscriptionService.getLatestSubscriptionDTOByUserAndPlan(user.getUserId(), plan.getPlanType(), user);
 	    
 	    if (!(sub == null || sub.getEndDate() != null)) {
 	    	CommonUtil.addMessage(session, ToastrType.ERROR, "You already have an active plan for " + plan.getPlanType().getValue());

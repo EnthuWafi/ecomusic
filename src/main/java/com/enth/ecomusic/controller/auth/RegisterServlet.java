@@ -2,6 +2,9 @@ package com.enth.ecomusic.controller.auth;
 
 import java.io.IOException;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.validator.EmailValidator;
+
 import com.enth.ecomusic.model.dto.UserDTO;
 import com.enth.ecomusic.model.entity.User;
 import com.enth.ecomusic.model.enums.RoleType;
@@ -52,6 +55,41 @@ public class RegisterServlet extends HttpServlet {
 
 	    HttpSession session = request.getSession();
 
+	    // Empty field check
+	    if (StringUtils.isBlank(fname) || StringUtils.isBlank(lname) || StringUtils.isBlank(username)
+	            || StringUtils.isBlank(email) || StringUtils.isBlank(password)) {
+	        CommonUtil.addMessage(session, ToastrType.ERROR, "All fields are required.");
+	        response.sendRedirect(request.getContextPath() + "/register");
+	        return;
+	    }
+
+	    // Validate email format
+	    if (!EmailValidator.getInstance().isValid(email)) {
+	        CommonUtil.addMessage(session, ToastrType.ERROR, "Invalid email format.");
+	        response.sendRedirect(request.getContextPath() + "/register");
+	        return;
+	    }
+
+	    // Validate name and username (simple alphanumeric + length check)
+	    if (!username.matches("^[a-zA-Z0-9_]{4,20}$")) {
+	        CommonUtil.addMessage(session, ToastrType.ERROR, "Username must be 4-20 characters, alphanumeric or underscores only.");
+	        response.sendRedirect(request.getContextPath() + "/register");
+	        return;
+	    }
+
+	    if (!fname.matches("^[a-zA-Z\\s]{1,50}$") || !lname.matches("^[a-zA-Z\\s]{1,50}$")) {
+	        CommonUtil.addMessage(session, ToastrType.ERROR, "First and Last name must contain only letters.");
+	        response.sendRedirect(request.getContextPath() + "/register");
+	        return;
+	    }
+
+	    if (password.length() < 6) {
+	        CommonUtil.addMessage(session, ToastrType.ERROR, "Password must be at least 6 characters long.");
+	        response.sendRedirect(request.getContextPath() + "/register");
+	        return;
+	    }
+
+	    
 	    // Check if user already exists
 	    UserDTO existing = userService.getUserDTOByUsernameOrEmail(email);
 	    if (existing != null) {

@@ -12,3 +12,5 @@ music.score.weight.totalPlays=0.15
 music.score.weight.freshness=-0.05
 mailUsername=
 mailAppPassword=
+adminProductId=
+listenerProductId=

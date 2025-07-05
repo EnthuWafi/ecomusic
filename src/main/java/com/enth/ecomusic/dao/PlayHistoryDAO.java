@@ -119,6 +119,15 @@ public class PlayHistoryDAO {
 
 	}
 
+	public long sumListenDurationByUserId(int userId) {
+		String sql = "SELECT SUM(listen_duration) FROM PlayHistory WHERE user_id = ?";
+
+		Long result = DAOUtil.executeSingleQuery(sql, ResultSetMapper::mapToLong, userId);
+
+		return result != null ? result : 0;
+	}
+	
+	
 	public boolean deletePlayHistoryByUserId(int userId) {
 		String sql = "DELETE FROM PlayHistory WHERE user_id = ?";
 
