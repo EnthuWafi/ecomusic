@@ -1,6 +1,6 @@
 # Moosic: The Eco-Music Platform
 
-A half-polished Java-based web application for music streaming and artist subscriptions — cobbled together with Jakarta EE, broken dreams, and occasional React components. Did I mention that I used Oracle 11g as the database for this project? The karma of being too lazy to use actual databases I suppose.
+A half-polished Java-based web application for music streaming and artist subscriptions — cobbled together with Jakarta EE, broken dreams, and occasional React components. Did I mention that I used Oracle 11g as the database for this project? The karma for being too lazy to use actual DBMS I suppose.
 
 ![Logo](src/main/webapp/assets/images/logo.svg)
 (what is this logo even)
