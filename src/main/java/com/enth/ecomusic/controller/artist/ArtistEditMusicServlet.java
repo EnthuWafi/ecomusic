@@ -26,6 +26,7 @@ import com.enth.ecomusic.util.AppContext;
 import com.enth.ecomusic.util.CommonUtil;
 import com.enth.ecomusic.util.JsonUtil;
 import com.enth.ecomusic.util.MultipartUtil;
+import com.enth.ecomusic.util.ResponseUtil;
 import com.enth.ecomusic.util.ToastrType;
 
 /**
@@ -128,13 +129,28 @@ public class ArtistEditMusicServlet extends HttpServlet {
 		music.setMoodId(moodId);
 		music.setVisibility(visibility);
 
-		boolean success = musicService.updateMusic(music, audioPart, imagePart, currentUser);
-		if (success) {
-			CommonUtil.addMessage(session, ToastrType.SUCCESS, "Music successfully updated");
-			response.sendRedirect(request.getContextPath() + "/artist/music");
-		} else {
-			CommonUtil.addMessage(session, ToastrType.ERROR, "Music failed to update!");
-			response.sendRedirect(request.getContextPath() + "/artist/music/edit/" + musicId);
+		try {
+
+			boolean success = musicService.updateMusic(music, audioPart, imagePart, currentUser);
+			
+
+			if (success) {
+				CommonUtil.addMessage(session, ToastrType.SUCCESS, "Music successfully updated");
+				response.sendRedirect(request.getContextPath() + "/artist/music");
+			} else {
+				CommonUtil.addMessage(session, ToastrType.ERROR, "Music failed to update!");
+				response.sendRedirect(request.getContextPath() + "/artist/music/edit/" + musicId);
+			}
+
+		} catch (IllegalStateException e) {
+			// Happens when file size exceeds @MultipartConfig limits
+			response.sendError(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE,
+					"Upload too large: " + e.getMessage());
+		} catch (Exception e) {
+			// Generic fallback
+			e.printStackTrace();
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+					"Server error: " + e.getMessage());
 		}
 	}
 

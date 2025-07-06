@@ -74,7 +74,7 @@
 					<a
 						href="${pageContext.request.contextPath}/music/play/${musicDTO.music.musicId}">
 						<img
-						src="${pageContext.request.contextPath}/stream/image/music/${musicDTO.music.musicId}"
+						src="${pageContext.request.contextPath}/stream/image/music/${musicDTO.music.musicId}?size=thumb"
 						class="rounded"
 						style="width: 80px; height: 80px; object-fit: cover;"
 						alt="${musicDTO.music.title} cover" />

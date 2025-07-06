@@ -29,8 +29,8 @@ import com.enth.ecomusic.util.ToastrType;
  * Servlet implementation class ArtistUploadMusicServlet
  */
 @MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2, // 2MB in memory
-maxFileSize = 1024 * 1024 * 10, // 10MB per file
-maxRequestSize = 1024 * 1024 * 50 // 50MB total per request
+		maxFileSize = 1024 * 1024 * 10, // 10MB per file
+		maxRequestSize = 1024 * 1024 * 50 // 50MB total per request
 )
 @WebServlet("/artist/music/upload")
 public class ArtistUploadMusicServlet extends HttpServlet {
@@ -87,7 +87,8 @@ public class ArtistUploadMusicServlet extends HttpServlet {
 		int moodId = MultipartUtil.getInt(request.getPart("moodId"), -1);
 		String title = MultipartUtil.getString(request.getPart("title"));
 		String desc = MultipartUtil.getString(request.getPart("description"));
-		VisibilityType visibility = VisibilityType.fromString(MultipartUtil.getString(request.getPart("visibility")).toLowerCase());
+		VisibilityType visibility = VisibilityType
+				.fromString(MultipartUtil.getString(request.getPart("visibility")).toLowerCase());
 		boolean isPremium = MultipartUtil.getBoolean(request.getPart("premiumContent"));
 
 		if (genreId == -1 || moodId == -1) {
@@ -103,13 +104,23 @@ public class ArtistUploadMusicServlet extends HttpServlet {
 		Music music = new Music(artist.getUserId(), title, genreId, moodId, desc, null, null, isPremium);
 		music.setVisibility(visibility);
 
-		boolean success = musicService.uploadMusic(music, audioPart, imagePart, artist);
-		if (success) {
-			CommonUtil.addMessage(session, ToastrType.SUCCESS, "Music successfully uploaded");
-			response.sendRedirect(request.getContextPath() + "/artist/music");
-		} else {
-			CommonUtil.addMessage(session, ToastrType.ERROR, "Music failed to upload!");
-			response.sendRedirect(request.getContextPath() + "/artist/music/upload");
+		try {
+			boolean success = musicService.uploadMusic(music, audioPart, imagePart, artist);
+			if (success) {
+				CommonUtil.addMessage(session, ToastrType.SUCCESS, "Music successfully uploaded");
+				response.sendRedirect(request.getContextPath() + "/artist/music");
+			} else {
+				CommonUtil.addMessage(session, ToastrType.ERROR, "Music failed to upload!");
+				response.sendRedirect(request.getContextPath() + "/artist/music/upload");
+			}
+
+		} catch (IllegalStateException e) {
+			// Happens when file size exceeds @MultipartConfig limits
+			response.sendError(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE, "Upload too large: " + e.getMessage());
+		} catch (Exception e) {
+			// Generic fallback
+			e.printStackTrace();
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server error: " + e.getMessage());
 		}
 	}
 
