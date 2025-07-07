@@ -10,7 +10,7 @@ export const AdminMusicList = ({
   // Pagination state
   const [currentPage, setCurrentPage] = React.useState(1);
   const [totalMusic, setTotalMusic] = React.useState(0);
-  const [musicPerPage] = React.useState(10); // You can make this configurable
+  const [musicPerPage] = React.useState(10);
 
   // Calculate pagination values
   const totalPages = Math.ceil(totalMusic / musicPerPage);
@@ -218,7 +218,7 @@ export const AdminMusicList = ({
     className: "fw-medium"
   }, track.title))), /*#__PURE__*/React.createElement("td", null, track.totalPlayCount), /*#__PURE__*/React.createElement("td", null, track.likeCount), /*#__PURE__*/React.createElement("td", null, track.visibility === 'PUBLIC' ? 'Public' : 'Private'), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("span", {
     className: `badge ${track.premiumContent ? 'bg-warning' : 'bg-info'}`
-  }, track.isPremium ? 'Premium' : 'Free')), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("button", {
+  }, track.premiumContent ? 'Premium' : 'Free')), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("button", {
     className: "btn btn-sm btn-danger",
     onClick: () => handleDelete(track.musicId)
   }, "Delete"))))))), /*#__PURE__*/React.createElement("div", {

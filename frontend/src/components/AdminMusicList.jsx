@@ -9,7 +9,7 @@ export const AdminMusicList = ({ baseUrl }) => {
 	// Pagination state
 	const [currentPage, setCurrentPage] = React.useState(1);
 	const [totalMusic, setTotalMusic] = React.useState(0);
-	const [musicPerPage] = React.useState(10); // You can make this configurable
+	const [musicPerPage] = React.useState(10);
 
 	// Calculate pagination values
 	const totalPages = Math.ceil(totalMusic / musicPerPage);
@@ -245,7 +245,7 @@ export const AdminMusicList = ({ baseUrl }) => {
 										</td>
 										<td>
 											<span className={`badge ${track.premiumContent ? 'bg-warning' : 'bg-info'}`}>
-												{track.isPremium ? 'Premium' : 'Free'}
+												{track.premiumContent ? 'Premium' : 'Free'}
 											</span>
 										</td>
 										<td>
