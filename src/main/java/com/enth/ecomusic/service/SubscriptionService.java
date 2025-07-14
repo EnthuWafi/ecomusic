@@ -261,12 +261,12 @@ public class SubscriptionService {
 		return subscriptionDAO.countAllSubscription();
 	}
 
-	public List<SubscriptionDTO> getAllSubscription(UserDTO user) {
+	public List<SubscriptionDTO> getAllSubscription(int offset, int limit, UserDTO user) {
 		if (!canViewSubscription(null, user)) {
 			return null;
 		}
 		
-		List<UserSubscription> subs = subscriptionDAO.getAllSubscriptions();
+		List<UserSubscription> subs = subscriptionDAO.getAllSubscriptionWithOffsetLimit(offset, limit);
 		List<SubscriptionDTO> subsDTO = new ArrayList<>();
 		for (UserSubscription sub : subs) {
 			attachPlanIfAvailable(sub);

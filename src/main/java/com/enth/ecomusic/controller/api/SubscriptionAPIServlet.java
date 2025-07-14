@@ -80,11 +80,16 @@ public class SubscriptionAPIServlet extends HttpServlet {
 
 	private void handleFetchSubscriptions(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException  {
 
+		int limit = CommonUtil.parseIntLimitParam(request.getParameter("limit"), 5, 50);
+		int offset = CommonUtil.parseIntLimitParam(request.getParameter("offset"), 0, Integer.MAX_VALUE);
+
 		UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
 		
-		List<SubscriptionDTO> subscriptionList = subscriptionService.getAllSubscription(currentUser);
+		List<SubscriptionDTO> subscriptionList = subscriptionService.getAllSubscription(offset, limit, currentUser);
 		
 		Map<String, Object> data = new HashMap<>();
+		data.put("limit", limit);
+		data.put("offset", offset);
 		data.put("results", subscriptionList);
 		ResponseUtil.sendJson(response, data);
 		

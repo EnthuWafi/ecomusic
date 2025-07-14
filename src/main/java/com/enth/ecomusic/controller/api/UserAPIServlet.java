@@ -159,11 +159,9 @@ public class UserAPIServlet extends HttpServlet {
 
 	private void handleFetchUsers(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		String limitStr = StringUtils.defaultString(request.getParameter("limit"));
-		String offsetStr = StringUtils.defaultString(request.getParameter("offset"));
 
-		int limit = StringUtils.isNumeric(limitStr) ? Integer.parseInt(limitStr) : 5;
-		int offset = StringUtils.isNumeric(offsetStr) ? Integer.parseInt(offsetStr) : 0;
+		int limit = CommonUtil.parseIntLimitParam(request.getParameter("limit"), 5, 50);
+		int offset = CommonUtil.parseIntLimitParam(request.getParameter("offset"), 0, Integer.MAX_VALUE);
 
 		List<UserDTO> userList = userService.getAllUserDTO(offset, limit);
 

@@ -188,4 +188,21 @@ public class SubscriptionDAO {
         }
         return list;
 	}
+
+	public List<UserSubscription> getAllSubscriptionWithOffsetLimit(int offset, int limit) {
+		String query = """
+				SELECT * FROM (
+				      SELECT s.*, ROW_NUMBER() OVER (ORDER BY s.created_at DESC) AS rnum
+				      FROM Subscriptions s
+				  )
+		        WHERE rnum BETWEEN ? AND ?
+				""";
+
+		List<Object> params = new ArrayList<>();
+
+		params.add(offset + 1);
+		params.add(offset + limit);
+
+		return DAOUtil.executeQuery(query, this::mapResultSetToSubscription, params.toArray());
+	}
 }
